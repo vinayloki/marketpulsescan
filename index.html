@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India Swing Trading Scanner — Weekly Flash Report</title>
+  <meta name="description" content="Educational India NSE/BSE swing trading scanner for 5-10 day holding periods. Weekly flash report with technical and fundamental analysis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-particles" id="bgParticles"></div>
+  <div class="bg-grid"></div>
+
+  <!-- DISCLAIMER BANNER -->
+  <div class="disclaimer-banner" id="disclaimerBanner">
+    <div class="disclaimer-content">
+      <span class="disclaimer-icon">⚠️</span>
+      <span>EDUCATIONAL STOCK SCANNER — NOT INVESTMENT ADVICE. For learning purposes only. Consult a SEBI-registered advisor before investing.</span>
+      <button class="disclaimer-close" id="disclaimerClose" aria-label="Close disclaimer">✕</button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-logo">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="10" fill="url(#logoGrad)"/>
+            <path d="M8 26L14 16L18 22L24 12L28 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="28" cy="10" r="3" fill="#10F5A8"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="36" y2="36">
+                <stop offset="0%" stop-color="#0F3460"/>
+                <stop offset="100%" stop-color="#16213E"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div>
+            <div class="brand-name">SwingScan<span class="brand-india">India</span></div>
+            <div class="brand-sub">NSE · BSE Swing Intelligence</div>
+          </div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="live-clock" id="liveClock"></div>
+        <div class="market-status" id="marketStatus">
+          <span class="status-dot"></span>
+          <span id="statusText">Market Closed</span>
+        </div>
+        <button class="generate-btn" id="generateBtn">
+          <span class="btn-icon">⚡</span>
+          Generate Report
+        </button>
+      </div>
+    </div>
+    <!-- Report Metadata -->
+    <div class="report-meta" id="reportMeta" style="display:none">
+      <span class="meta-tag">📅 <span id="reportDate"></span></span>
+      <span class="meta-tag">🕐 <span id="reportTime"></span> IST</span>
+      <span class="meta-tag cap-chip">💰 ₹10 Lakh Capital</span>
+      <span class="meta-tag">📊 NSE · BSE</span>
+      <span class="meta-tag risk-chip"><span id="riskBadge">Medium Risk</span></span>
+    </div>
+  </header>
+
+  <!-- MAIN APP -->
+  <main class="app-main" id="appMain">
+
+    <!-- LANDING STATE -->
+    <section class="landing" id="landingState">
+      <div class="landing-hero">
+        <div class="landing-badge">Weekly Flash Report System</div>
+        <h1 class="landing-title">India Swing Trading<br/>Scanner <span class="gradient-text">Pro</span></h1>
+        <p class="landing-desc">
+          AI-powered NSE/BSE swing trade opportunity scanner. Identifies high-probability 5–10 day setups using technical breakouts, mean reversion, sector rotation & earnings momentum.
+        </p>
+        <div class="landing-features">
+          <div class="feature-card">
+            <div class="fc-icon">🎯</div>
+            <div class="fc-title">4 Scan Methods</div>
+            <div class="fc-desc">Breakout · Mean Reversion · Sector · Earnings</div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">📐</div>
+            <div class="fc-title">Risk-Managed</div>
+            <div class="fc-desc">Max 2% capital risk · Mandatory stop losses</div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">🔬</div>
+            <div class="fc-title">Full Data Suite</div>
+            <div class="fc-desc">Technical + Fundamental + News check</div>
+          </div>
+          <div class="feature-card">
+            <div class="fc-icon">🛡️</div>
+            <div class="fc-title">SEBI Compliant</div>
+            <div class="fc-desc">Educational · Disclosures on every output</div>
+          </div>
+        </div>
+        <button class="cta-btn" id="ctaBtn">
+          <span>Generate This Week's Report</span>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <p class="cta-note">⚠️ Educational scanner only. Not investment advice.</p>
+      </div>
+    </section>
+
+    <!-- LOADING STATE -->
+    <section class="loading-state" id="loadingState" style="display:none">
+      <div class="loader-container">
+        <div class="loader-ring"></div>
+        <div class="loader-inner">
+          <svg width="40" height="40" viewBox="0 0 36 36" fill="none">
+            <path d="M8 26L14 16L18 22L24 12L28 18" stroke="#10F5A8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="loader-text" id="loaderText">Initializing scanners...</div>
+        <div class="loader-steps">
+          <div class="lstep" id="lstep1">📡 Fetching Nifty 50 data</div>
+          <div class="lstep" id="lstep2">🔍 Running technical scans</div>
+          <div class="lstep" id="lstep3">📊 Analyzing sector rotation</div>
+          <div class="lstep" id="lstep4">💹 Computing risk metrics</div>
+          <div class="lstep" id="lstep5">🤖 Building flash report</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORT STATE — 5 TABS -->
+    <section class="report-state" id="reportState" style="display:none">
+
+      <!-- TOP DISCLAIMER -->
+      <div class="report-disclaimer">
+        <strong>⚠️ EDUCATIONAL STOCK SCANNER — NOT INVESTMENT ADVICE</strong>
+        This report identifies potential swing trade setups based on technical and fundamental data.
+        It is for learning and research purposes only. Past performance does not guarantee future results.
+        All trades carry risk of capital loss. Consult a SEBI-registered advisor before investing.
+      </div>
+
+      <!-- TAB NAV -->
+      <nav class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="market" id="tabMarket">
+          <span class="tab-icon">🌐</span> Market Snapshot
+        </button>
+        <button class="tab-btn" data-tab="setups" id="tabSetups">
+          <span class="tab-icon">🎯</span> Top Setups
+          <span class="tab-badge" id="setupBadge">0</span>
+        </button>
+        <button class="tab-btn" data-tab="watchlist" id="tabWatchlist">
+          <span class="tab-icon">👁️</span> Watchlist
+        </button>
+        <button class="tab-btn" data-tab="heatmap" id="tabHeatmap">
+          <span class="tab-icon">🔥</span> Sector Heatmap
+        </button>
+        <button class="tab-btn" data-tab="risk" id="tabRisk">
+          <span class="tab-icon">🛡️</span> Risk Dashboard
+        </button>
+        <button class="tab-btn" data-tab="news" id="tabNews">
+          <span class="tab-icon">📰</span> Market News
+        </button>
+      </nav>
+
+      <!-- TAB CONTENTS -->
+      <div class="tab-contents">
+
+        <!-- TAB 1: MARKET SNAPSHOT -->
+        <div class="tab-content active" id="tab-market">
+          <div class="section-header">
+            <h2>🌐 Market Snapshot</h2>
+            <span class="section-sub">Weekly performance overview · India Equity Markets</span>
+          </div>
+          <div id="marketSnapshotContent"></div>
+        </div>
+
+        <!-- TAB 2: TOP SWING SETUPS -->
+        <div class="tab-content" id="tab-setups">
+          <div class="section-header">
+            <h2 style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+              <span>🎯 Top Swing Setups</span>
+              <div class="timeframe-filters" id="timeframeFilters" style="display:flex; gap:8px; font-size:12px;">
+                <button class="tf-btn active" data-tf="1W" style="background:var(--primary); color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Weekly</button>
+                <button class="tf-btn" data-tf="1M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Monthly</button>
+                <button class="tf-btn" data-tf="3M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Quarterly</button>
+                <button class="tf-btn" data-tf="6M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">6-Month</button>
+                <button class="tf-btn" data-tf="12M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Yearly</button>
+              </div>
+            </h2>
+            <span class="section-sub">High-conviction opportunities for 5–10 day holding · ₹10L capital basis</span>
+          </div>
+          <div id="setupsContent"></div>
+        </div>
+
+        <!-- TAB 3: WATCHLIST -->
+        <div class="tab-content" id="tab-watchlist">
+          <div class="section-header">
+            <h2>👁️ Watchlist</h2>
+            <span class="section-sub">Stocks near entry — watch for triggers in next 1–2 weeks</span>
+          </div>
+          <div id="watchlistContent"></div>
+        </div>
+
+        <!-- TAB 4: SECTOR HEATMAP -->
+        <div class="tab-content" id="tab-heatmap">
+          <div class="section-header">
+            <h2>🔥 Sector Heatmap</h2>
+            <span class="section-sub">NSE sector performance ranked by weekly returns</span>
+          </div>
+          <div id="heatmapContent"></div>
+        </div>
+
+        <!-- TAB 5: RISK DASHBOARD -->
+        <div class="tab-content" id="tab-risk">
+          <div class="section-header">
+            <h2>🛡️ Risk Dashboard</h2>
+            <span class="section-sub">Macro indicators · Volatility · Key market events</span>
+          </div>
+          <div id="riskContent"></div>
+        </div>
+
+        <!-- TAB 6: MARKET NEWS -->
+        <div class="tab-content" id="tab-news">
+          <div class="section-header">
+            <h2>📰 Market News</h2>
+            <span class="section-sub">Latest updates from RBI, Livemint, and Economic Times</span>
+          </div>
+          <div id="newsContent"></div>
+        </div>
+
+      </div>
+
+      <!-- REPORT FOOTER -->
+      <footer class="report-footer">
+        <div class="footer-sources">
+          <strong>📊 Data Sources:</strong>
+          <a href="https://www.nseindia.com" target="_blank" rel="noopener">NSE India</a> ·
+          <a href="https://www.bseindia.com" target="_blank" rel="noopener">BSE India</a> ·
+          <a href="https://finance.yahoo.com" target="_blank" rel="noopener">Yahoo Finance</a> ·
+          <a href="https://www.moneycontrol.com" target="_blank" rel="noopener">Moneycontrol</a> ·
+          <a href="https://www.screener.in" target="_blank" rel="noopener">Screener.in</a> ·
+          <a href="https://tickertape.in" target="_blank" rel="noopener">Tickertape</a> ·
+          <a href="https://www.tradingview.com" target="_blank" rel="noopener">TradingView</a>
+        </div>
+        <div class="footer-meta">
+          <span>🕐 Report generated: <span id="footerTime"></span></span>
+          <span>💡 Methodology: Technical + Fundamental scan across NSE/BSE</span>
+          <span>⚖️ Not a SEBI-registered advisor. For educational use only.</span>
+        </div>
+      </footer>
+
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

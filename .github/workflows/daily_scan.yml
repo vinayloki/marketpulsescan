@@ -1,0 +1,51 @@
+name: Daily Swing Scanner Update
+
+on:
+  schedule:
+    # Runs at 11:15 AM UTC (4:45 PM IST) every Mon-Fri (after Indian markets close)
+    - cron: '15 11 * * 1-5'
+  
+  # Allows you to click a button on GitHub to run it manually anytime
+  workflow_dispatch:
+
+jobs:
+  update-scanner-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (For NSE API)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Node Dependencies
+        run: npm install stock-nse-india
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Market Data Scanner (~3.5 mins)
+        run: python scanner.py
+
+      - name: Run News Fetcher
+        run: python news_fetcher.py
+
+      - name: Commit and Push Updated JSON Data
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          git add scan_results/
+          
+          # Only commit if there are actual changes to save
+          git diff --staged --quiet || git commit -m "Automated Market Update: $(date -u +'%Y-%m-%d')"
+          git push
