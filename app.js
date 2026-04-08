@@ -119,6 +119,7 @@ function initTabs() {
 ═══════════════════════════════════════════════ */
 let fetchedBackendData = null;
 let fetchedNewsData = null;
+let fetchedFullScan = null;
 let currentTf = '1W';
 
 async function startGeneration() {
@@ -156,6 +157,14 @@ async function startGeneration() {
         fetchedNewsData = await res.json();
       } catch (e) {
         console.warn("Could not load news file.", e);
+      }
+    }
+    if (i === 3 && !fetchedFullScan) {
+      try {
+        const res = await fetch('scan_results/full_summary.json');
+        fetchedFullScan = await res.json();
+      } catch (e) {
+        console.warn("Could not load full_summary.json.", e);
       }
     }
 
@@ -283,8 +292,9 @@ function buildReport(tf) {
   buildSetups(d.setups || []);
   buildWatchlist(d.watchlist || []);
   buildHeatmap(d.sectors || []);
-  buildRiskDashboard(d.risk || d.market); // fallback map
+  buildRiskDashboard(d.risk || d.market);
   buildNewsTab();
+  buildFullScanTab();
 
   // Show report
   document.getElementById('loadingState').style.display = 'none';
@@ -817,3 +827,174 @@ function animateVix(vixVal) {
     setTimeout(() => { needle.style.left = pct + '%'; }, 100);
   });
 }
+
+/* ═══════════════════════════════════════════════
+   TAB 7 — FULL SCAN TABLE
+═══════════════════════════════════════════════ */
+let _fullScanData = [];    // master list
+let _fsSortCol = '1M';     // default sort
+let _fsSortAsc = false;
+let _fsFilter  = '';
+let _fsTfFilter = '';
+
+function buildFullScanTab() {
+  const container = document.getElementById('fullscanContent');
+  const TFS = ['1W','2W','1M','3M','6M','12M'];
+
+  if (!fetchedFullScan || !fetchedFullScan.stocks || fetchedFullScan.stocks.length === 0) {
+    container.innerHTML = `
+      <div style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);">
+        <div style="font-size:48px;margin-bottom:16px;">📋</div>
+        <div style="font-size:16px;">Full scan data not yet available.</div>
+        <div style="font-size:13px;margin-top:8px;">Run <code>python scanner.py</code> locally to generate <code>scan_results/full_summary.json</code>, then push to GitHub.</div>
+      </div>`;
+    return;
+  }
+
+  _fullScanData = fetchedFullScan.stocks;
+  document.getElementById('fullscanBadge').textContent = _fullScanData.length;
+
+  container.innerHTML = `
+    <!-- Stats bar -->
+    <div id="fs-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;"></div>
+
+    <!-- Controls -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+      <input id="fs-search" type="text" placeholder="🔍 Search ticker..."
+        style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
+               color:#fff;font-size:13px;width:200px;outline:none;"
+        oninput="_fsFilter=this.value.toUpperCase();_fsRender()">
+
+      <select id="fs-tf-filter"
+        style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
+               color:#fff;font-size:13px;cursor:pointer;"
+        onchange="_fsTfFilter=this.value;_fsRender()">
+        <option value="">All Stocks</option>
+        ${TFS.map(tf => `<option value="${tf}">✅ ${tf} Gainers Only</option>`).join('')}
+      </select>
+
+      <span id="fs-count" style="font-size:12px;color:rgba(255,255,255,0.4);margin-left:auto;">Loading...</span>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+      <table id="fs-table" style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead style="background:#0d1520;position:sticky;top:0;z-index:2;">
+          <tr>
+            <th style="padding:12px 16px;text-align:left;color:var(--primary);cursor:pointer;" onclick="_fsSort('t')">Ticker ▲▼</th>
+            <th style="padding:12px 16px;text-align:right;color:rgba(255,255,255,0.5);">Price (₹)</th>
+            <th style="padding:12px 16px;text-align:center;color:rgba(255,255,255,0.5);">Date</th>
+            ${TFS.map(tf => `<th style="padding:12px 16px;text-align:right;color:var(--primary);cursor:pointer;" onclick="_fsSort('${tf}')">${tf} ▲▼</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody id="fs-tbody"></tbody>
+      </table>
+    </div>
+    <div id="fs-pagination" style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;"></div>
+  `;
+
+  _fsComputeStats(TFS);
+  _fsSortCol = '1M';
+  _fsSortAsc = false;
+  _fsRender();
+}
+
+const FS_PAGE_SIZE = 100;
+let _fsPage = 0;
+
+function _fsFilteredData() {
+  let data = _fullScanData;
+  if (_fsFilter) data = data.filter(s => s.t && s.t.toUpperCase().includes(_fsFilter));
+  if (_fsTfFilter) data = data.filter(s => s[_fsTfFilter] !== null && s[_fsTfFilter] > 0);
+  // Sort
+  data = [...data].sort((a, b) => {
+    const av = a[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
+    const bv = b[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
+    if (typeof av === 'string') return _fsSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    return _fsSortAsc ? av - bv : bv - av;
+  });
+  return data;
+}
+
+function _fsRender() {
+  const TFS = ['1W','2W','1M','3M','6M','12M'];
+  const data = _fsFilteredData();
+  const total = data.length;
+  const pageData = data.slice(_fsPage * FS_PAGE_SIZE, (_fsPage + 1) * FS_PAGE_SIZE);
+
+  document.getElementById('fs-count').textContent = `Showing ${pageData.length} of ${total} stocks`;
+
+  const tbody = document.getElementById('fs-tbody');
+  tbody.innerHTML = pageData.map((s, i) => {
+    const bg = i % 2 === 0 ? 'background:transparent' : 'background:rgba(255,255,255,0.015)';
+    const cells = TFS.map(tf => {
+      const v = s[tf];
+      if (v === null || v === undefined) return `<td style="text-align:right;padding:9px 16px;color:rgba(255,255,255,0.2);">—</td>`;
+      const color = v >= 0 ? '#3fb950' : '#f85149';
+      const arrow = v >= 0 ? '▲' : '▼';
+      const weight = Math.abs(v) > 50 ? '800' : Math.abs(v) > 10 ? '700' : '500';
+      return `<td style="text-align:right;padding:9px 16px;color:${color};font-weight:${weight};">${arrow} ${Math.abs(v).toFixed(2)}%</td>`;
+    }).join('');
+    return `<tr style="${bg};border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s;"
+            onmouseover="this.style.background='rgba(16,245,168,0.04)'"
+            onmouseout="this.style.background='${i%2===0?'transparent':'rgba(255,255,255,0.015)'}'">
+      <td style="padding:9px 16px;font-weight:700;color:#fff;">
+        <a href="https://in.tradingview.com/chart/?symbol=NSE:${s.t}" target="_blank" rel="noopener"
+           style="color:var(--primary);text-decoration:none;">${s.t}</a>
+      </td>
+      <td style="padding:9px 16px;text-align:right;color:rgba(255,255,255,0.7);">₹${s.c.toFixed(2)}</td>
+      <td style="padding:9px 16px;text-align:center;color:rgba(255,255,255,0.35);font-size:11px;">${s.d}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  // Pagination
+  const totalPages = Math.ceil(total / FS_PAGE_SIZE);
+  const pagDiv = document.getElementById('fs-pagination');
+  if (totalPages <= 1) { pagDiv.innerHTML = ''; return; }
+
+  const btnStyle = (active) => `padding:6px 14px;border-radius:6px;border:1px solid ${active?'var(--primary)':'var(--border)'};
+    background:${active?'var(--primary)':'var(--surface)'};color:#fff;cursor:pointer;font-size:12px;`;
+
+  pagDiv.innerHTML = [
+    `<button style="${btnStyle(false)}" onclick="_fsPage=Math.max(0,_fsPage-1);_fsRender()">← Prev</button>`,
+    ...Array.from({length: totalPages}, (_, p) =>
+      p === _fsPage
+        ? `<button style="${btnStyle(true)}" onclick="_fsPage=${p};_fsRender()">${p+1}</button>`
+        : `<button style="${btnStyle(false)}" onclick="_fsPage=${p};_fsRender()">${p+1}</button>`
+    ).slice(Math.max(0, _fsPage-2), _fsPage+5),
+    `<button style="${btnStyle(false)}" onclick="_fsPage=Math.min(${totalPages-1},_fsPage+1);_fsRender()">Next →</button>`
+  ].join('');
+}
+
+function _fsSort(col) {
+  if (_fsSortCol === col) { _fsSortAsc = !_fsSortAsc; }
+  else { _fsSortCol = col; _fsSortAsc = col === 't'; }
+  _fsPage = 0;
+  _fsRender();
+}
+
+function _fsComputeStats(TFS) {
+  const data = _fullScanData;
+  const total = data.length;
+  const gainers1M = data.filter(s => s['1M'] > 0).length;
+  const losers1M  = data.filter(s => s['1M'] < 0).length;
+  const multi12M  = data.filter(s => s['12M'] > 100).length;
+  const top1W     = data.filter(s => s['1W'] > 0).length;
+
+  const statsEl = document.getElementById('fs-stats');
+  const statCard = (val, label, color) =>
+    `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;text-align:center;min-width:90px;">
+      <div style="font-size:22px;font-weight:800;color:${color};">${val}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">${label}</div>
+    </div>`;
+
+  statsEl.innerHTML = [
+    statCard(total,      'Total Stocks',    'var(--primary)'),
+    statCard(top1W,      '1W Gainers',      '#3fb950'),
+    statCard(gainers1M,  '1M Gainers',      '#3fb950'),
+    statCard(losers1M,   '1M Losers',       '#f85149'),
+    statCard(multi12M,   '12M > 100%',      '#a78bfa'),
+  ].join('');
+}
+

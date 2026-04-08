@@ -160,6 +160,10 @@
         <button class="tab-btn" data-tab="news" id="tabNews">
           <span class="tab-icon">📰</span> Market News
         </button>
+        <button class="tab-btn" data-tab="fullscan" id="tabFullscan">
+          <span class="tab-icon">📋</span> Full Scan
+          <span class="tab-badge" id="fullscanBadge">0</span>
+        </button>
       </nav>
 
       <!-- TAB CONTENTS -->
@@ -226,6 +230,15 @@
             <span class="section-sub">Latest updates from RBI, Livemint, and Economic Times</span>
           </div>
           <div id="newsContent"></div>
+        </div>
+
+        <!-- TAB 7: FULL SCAN TABLE -->
+        <div class="tab-content" id="tab-fullscan">
+          <div class="section-header">
+            <h2>📋 Full NSE Scan — All Stocks</h2>
+            <span class="section-sub">Color-coded % change across all 6 timeframes · Searchable &amp; Sortable</span>
+          </div>
+          <div id="fullscanContent"></div>
         </div>
 
       </div>

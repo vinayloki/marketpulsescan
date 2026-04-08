@@ -314,6 +314,25 @@ def rank_and_export(perf_df: pd.DataFrame):
         json.dump(top_performers, f, indent=2, ensure_ascii=False)
     log.info(f"   📄 Latest files updated ✅")
 
+    # ── 5. Full summary JSON for browser table (compact — no raw prices) ──
+    full_summary_records = []
+    for _, row in perf_df_sorted.iterrows():
+        record = {
+            "t": row["ticker"],
+            "c": row["last_close"],
+            "d": row["last_date"],
+        }
+        for tf in TIMEFRAMES.keys():
+            if tf in perf_df.columns:
+                val = row.get(tf)
+                record[tf] = round(float(val), 2) if val is not None and not pd.isna(val) else None
+        full_summary_records.append(record)
+
+    full_summary_path = OUTPUT_DIR / "full_summary.json"
+    with open(full_summary_path, "w", encoding="utf-8") as f:
+        json.dump({"generated": date_str, "stocks": full_summary_records}, f, separators=(",", ":"), ensure_ascii=False)
+    log.info(f"   📄 Full summary JSON saved: {full_summary_path.name} ({len(full_summary_records)} stocks)")
+
     # ── Print summary to console ──
     print("\n" + "═" * 70)
     print(f"  📊 SCAN COMPLETE — {date_str}")
