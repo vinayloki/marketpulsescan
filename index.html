@@ -3,268 +3,601 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>India Swing Trading Scanner — Weekly Flash Report</title>
-  <meta name="description" content="Educational India NSE/BSE swing trading scanner for 5-10 day holding periods. Weekly flash report with technical and fundamental analysis." />
+  <title>India Swing Scanner — NSE Stock Intelligence</title>
+  <meta name="description" content="NSE/BSE swing trading scanner for 5-10 day holding periods. Live flash report with technical analysis across 2200+ stocks." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ═══ RESET & ROOT ══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #07090f;
+      --bg2:      #0d1117;
+      --surface:  #111820;
+      --surface2: #182030;
+      --border:   rgba(255,255,255,0.07);
+      --primary:  #10f5a8;
+      --primary2: #3de8f5;
+      --blue:     #3d8ef4;
+      --amber:    #f5a623;
+      --red:      #f5365c;
+      --green:    #10f5a8;
+      --purple:   #a78bfa;
+      --font:     'Inter', sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+      --radius:   12px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: #e6edf3;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: var(--mono); font-size: 0.85em; background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; }
+
+    /* ═══ ANIMATED BACKGROUND ═══════════════════════════════════ */
+    .bg-glow {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(16,245,168,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse 60% 40% at 80% 80%, rgba(61,142,244,0.04) 0%, transparent 60%);
+    }
+
+    /* ═══ HEADER ════════════════════════════════════════════════ */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,9,15,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .header-inner {
+      max-width: 1600px; margin: 0 auto;
+      display: flex; align-items: center; gap: 20px;
+      height: 60px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 700; color: #fff;
+      white-space: nowrap;
+    }
+    .brand-dot { color: var(--primary); }
+    .brand svg { flex-shrink: 0; }
+    .header-clock { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.35); }
+    .market-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 12px; font-weight: 500;
+    }
+    .mpdot { width: 7px; height: 7px; border-radius: 50%; animation: pulse 2s infinite; }
+    .mpdot.open  { background: var(--green);  box-shadow: 0 0 8px var(--green); }
+    .mpdot.pre   { background: var(--amber);  box-shadow: 0 0 8px var(--amber); }
+    .mpdot.closed{ background: #444; animation: none; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .header-spacer { flex: 1; }
+    .scan-info {
+      font-size: 11px; color: rgba(255,255,255,0.3);
+      display: flex; gap: 16px; align-items: center;
+    }
+    .scan-info strong { color: var(--primary); }
+
+    /* ═══ DISCLAIMER ════════════════════════════════════════════ */
+    .disclaimer {
+      background: rgba(245,166,35,0.08);
+      border-bottom: 1px solid rgba(245,166,35,0.15);
+      padding: 8px 24px;
+      font-size: 11px; color: rgba(255,255,255,0.5);
+      text-align: center;
+    }
+    .disclaimer strong { color: var(--amber); }
+
+    /* ═══ MAIN LAYOUT ═══════════════════════════════════════════ */
+    .app {
+      max-width: 1600px; margin: 0 auto;
+      padding: 20px 24px 60px;
+      position: relative; z-index: 1;
+    }
+
+    /* ═══ LOADING SCREEN ════════════════════════════════════════ */
+    #loadScreen {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 60vh; gap: 24px;
+    }
+    .spinner {
+      width: 56px; height: 56px;
+      border: 3px solid var(--surface2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .load-title { font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.7); }
+    .load-steps { display: flex; flex-direction: column; gap: 8px; min-width: 260px; }
+    .load-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: rgba(255,255,255,0.3);
+      transition: color 0.3s;
+    }
+    .load-step.active { color: var(--primary); }
+    .load-step.done   { color: rgba(255,255,255,0.5); }
+    .load-step-icon { font-size: 15px; width: 20px; text-align: center; }
+
+    /* ═══ ERROR SCREEN ══════════════════════════════════════════ */
+    #errorScreen {
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 60vh; gap: 16px; text-align: center;
+    }
+    .error-icon { font-size: 56px; }
+    .error-title { font-size: 20px; font-weight: 700; color: var(--red); }
+    .error-body { font-size: 13px; color: rgba(255,255,255,0.5); max-width: 500px; line-height: 1.7; }
+
+    /* ═══ DASHBOARD ═════════════════════════════════════════════ */
+    #dashboard { display: none; }
+
+    /* Stat cards row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+      gap: 12px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .stat-card .sv { font-size: 28px; font-weight: 800; font-family: var(--mono); }
+    .stat-card .sl { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+    .col-green { color: var(--green); }
+    .col-red   { color: var(--red); }
+    .col-blue  { color: var(--blue); }
+    .col-purple{ color: var(--purple); }
+    .col-amber { color: var(--amber); }
+
+    /* ═══ TAB NAVIGATION ════════════════════════════════════════ */
+    .tab-nav {
+      display: flex; gap: 4px; flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .tab-btn {
+      padding: 10px 18px; border: none; outline: none;
+      background: transparent; color: rgba(255,255,255,0.45);
+      font-family: var(--font); font-size: 13px; font-weight: 500;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.03); border-radius: 8px 8px 0 0; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-badge {
+      background: var(--primary); color: #000; font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 10px; min-width: 20px; text-align: center;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ═══ FULL SCAN TABLE (main panel) ══════════════════════════ */
+    .fs-controls {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      align-items: center; margin-bottom: 16px;
+    }
+    .fs-input {
+      padding: 9px 14px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: #fff; font-size: 13px; font-family: var(--font);
+      outline: none; width: 200px;
+      transition: border-color 0.2s;
+    }
+    .fs-input:focus { border-color: var(--primary); }
+    .fs-select {
+      padding: 9px 14px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: #fff; font-size: 13px; font-family: var(--font);
+      cursor: pointer; outline: none;
+    }
+    .fs-count { font-size: 12px; color: rgba(255,255,255,0.35); margin-left: auto; }
+
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: #0d1520; }
+    thead th {
+      padding: 12px 16px; text-align: right;
+      color: rgba(255,255,255,0.5); font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap; cursor: pointer; user-select: none;
+      transition: color 0.2s;
+    }
+    thead th:first-child { text-align: left; }
+    thead th:hover { color: var(--primary); }
+    thead th.sort-active { color: var(--primary); }
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.12s;
+    }
+    tbody tr:hover { background: rgba(16,245,168,0.04); }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,0.012); }
+    tbody tr:nth-child(even):hover { background: rgba(16,245,168,0.04); }
+    td { padding: 9px 16px; text-align: right; }
+    td.td-ticker {
+      text-align: left; font-weight: 700; color: #fff;
+      white-space: nowrap;
+    }
+    td.td-ticker a { color: var(--primary); }
+    td.td-price { color: rgba(255,255,255,0.6); font-family: var(--mono); font-size: 12px; }
+    td.td-date { color: rgba(255,255,255,0.3); font-size: 11px; text-align: center; }
+    td.pos { color: #3fb950; }
+    td.neg { color: #f85149; }
+    td.na  { color: rgba(255,255,255,0.2); }
+    .bold-md  { font-weight: 600; }
+    .bold-hi  { font-weight: 800; }
+
+    /* Pagination */
+    .pagination {
+      display: flex; gap: 6px; justify-content: center;
+      margin-top: 18px; flex-wrap: wrap;
+    }
+    .pg-btn {
+      padding: 6px 14px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: #fff; font-size: 12px; cursor: pointer;
+      transition: all 0.15s; font-family: var(--font);
+    }
+    .pg-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .pg-btn.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 700; }
+
+    /* ═══ MARKET SNAPSHOT ═══════════════════════════════════════ */
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      gap: 12px; margin-bottom: 20px;
+    }
+    .index-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px;
+    }
+    .index-card .ic-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    .index-card .ic-value { font-family: var(--mono); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .index-card .ic-change { font-size: 13px; font-weight: 600; }
+    .ic-change.up { color: var(--green); }
+    .ic-change.dn { color: var(--red); }
+    .ic-change.flat { color: var(--amber); }
+    .ic-sub { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 4px; }
+
+    /* ═══ TOP SETUPS ════════════════════════════════════════════ */
+    .setup-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+      margin-bottom: 16px;
+    }
+    .setup-header {
+      display: flex; align-items: flex-start; gap: 16px;
+      margin-bottom: 16px;
+    }
+    .setup-rank {
+      background: var(--primary); color: #000;
+      font-weight: 800; font-size: 13px; font-family: var(--mono);
+      padding: 4px 10px; border-radius: 6px; white-space: nowrap;
+    }
+    .setup-name { font-size: 17px; font-weight: 700; }
+    .setup-ticker { font-size: 12px; color: rgba(255,255,255,0.35); }
+    .setup-type-badge {
+      display: inline-block; padding: 2px 10px;
+      border-radius: 4px; font-size: 11px; font-weight: 600;
+      margin-top: 4px;
+    }
+    .badge-breakout  { background: rgba(16,245,168,0.15); color: var(--green); }
+    .badge-reversion { background: rgba(61,142,244,0.15); color: var(--blue); }
+    .badge-sector    { background: rgba(167,139,250,0.15); color: var(--purple); }
+    .badge-earnings  { background: rgba(245,166,35,0.15); color: var(--amber); }
+    .setup-cmp { font-family: var(--mono); font-size: 20px; font-weight: 700; text-align: right; }
+    .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .setup-section-title { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .ind-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; }
+    .ind-key { color: rgba(255,255,255,0.5); }
+    .ind-val { font-weight: 600; }
+    .bull { color: var(--green); } .bear { color: var(--red); } .neut { color: var(--amber); }
+    .trade-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+    .trade-box-item { background: var(--surface2); border-radius: 8px; padding: 10px 14px; text-align: center; }
+    .trade-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .trade-val { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+    .entry-val { color: var(--primary); } .sl-val { color: var(--red); }
+    .t1-val { color: #3fb950; } .t2-val { color: var(--blue); }
+    .trigger-note {
+      background: rgba(16,245,168,0.05); border-left: 3px solid var(--primary);
+      border-radius: 0 8px 8px 0; padding: 12px 16px;
+      font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .tf-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tf-btn {
+      padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface); color: rgba(255,255,255,0.6);
+      font-size: 12px; cursor: pointer; font-family: var(--font);
+      transition: all 0.15s;
+    }
+    .tf-btn.active { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 700; }
+
+    /* ═══ WATCHLIST ═════════════════════════════════════════════ */
+    .wl-table { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+    .wl-row {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 2fr 3fr;
+      gap: 8px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      align-items: center; font-size: 13px;
+    }
+    .wl-row:last-child { border-bottom: none; }
+    .wl-header { background: #0d1520; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+    .readiness-hot  { color: var(--green); font-weight: 700; }
+    .readiness-warm { color: var(--amber); font-weight: 600; }
+    .readiness-cool { color: rgba(255,255,255,0.35); }
+
+    /* ═══ SECTOR HEATMAP ════════════════════════════════════════ */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+      gap: 10px; margin-bottom: 20px;
+    }
+    .hm-cell {
+      border-radius: 10px; padding: 14px 16px;
+      border: 1px solid transparent; cursor: default;
+      transition: transform 0.15s;
+    }
+    .hm-cell:hover { transform: translateY(-2px); }
+    .hm-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .hm-idx  { font-size: 10px; opacity: 0.6; margin-bottom: 8px; }
+    .hm-chng { font-family: var(--mono); font-size: 18px; font-weight: 800; }
+    .hm-vol  { font-size: 10px; opacity: 0.5; margin-top: 4px; }
+    .hm-sb   { background: rgba(16,245,168,0.18); border-color: rgba(16,245,168,0.25); color: #3df5b4; }
+    .hm-b    { background: rgba(16,245,168,0.09); border-color: rgba(16,245,168,0.12); color: #7df5cc; }
+    .hm-slb  { background: rgba(16,245,168,0.04); border-color: rgba(16,245,168,0.06); color: rgba(255,255,255,0.7); }
+    .hm-f    { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); }
+    .hm-sbe  { background: rgba(245,54,92,0.06); border-color: rgba(245,54,92,0.1); color: rgba(255,150,150,0.8); }
+    .hm-be   { background: rgba(245,54,92,0.12); border-color: rgba(245,54,92,0.18); color: rgba(255,120,120,0.9); }
+    .hm-sbe2 { background: rgba(245,54,92,0.2);  border-color: rgba(245,54,92,0.28); color: #f85149; }
+
+    /* ═══ RISK DASHBOARD ════════════════════════════════════════ */
+    .risk-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 12px; margin-bottom: 20px; }
+    .risk-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .risk-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .risk-val { font-family: var(--mono); font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+    .vix-track { height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--green), var(--amber), var(--red)); position: relative; margin: 10px 0; }
+    .vix-needle { position: absolute; top: -4px; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid #000; transform: translateX(-50%); transition: left 1s ease; }
+    .macro-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .macro-table th { padding: 10px 14px; text-align: left; background: #0d1520; color: rgba(255,255,255,0.4); font-size: 11px; text-transform: uppercase; }
+    .macro-table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+    /* ═══ NEWS ══════════════════════════════════════════════════ */
+    .news-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 10px;
+      transition: border-color 0.2s;
+    }
+    .news-item:hover { border-color: rgba(255,255,255,0.15); }
+    .news-source { font-size: 11px; color: var(--primary); font-weight: 600; margin-bottom: 5px; }
+    .news-title { font-size: 14px; font-weight: 500; line-height: 1.5; }
+    .news-time { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 5px; }
+
+    /* ═══ SECTION HEADERS ═══════════════════════════════════════ */
+    .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+    .section-head h2 { font-size: 18px; font-weight: 700; }
+    .section-head .sh-sub { font-size: 12px; color: rgba(255,255,255,0.35); }
+
+    /* ═══ MISC UTILITIES ════════════════════════════════════════ */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+    .flex { display: flex; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .flex-wrap { flex-wrap: wrap; }
+    .mt-12 { margin-top: 12px; }
+    .mt-20 { margin-top: 20px; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .app { padding: 14px 14px 40px; }
+      .header-inner { gap: 10px; }
+      .scan-info { display: none; }
+      .trade-grid { grid-template-columns: repeat(2,1fr); }
+      .setup-grid { grid-template-columns: 1fr; }
+      .wl-row { grid-template-columns: 1fr 1fr; }
+      .wl-row > *:nth-child(n+4) { display: none; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Animated background -->
-  <div class="bg-particles" id="bgParticles"></div>
-  <div class="bg-grid"></div>
+<div class="bg-glow"></div>
 
-  <!-- DISCLAIMER BANNER -->
-  <div class="disclaimer-banner" id="disclaimerBanner">
-    <div class="disclaimer-content">
-      <span class="disclaimer-icon">⚠️</span>
-      <span>EDUCATIONAL STOCK SCANNER — NOT INVESTMENT ADVICE. For learning purposes only. Consult a SEBI-registered advisor before investing.</span>
-      <button class="disclaimer-close" id="disclaimerClose" aria-label="Close disclaimer">✕</button>
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <strong>⚠️ EDUCATIONAL SCANNER — NOT INVESTMENT ADVICE.</strong>
+  For learning purposes only. Consult a SEBI-registered advisor before investing. Past performance ≠ future results.
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="9" fill="url(#lg)"/>
+        <path d="M6 24L11 15L15 20L21 10L26 16" stroke="#10f5a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="26" cy="9" r="2.5" fill="#10f5a8"/>
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="32" y2="32"><stop offset="0%" stop-color="#0f3460"/><stop offset="100%" stop-color="#0d1117"/></linearGradient></defs>
+      </svg>
+      SwingScan<span class="brand-dot">India</span>
+    </div>
+
+    <div class="market-pill" id="marketPill">
+      <span class="mpdot closed" id="mpdot"></span>
+      <span id="mpText">Market Closed</span>
+    </div>
+
+    <div class="header-spacer"></div>
+
+    <div class="scan-info">
+      <span>Scan date: <strong id="hScanDate">—</strong></span>
+      <span>Stocks: <strong id="hStockCount">—</strong></span>
+    </div>
+    <div class="header-clock" id="clock"></div>
+  </div>
+</header>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- LOADING -->
+  <div id="loadScreen">
+    <div class="spinner"></div>
+    <div class="load-title">Loading scan data…</div>
+    <div class="load-steps" id="loadSteps">
+      <div class="load-step active" id="ls1"><span class="load-step-icon">📡</span> Fetching scan summary</div>
+      <div class="load-step" id="ls2"><span class="load-step-icon">📋</span> Loading full stock table (2200+ stocks)</div>
+      <div class="load-step" id="ls3"><span class="load-step-icon">📰</span> Loading market news</div>
+      <div class="load-step" id="ls4"><span class="load-step-icon">🏗️</span> Building dashboard</div>
     </div>
   </div>
 
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="header-brand">
-        <div class="brand-logo">
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-            <rect width="36" height="36" rx="10" fill="url(#logoGrad)"/>
-            <path d="M8 26L14 16L18 22L24 12L28 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="28" cy="10" r="3" fill="#10F5A8"/>
-            <defs>
-              <linearGradient id="logoGrad" x1="0" y1="0" x2="36" y2="36">
-                <stop offset="0%" stop-color="#0F3460"/>
-                <stop offset="100%" stop-color="#16213E"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <div>
-            <div class="brand-name">SwingScan<span class="brand-india">India</span></div>
-            <div class="brand-sub">NSE · BSE Swing Intelligence</div>
-          </div>
-        </div>
+  <!-- ERROR -->
+  <div id="errorScreen">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Could not load scan data</div>
+    <div class="error-body" id="errorBody">Unable to fetch the scan results. Try refreshing the page. If the issue persists, the daily scan may not have run yet.</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+
+    <!-- STATS ROW -->
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- TABS -->
+    <nav class="tab-nav" id="tabNav">
+      <button class="tab-btn active" data-tab="fullscan">📋 Full Scan <span class="tab-badge" id="fsBadge">0</span></button>
+      <button class="tab-btn" data-tab="setups">🎯 Top Setups</button>
+      <button class="tab-btn" data-tab="market">🌐 Market Snapshot</button>
+      <button class="tab-btn" data-tab="watchlist">👁️ Watchlist</button>
+      <button class="tab-btn" data-tab="heatmap">🔥 Sector Heatmap</button>
+      <button class="tab-btn" data-tab="risk">🛡️ Risk Dashboard</button>
+      <button class="tab-btn" data-tab="news">📰 Market News</button>
+    </nav>
+
+    <!-- FULL SCAN (default) -->
+    <div class="tab-panel active" id="tab-fullscan">
+      <div class="section-head">
+        <h2>📋 Full NSE Scan — All Stocks</h2>
+        <span class="sh-sub">Click any column header to sort · Ticker links open TradingView chart</span>
       </div>
-      <div class="header-meta">
-        <div class="live-clock" id="liveClock"></div>
-        <div class="market-status" id="marketStatus">
-          <span class="status-dot"></span>
-          <span id="statusText">Market Closed</span>
-        </div>
-        <button class="generate-btn" id="generateBtn">
-          <span class="btn-icon">⚡</span>
-          Generate Report
-        </button>
+      <div class="fs-controls">
+        <input class="fs-input" id="fsSearch" type="text" placeholder="🔍 Search ticker..." oninput="onFsSearch()">
+        <select class="fs-select" id="fsTfFilter" onchange="onFsFilter()">
+          <option value="">All Stocks</option>
+          <option value="1W">✅ 1W Gainers</option>
+          <option value="2W">✅ 2W Gainers</option>
+          <option value="1M">✅ 1M Gainers</option>
+          <option value="3M">✅ 3M Gainers</option>
+          <option value="6M">✅ 6M Gainers</option>
+          <option value="12M">✅ 12M Gainers</option>
+        </select>
+        <span class="fs-count" id="fsCount">Loading…</span>
       </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left" onclick="fsSort('t')">Ticker <span id="th-t"></span></th>
+              <th onclick="fsSort('c')">Price (₹) <span id="th-c"></span></th>
+              <th>Date</th>
+              <th onclick="fsSort('1W')">1W <span id="th-1W"></span></th>
+              <th onclick="fsSort('2W')">2W <span id="th-2W"></span></th>
+              <th onclick="fsSort('1M')">1M <span id="th-1M"></span></th>
+              <th onclick="fsSort('3M')">3M <span id="th-3M"></span></th>
+              <th onclick="fsSort('6M')">6M <span id="th-6M"></span></th>
+              <th onclick="fsSort('12M')">12M <span id="th-12M"></span></th>
+            </tr>
+          </thead>
+          <tbody id="fsTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="fsPagination"></div>
     </div>
-    <!-- Report Metadata -->
-    <div class="report-meta" id="reportMeta" style="display:none">
-      <span class="meta-tag">📅 <span id="reportDate"></span></span>
-      <span class="meta-tag">🕐 <span id="reportTime"></span> IST</span>
-      <span class="meta-tag cap-chip">💰 ₹10 Lakh Capital</span>
-      <span class="meta-tag">📊 NSE · BSE</span>
-      <span class="meta-tag risk-chip"><span id="riskBadge">Medium Risk</span></span>
+
+    <!-- TOP SETUPS -->
+    <div class="tab-panel" id="tab-setups">
+      <div class="section-head">
+        <h2>🎯 Top Swing Setups</h2>
+        <span class="sh-sub">High-conviction 5–10 day holding opportunities · ₹10L capital basis</span>
+      </div>
+      <div class="tf-filters" id="tfFilters">
+        <button class="tf-btn active" data-tf="1W" onclick="onTfChange(this)">Weekly</button>
+        <button class="tf-btn" data-tf="2W" onclick="onTfChange(this)">2-Week</button>
+        <button class="tf-btn" data-tf="1M" onclick="onTfChange(this)">Monthly</button>
+        <button class="tf-btn" data-tf="3M" onclick="onTfChange(this)">Quarterly</button>
+        <button class="tf-btn" data-tf="6M" onclick="onTfChange(this)">6-Month</button>
+        <button class="tf-btn" data-tf="12M" onclick="onTfChange(this)">Yearly</button>
+      </div>
+      <div id="setupsContent"></div>
     </div>
-  </header>
 
-  <!-- MAIN APP -->
-  <main class="app-main" id="appMain">
-
-    <!-- LANDING STATE -->
-    <section class="landing" id="landingState">
-      <div class="landing-hero">
-        <div class="landing-badge">Weekly Flash Report System</div>
-        <h1 class="landing-title">India Swing Trading<br/>Scanner <span class="gradient-text">Pro</span></h1>
-        <p class="landing-desc">
-          AI-powered NSE/BSE swing trade opportunity scanner. Identifies high-probability 5–10 day setups using technical breakouts, mean reversion, sector rotation & earnings momentum.
-        </p>
-        <div class="landing-features">
-          <div class="feature-card">
-            <div class="fc-icon">🎯</div>
-            <div class="fc-title">4 Scan Methods</div>
-            <div class="fc-desc">Breakout · Mean Reversion · Sector · Earnings</div>
-          </div>
-          <div class="feature-card">
-            <div class="fc-icon">📐</div>
-            <div class="fc-title">Risk-Managed</div>
-            <div class="fc-desc">Max 2% capital risk · Mandatory stop losses</div>
-          </div>
-          <div class="feature-card">
-            <div class="fc-icon">🔬</div>
-            <div class="fc-title">Full Data Suite</div>
-            <div class="fc-desc">Technical + Fundamental + News check</div>
-          </div>
-          <div class="feature-card">
-            <div class="fc-icon">🛡️</div>
-            <div class="fc-title">SEBI Compliant</div>
-            <div class="fc-desc">Educational · Disclosures on every output</div>
-          </div>
-        </div>
-        <button class="cta-btn" id="ctaBtn">
-          <span>Generate This Week's Report</span>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <p class="cta-note">⚠️ Educational scanner only. Not investment advice.</p>
+    <!-- MARKET SNAPSHOT -->
+    <div class="tab-panel" id="tab-market">
+      <div class="section-head">
+        <h2>🌐 Market Snapshot</h2>
+        <span class="sh-sub">Weekly performance overview · India equity markets</span>
       </div>
-    </section>
+      <div id="marketContent"></div>
+    </div>
 
-    <!-- LOADING STATE -->
-    <section class="loading-state" id="loadingState" style="display:none">
-      <div class="loader-container">
-        <div class="loader-ring"></div>
-        <div class="loader-inner">
-          <svg width="40" height="40" viewBox="0 0 36 36" fill="none">
-            <path d="M8 26L14 16L18 22L24 12L28 18" stroke="#10F5A8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="loader-text" id="loaderText">Initializing scanners...</div>
-        <div class="loader-steps">
-          <div class="lstep" id="lstep1">📡 Fetching Nifty 50 data</div>
-          <div class="lstep" id="lstep2">🔍 Running technical scans</div>
-          <div class="lstep" id="lstep3">📊 Analyzing sector rotation</div>
-          <div class="lstep" id="lstep4">💹 Computing risk metrics</div>
-          <div class="lstep" id="lstep5">🤖 Building flash report</div>
-        </div>
+    <!-- WATCHLIST -->
+    <div class="tab-panel" id="tab-watchlist">
+      <div class="section-head">
+        <h2>👁️ Watchlist</h2>
+        <span class="sh-sub">Near entry — watch for triggers in next 1–2 sessions</span>
       </div>
-    </section>
+      <div id="watchlistContent"></div>
+    </div>
 
-    <!-- REPORT STATE — 5 TABS -->
-    <section class="report-state" id="reportState" style="display:none">
-
-      <!-- TOP DISCLAIMER -->
-      <div class="report-disclaimer">
-        <strong>⚠️ EDUCATIONAL STOCK SCANNER — NOT INVESTMENT ADVICE</strong>
-        This report identifies potential swing trade setups based on technical and fundamental data.
-        It is for learning and research purposes only. Past performance does not guarantee future results.
-        All trades carry risk of capital loss. Consult a SEBI-registered advisor before investing.
+    <!-- SECTOR HEATMAP -->
+    <div class="tab-panel" id="tab-heatmap">
+      <div class="section-head">
+        <h2>🔥 Sector Heatmap</h2>
+        <span class="sh-sub">NSE sector performance ranked by weekly returns</span>
       </div>
+      <div id="heatmapContent"></div>
+    </div>
 
-      <!-- TAB NAV -->
-      <nav class="tab-nav" id="tabNav">
-        <button class="tab-btn active" data-tab="market" id="tabMarket">
-          <span class="tab-icon">🌐</span> Market Snapshot
-        </button>
-        <button class="tab-btn" data-tab="setups" id="tabSetups">
-          <span class="tab-icon">🎯</span> Top Setups
-          <span class="tab-badge" id="setupBadge">0</span>
-        </button>
-        <button class="tab-btn" data-tab="watchlist" id="tabWatchlist">
-          <span class="tab-icon">👁️</span> Watchlist
-        </button>
-        <button class="tab-btn" data-tab="heatmap" id="tabHeatmap">
-          <span class="tab-icon">🔥</span> Sector Heatmap
-        </button>
-        <button class="tab-btn" data-tab="risk" id="tabRisk">
-          <span class="tab-icon">🛡️</span> Risk Dashboard
-        </button>
-        <button class="tab-btn" data-tab="news" id="tabNews">
-          <span class="tab-icon">📰</span> Market News
-        </button>
-        <button class="tab-btn" data-tab="fullscan" id="tabFullscan">
-          <span class="tab-icon">📋</span> Full Scan
-          <span class="tab-badge" id="fullscanBadge">0</span>
-        </button>
-      </nav>
-
-      <!-- TAB CONTENTS -->
-      <div class="tab-contents">
-
-        <!-- TAB 1: MARKET SNAPSHOT -->
-        <div class="tab-content active" id="tab-market">
-          <div class="section-header">
-            <h2>🌐 Market Snapshot</h2>
-            <span class="section-sub">Weekly performance overview · India Equity Markets</span>
-          </div>
-          <div id="marketSnapshotContent"></div>
-        </div>
-
-        <!-- TAB 2: TOP SWING SETUPS -->
-        <div class="tab-content" id="tab-setups">
-          <div class="section-header">
-            <h2 style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-              <span>🎯 Top Swing Setups</span>
-              <div class="timeframe-filters" id="timeframeFilters" style="display:flex; gap:8px; font-size:12px;">
-                <button class="tf-btn active" data-tf="1W" style="background:var(--primary); color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Weekly</button>
-                <button class="tf-btn" data-tf="1M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Monthly</button>
-                <button class="tf-btn" data-tf="3M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Quarterly</button>
-                <button class="tf-btn" data-tf="6M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">6-Month</button>
-                <button class="tf-btn" data-tf="12M" style="background:#2C3A4F; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Yearly</button>
-              </div>
-            </h2>
-            <span class="section-sub">High-conviction opportunities for 5–10 day holding · ₹10L capital basis</span>
-          </div>
-          <div id="setupsContent"></div>
-        </div>
-
-        <!-- TAB 3: WATCHLIST -->
-        <div class="tab-content" id="tab-watchlist">
-          <div class="section-header">
-            <h2>👁️ Watchlist</h2>
-            <span class="section-sub">Stocks near entry — watch for triggers in next 1–2 weeks</span>
-          </div>
-          <div id="watchlistContent"></div>
-        </div>
-
-        <!-- TAB 4: SECTOR HEATMAP -->
-        <div class="tab-content" id="tab-heatmap">
-          <div class="section-header">
-            <h2>🔥 Sector Heatmap</h2>
-            <span class="section-sub">NSE sector performance ranked by weekly returns</span>
-          </div>
-          <div id="heatmapContent"></div>
-        </div>
-
-        <!-- TAB 5: RISK DASHBOARD -->
-        <div class="tab-content" id="tab-risk">
-          <div class="section-header">
-            <h2>🛡️ Risk Dashboard</h2>
-            <span class="section-sub">Macro indicators · Volatility · Key market events</span>
-          </div>
-          <div id="riskContent"></div>
-        </div>
-
-        <!-- TAB 6: MARKET NEWS -->
-        <div class="tab-content" id="tab-news">
-          <div class="section-header">
-            <h2>📰 Market News</h2>
-            <span class="section-sub">Latest updates from RBI, Livemint, and Economic Times</span>
-          </div>
-          <div id="newsContent"></div>
-        </div>
-
-        <!-- TAB 7: FULL SCAN TABLE -->
-        <div class="tab-content" id="tab-fullscan">
-          <div class="section-header">
-            <h2>📋 Full NSE Scan — All Stocks</h2>
-            <span class="section-sub">Color-coded % change across all 6 timeframes · Searchable &amp; Sortable</span>
-          </div>
-          <div id="fullscanContent"></div>
-        </div>
-
+    <!-- RISK DASHBOARD -->
+    <div class="tab-panel" id="tab-risk">
+      <div class="section-head">
+        <h2>🛡️ Risk Dashboard</h2>
+        <span class="sh-sub">Macro indicators · Volatility · Key market events</span>
       </div>
+      <div id="riskContent"></div>
+    </div>
 
-      <!-- REPORT FOOTER -->
-      <footer class="report-footer">
-        <div class="footer-sources">
-          <strong>📊 Data Sources:</strong>
-          <a href="https://www.nseindia.com" target="_blank" rel="noopener">NSE India</a> ·
-          <a href="https://www.bseindia.com" target="_blank" rel="noopener">BSE India</a> ·
-          <a href="https://finance.yahoo.com" target="_blank" rel="noopener">Yahoo Finance</a> ·
-          <a href="https://www.moneycontrol.com" target="_blank" rel="noopener">Moneycontrol</a> ·
-          <a href="https://www.screener.in" target="_blank" rel="noopener">Screener.in</a> ·
-          <a href="https://tickertape.in" target="_blank" rel="noopener">Tickertape</a> ·
-          <a href="https://www.tradingview.com" target="_blank" rel="noopener">TradingView</a>
-        </div>
-        <div class="footer-meta">
-          <span>🕐 Report generated: <span id="footerTime"></span></span>
-          <span>💡 Methodology: Technical + Fundamental scan across NSE/BSE</span>
-          <span>⚖️ Not a SEBI-registered advisor. For educational use only.</span>
-        </div>
-      </footer>
+    <!-- NEWS -->
+    <div class="tab-panel" id="tab-news">
+      <div class="section-head">
+        <h2>📰 Market News</h2>
+        <span class="sh-sub">Latest updates — LiveMint · Economic Times</span>
+      </div>
+      <div id="newsContent"></div>
+    </div>
 
-    </section>
-  </main>
+  </div><!-- /dashboard -->
 
-  <script src="app.js"></script>
+  <!-- FOOTER -->
+  <footer style="margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:11px;color:rgba(255,255,255,0.25);text-align:center;line-height:1.8;">
+    <div>📊 Data Sources: <a href="https://www.nseindia.com" target="_blank">NSE India</a> · <a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> · <a href="https://www.screener.in" target="_blank">Screener.in</a> · <a href="https://www.moneycontrol.com" target="_blank">Moneycontrol</a> · <a href="https://www.tradingview.com" target="_blank">TradingView</a></div>
+    <div style="margin-top:6px;">⚖️ Educational scanner only. Not a SEBI-registered advisor. Not investment advice.</div>
+    <div style="margin-top:4px;">Last scan: <span id="footerDate">—</span></div>
+  </footer>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

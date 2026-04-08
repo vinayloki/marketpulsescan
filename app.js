@@ -1,1000 +1,604 @@
 /**
- * INDIA SWING SCANNER — MAIN APPLICATION
- * Interactive 5-tab weekly flash report widget
+ * INDIA SWING SCANNER — MAIN APP
+ * Auto-loads all data on page open. No button click needed.
  */
 
-/* ═══════════════════════════════════════════════
-   INITIALIZATION
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   GLOBALS
+═══════════════════════════════════════════════════════════════ */
+let summaryData   = null;   // latest_scan_summary.json
+let fullScanData  = [];     // full_summary.json stocks array
+let newsData      = [];     // daily_news.json
+let staticData    = null;   // data from data.js (fallback)
+let currentTf     = '1W';
 
+// Full Scan table state
+let _fsSortCol  = '1M';
+let _fsSortAsc  = false;
+let _fsFilter   = '';
+let _fsTfFilter = '';
+let _fsPage     = 0;
+const FS_PAGE   = 100;
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  initParticles();
   initClock();
   initMarketStatus();
-  initButtons();
   initTabs();
+  loadEverything();
 });
 
-/* ═══════════════════════════════════════════════
-   BACKGROUND PARTICLES
-═══════════════════════════════════════════════ */
-function initParticles() {
-  const container = document.getElementById('bgParticles');
-  const colors = ['rgba(16,245,168,0.4)', 'rgba(61,142,244,0.3)', 'rgba(167,139,250,0.25)', 'rgba(34,211,238,0.2)'];
-
-  for (let i = 0; i < 30; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = Math.random() * 4 + 1;
-    p.style.cssText = `
-      width: ${size}px; height: ${size}px;
-      left: ${Math.random() * 100}%;
-      bottom: -20px;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      animation-duration: ${Math.random() * 15 + 10}s;
-      animation-delay: ${Math.random() * 10}s;
-    `;
-    container.appendChild(p);
-  }
-}
-
-/* ═══════════════════════════════════════════════
-   LIVE CLOCK
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   CLOCK + MARKET STATUS
+═══════════════════════════════════════════════════════════════ */
 function initClock() {
-  function updateClock() {
-    const now = new Date();
-    const ist = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-    const h = String(ist.getHours()).padStart(2, '0');
-    const m = String(ist.getMinutes()).padStart(2, '0');
-    const s = String(ist.getSeconds()).padStart(2, '0');
-    document.getElementById('liveClock').textContent = `${h}:${m}:${s} IST`;
+  function tick() {
+    const ist = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('clock').textContent =
+      `${pad(ist.getHours())}:${pad(ist.getMinutes())}:${pad(ist.getSeconds())} IST`;
   }
-  updateClock();
-  setInterval(updateClock, 1000);
+  tick();
+  setInterval(tick, 1000);
 }
 
-/* ═══════════════════════════════════════════════
-   MARKET STATUS
-═══════════════════════════════════════════════ */
 function initMarketStatus() {
-  const now = new Date();
-  const ist = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-  const h = ist.getHours();
-  const m = ist.getMinutes();
-  const day = ist.getDay(); // 0=Sun, 6=Sat
-
-  const statusEl = document.getElementById('marketStatus');
-  const textEl = document.getElementById('statusText');
-  const dot = statusEl.querySelector('.status-dot');
-
+  const ist  = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const h = ist.getHours(), m = ist.getMinutes(), day = ist.getDay();
+  const dot   = document.getElementById('mpdot');
+  const label = document.getElementById('mpText');
   const isWeekday = day > 0 && day < 6;
-  const isMarketHours = h >= 9 && (h < 15 || (h === 15 && m <= 30));
+  const inHours   = h > 9 || (h === 9 && m >= 15);
+  const inClose   = h < 15 || (h === 15 && m <= 30);
 
-  if (isWeekday && isMarketHours) {
-    textEl.textContent = 'Market Open';
-    dot.style.background = 'var(--green)';
-    dot.style.boxShadow = '0 0 8px var(--green)';
+  if (isWeekday && inHours && inClose) {
+    dot.className = 'mpdot open'; label.textContent = 'Market Open';
   } else if (isWeekday && h >= 8 && h < 9) {
-    textEl.textContent = 'Pre-Market';
-    dot.style.background = 'var(--amber)';
-    dot.style.boxShadow = '0 0 8px var(--amber)';
-    dot.style.animation = 'none';
+    dot.className = 'mpdot pre'; label.textContent = 'Pre-Market';
   } else {
-    textEl.textContent = 'Market Closed';
-    dot.style.background = 'var(--red)';
-    dot.style.boxShadow = 'none';
-    dot.style.animation = 'none';
+    dot.className = 'mpdot closed'; label.textContent = 'Market Closed';
   }
 }
 
-/* ═══════════════════════════════════════════════
-   BUTTON HANDLERS
-═══════════════════════════════════════════════ */
-function initButtons() {
-  document.getElementById('generateBtn').addEventListener('click', startGeneration);
-  document.getElementById('ctaBtn').addEventListener('click', startGeneration);
-  document.getElementById('disclaimerClose').addEventListener('click', () => {
-    document.getElementById('disclaimerBanner').style.display = 'none';
-  });
-}
-
-/* ═══════════════════════════════════════════════
-   TAB SYSTEM
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════════════════ */
 function initTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const tabId = btn.dataset.tab;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById(`tab-${tabId}`).classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
     });
   });
 }
 
-/* ═══════════════════════════════════════════════
-   DATA FETCHING & GENERATION FLOW
-═══════════════════════════════════════════════ */
-let fetchedBackendData = null;
-let fetchedNewsData = null;
-let fetchedFullScan = null;
-let currentTf = '1W';
+/* ═══════════════════════════════════════════════════════════════
+   LOAD EVERYTHING — parallel fetches, show dashboard instantly
+═══════════════════════════════════════════════════════════════ */
+function setStep(id, state) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `load-step ${state}`;
+}
 
-async function startGeneration() {
-  // Switch views
-  document.getElementById('landingState').style.display = 'none';
-  document.getElementById('loadingState').style.display = 'flex';
-  document.getElementById('reportState').style.display = 'none';
+async function loadEverything() {
+  try {
+    setStep('ls1', 'active');
 
-  const steps = [
-    { id: 'lstep1', text: '📡 Fetching live NSE data...', delay: 700 },
-    { id: 'lstep2', text: '🔍 Scanning 2,200+ local results...', delay: 900 },
-    { id: 'lstep3', text: '📰 Pulling latest market news...', delay: 800 },
-    { id: 'lstep4', text: '💹 Mapping timeframes...', delay: 700 },
-    { id: 'lstep5', text: '🤖 Building flash report...', delay: 900 },
-  ];
+    // Fetch all 3 files in parallel — don't block on any single one
+    const [summRes, fullRes, newsRes] = await Promise.allSettled([
+      fetch('scan_results/latest_scan_summary.json'),
+      fetch('scan_results/full_summary.json'),
+      fetch('scan_results/daily_news.json'),
+    ]);
 
-  const loaderText = document.getElementById('loaderText');
+    setStep('ls1', 'done'); setStep('ls2', 'active');
 
-  for (let i = 0; i < steps.length; i++) {
-    const step = steps[i];
-    loaderText.textContent = step.text;
-
-    // Trigger data fetch in background during UI fake load
-    if (i === 1 && !fetchedBackendData) {
-      try {
-        const res = await fetch('scan_results/latest_scan_summary.json');
-        fetchedBackendData = await res.json();
-      } catch (e) {
-        console.warn("Could not load scan_results/latest_scan_summary.json. Ensure local server is running.", e);
-      }
-    }
-    if (i === 2 && !fetchedNewsData) {
-      try {
-        const res = await fetch('scan_results/daily_news.json');
-        fetchedNewsData = await res.json();
-      } catch (e) {
-        console.warn("Could not load news file.", e);
-      }
-    }
-    if (i === 3 && !fetchedFullScan) {
-      try {
-        const res = await fetch('scan_results/full_summary.json');
-        fetchedFullScan = await res.json();
-      } catch (e) {
-        console.warn("Could not load full_summary.json.", e);
-      }
+    // Parse summary
+    if (summRes.status === 'fulfilled' && summRes.value.ok) {
+      summaryData = await summRes.value.json();
+    } else {
+      console.warn('No summary JSON — using static fallback');
     }
 
-    // Mark previous as done
-    if (i > 0) {
-      const prev = document.getElementById(steps[i - 1].id);
-      prev.classList.remove('active');
-      prev.classList.add('done');
+    setStep('ls2', 'done'); setStep('ls3', 'active');
+
+    // Parse full scan
+    if (fullRes.status === 'fulfilled' && fullRes.value.ok) {
+      const fj = await fullRes.value.json();
+      fullScanData = fj.stocks || [];
+      if (summaryData && fj.generated) summaryData.scan_date = fj.generated;
     }
 
-    document.getElementById(step.id).classList.add('active');
-    await delay(step.delay);
+    // Parse news
+    if (newsRes.status === 'fulfilled' && newsRes.value.ok) {
+      newsData = await newsRes.value.json();
+    }
+
+    setStep('ls3', 'done'); setStep('ls4', 'active');
+
+    // Build the dashboard
+    buildDashboard();
+    setStep('ls4', 'done');
+
+    // Show
+    document.getElementById('loadScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+
+    // Animate needles after paint
+    setTimeout(animateNeedles, 300);
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loadScreen').style.display = 'none';
+    document.getElementById('errorScreen').style.display = 'flex';
+    document.getElementById('errorBody').textContent = `Error: ${err.message}`;
   }
-
-  // Final step done
-  const lastStep = document.getElementById(steps[steps.length - 1].id);
-  lastStep.classList.remove('active');
-  lastStep.classList.add('done');
-
-  await delay(500);
-
-  // Hook up timeframe filters
-  const tfBtns = document.querySelectorAll('.tf-btn');
-  tfBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      tfBtns.forEach(b => {
-        b.classList.remove('active');
-        b.style.background = '#2C3A4F';
-      });
-      e.target.classList.add('active');
-      e.target.style.background = 'var(--primary)';
-      currentTf = e.target.dataset.tf;
-      buildReport(currentTf);
-    });
-  });
-
-  // Build and show report
-  buildReport(currentTf);
 }
 
-function delay(ms) {
-  return new Promise(res => setTimeout(res, ms));
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD ORCHESTRATOR
+═══════════════════════════════════════════════════════════════ */
+function buildDashboard() {
+  // Use static data.js as fallback for setups/market/watchlist/heatmap/risk
+  const S = typeof REPORT_DATA !== 'undefined' ? REPORT_DATA : null;
+
+  // Header meta
+  const scanDate = summaryData?.scan_date || (S ? S.generatedAt : '—');
+  const stockCount = fullScanData.length || summaryData?.total_stocks_scanned || '—';
+  document.getElementById('hScanDate').textContent = scanDate;
+  document.getElementById('hStockCount').textContent = stockCount;
+  document.getElementById('footerDate').textContent = scanDate;
+
+  buildStatsRow();
+  buildFullScan();
+  buildSetups(currentTf);
+  buildMarket(S);
+  buildWatchlist(S);
+  buildHeatmap(S);
+  buildRisk(S);
+  buildNews();
 }
 
-/* ═══════════════════════════════════════════════
-   REPORT BUILDER — ORCHESTRATOR
-═══════════════════════════════════════════════ */
-function buildReport(tf) {
-  // Skeleton to avoid undefined errors since data.js was removed
-  let d = typeof REPORT_DATA !== 'undefined' ? REPORT_DATA : {
-    market: { indices: [], events: [], fii: {}, dii: {}, topSectors: [] },
-    setups: [],
-    watchlist: [],
-    sectors: [],
-    risk: { 
-        vix: { value: 15, class: 'medium', status: 'Normal' }, 
-        overallRisk: { level: 'Medium', class: 'medium' },
-        niftyCurrent: 22000,
-        niftySupport: [],
-        niftyResistance: [],
-        macro: [], upcomingEvents: []
-    }
-  };
-  
-  if (fetchedBackendData) {
-    // Dynamically map backend data to the UI format
-    const breadth = fetchedBackendData.market_breadth[tf];
-    const topStocks = fetchedBackendData.top_10_by_timeframe[tf] || [];
-    
-    // Inject dynamic setups
-    d.setups = topStocks.map((stock, i) => {
-      const perf = stock[tf] || 0;
-      return {
-        rank: `#${i+1}`,
-        name: stock.ticker, // using ticker as name for simplicity since backend only has ticker
-        ticker: stock.ticker,
-        cmp: `₹${stock.last_close.toFixed(2)}`,
-        marketCap: `Scan ${tf} Gain: +${perf.toFixed(2)}%`,
-        setupType: perf > 50 ? 'breakout' : 'mean-reversion',
-        setupLabel: tf + ' Momentum Leader',
-        technical: {
-          rsi: { value: Math.min(Math.max(50 + perf/2, 20), 90), label: 'Bullish', interpretation: 'Strong momentum in ' + tf },
-          macd: { signal: 'bullish', label: 'Bullish Crossover', detail: 'Positive trajectory' },
-          dma: { above50: true, label: 'Above moving averages' },
-          volume: { status: 'surge', label: 'Heavy institutional volume detected' },
-          support: `₹${(stock.last_close * 0.9).toFixed(2)}`,
-          resistance: `₹${(stock.last_close * 1.15).toFixed(2)}`
-        },
-        fundamental: {
-          pe: 'N/A', sectorPe: 'N/A', de: '< 1.0',
-          promoterHolding: '>50%', promoterTrend: 'Stable',
-          salesGrowth: '+15% YoY', profitGrowth: '+20% YoY'
-        },
-        trade: {
-          entryLow: stock.last_close.toFixed(2), entryHigh: (stock.last_close*1.02).toFixed(2),
-          sl: (stock.last_close * 0.9).toFixed(2), slPct: '10%',
-          t1: (stock.last_close * 1.15).toFixed(2), t1Pct: '15%',
-          t2: (stock.last_close * 1.30).toFixed(2), t2Pct: '30%',
-          rrRatio: '1:2.5', rrReward: 70, positionAmount: '₹1.0L', shares: ~~(100000/stock.last_close)
-        },
-        news: { clean: true, summary: "Strong quantitative scan result" },
-        chartLink: `https://in.tradingview.com/chart/?symbol=NSE:${stock.ticker}`,
-        sources: "NSE Bulk Data, Yahoo Finance"
-      };
-    });
+/* ═══════════════════════════════════════════════════════════════
+   STATS ROW
+═══════════════════════════════════════════════════════════════ */
+function buildStatsRow() {
+  const el = document.getElementById('statsRow');
+  const total   = fullScanData.length;
+  const g1W     = fullScanData.filter(s => s['1W'] > 0).length;
+  const g1M     = fullScanData.filter(s => s['1M'] > 0).length;
+  const l1M     = fullScanData.filter(s => s['1M'] < 0).length;
+  const multi   = fullScanData.filter(s => s['12M'] > 100).length;
 
-    // Update Market Snapshot metrics
-    d.market.bias = breadth.advance_decline_ratio > 1 ? 'Bullish' : 'Bearish';
-    d.market.biasClass = breadth.advance_decline_ratio > 1 ? 'bullish' : 'bearish';
-    d.market.biasNote = `${tf} Market Breadth: ${breadth.advancing} Advancing vs ${breadth.declining} Declining. A/D Ratio is ${breadth.advance_decline_ratio.toFixed(2)}. Average return across NSE is ${breadth.avg_return_pct.toFixed(2)}%.`;
-    d.market.topSectors = [`A/D Ratio: ${breadth.advance_decline_ratio.toFixed(2)}`, `Avg Return: ${breadth.avg_return_pct.toFixed(2)}%`, `Median: ${breadth.median_return_pct.toFixed(2)}%`];
-  }
+  // Market breadth 1W from summary if available
+  const mb1W = summaryData?.market_breadth?.['1W'];
+  const adRatio = mb1W ? mb1W.advance_decline_ratio.toFixed(2) : '—';
+  const avgRet  = mb1W ? (mb1W.avg_return_pct > 0 ? '+' : '') + mb1W.avg_return_pct.toFixed(2) + '%' : '—';
 
-  // Set report metadata
-  const dtStr = fetchedBackendData ? fetchedBackendData.scan_date : new Date().toLocaleDateString();
-  const timeStr = fetchedBackendData ? fetchedBackendData.scan_timestamp : '';
-
-  document.getElementById('reportDate').textContent = dtStr;
-  document.getElementById('reportTime').textContent = timeStr;
-  document.getElementById('footerTime').textContent = `${dtStr} ${timeStr} IST`;
-  document.getElementById('reportMeta').style.display = 'flex';
-
-  // Build tabs
-  buildMarketSnapshot(d.market);
-  buildSetups(d.setups || []);
-  buildWatchlist(d.watchlist || []);
-  buildHeatmap(d.sectors || []);
-  buildRiskDashboard(d.risk || d.market);
-  buildNewsTab();
-  buildFullScanTab();
-
-  // Show report
-  document.getElementById('loadingState').style.display = 'none';
-  document.getElementById('reportState').style.display = 'block';
-
-  setTimeout(() => {
-    if(d.risk) animateVix(parseFloat(d.risk.vix.value));
-    animateRsiNeedles();
-  }, 200);
+  el.innerHTML = [
+    statCard(total,    'Stocks Scanned', 'col-blue'),
+    statCard(g1W,      '1W Gainers',     'col-green'),
+    statCard(g1M,      '1M Gainers',     'col-green'),
+    statCard(l1M,      '1M Losers',      'col-red'),
+    statCard(multi,    '12M > 100%',     'col-purple'),
+    statCard(adRatio,  '1W A/D Ratio',   adRatio >= 1 ? 'col-green' : 'col-red'),
+    statCard(avgRet,   '1W Avg Return',  avgRet.startsWith('+') ? 'col-green' : 'col-red'),
+  ].join('');
 }
 
-function buildNewsTab() {
-  const container = document.getElementById('newsContent');
-  if (!fetchedNewsData || fetchedNewsData.length === 0) {
-    container.innerHTML = `<div style="padding: 20px; color:rgba(255,255,255,0.5);">No recent news found or waiting for backend.</div>`;
+function statCard(val, label, cls) {
+  return `<div class="stat-card">
+    <div class="sv ${cls}">${val}</div>
+    <div class="sl">${label}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FULL SCAN TABLE
+═══════════════════════════════════════════════════════════════ */
+function buildFullScan() {
+  document.getElementById('fsBadge').textContent = fullScanData.length;
+  if (fullScanData.length === 0) {
+    document.getElementById('fsTbody').innerHTML =
+      `<tr><td colspan="9" style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);">
+        No scan data available. The daily scan runs at 4:45 PM IST (Mon–Fri).
+      </td></tr>`;
     return;
   }
-  
-  const newsHtml = fetchedNewsData.map(item => `
-    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:12px;">
-      <div style="font-size:11px; color:rgba(255,255,255,0.4); margin-bottom:6px; display:flex; justify-content:space-between;">
-        <span style="color:var(--primary); font-weight:600;">[${item.source}]</span>
-        <span>${item.time}</span>
-      </div>
-      <div>
-        <a href="${item.link}" target="_blank" rel="noopener" style="color:#fff; text-decoration:none; font-size:15px; font-weight:500; line-height:1.4;">
-          ${item.title}
-        </a>
-      </div>
-    </div>
-  `).join('');
-  
-  container.innerHTML = `<div class="news-list" style="max-height: 600px; overflow-y: auto; padding-right:10px;">${newsHtml}</div>`;
+  _fsPage = 0;
+  fsRender();
 }
 
-/* ═══════════════════════════════════════════════
-   TAB 1 — MARKET SNAPSHOT
-═══════════════════════════════════════════════ */
-function buildMarketSnapshot(m) {
-  const container = document.getElementById('marketSnapshotContent');
-
-  const indicesHtml = m.indices.map(idx => `
-    <div class="index-card ${idx.trend}">
-      <div class="ic-label">${idx.label}</div>
-      <div class="ic-value">${idx.value}</div>
-      <div>
-        <span class="ic-change ${idx.trend === 'bullish' ? 'up' : idx.trend === 'bearish' ? 'dn' : 'flat'}">
-          ${idx.trend === 'bullish' ? '▲' : idx.trend === 'bearish' ? '▼' : '◆'} ${idx.change} (${idx.pts})
-        </span>
-      </div>
-      <div class="ic-sub">Weekly: ${idx.weekly} · ${idx.sub}</div>
-    </div>
-  `).join('');
-
-  const eventsHtml = m.events.map(ev => `
-    <div class="event-item">
-      <div class="event-date">${ev.date}</div>
-      <span class="event-tag ${ev.tagClass}">${ev.tag}</span>
-      <div class="event-desc">${ev.desc}</div>
-    </div>
-  `).join('');
-
-  container.innerHTML = `
-    <div class="market-grid">${indicesHtml}</div>
-
-    <div class="fii-dii-row">
-      <div class="fii-card">
-        <div class="fii-title">${m.fii.label}</div>
-        <div class="fii-val ${m.fii.type}">${m.fii.value}</div>
-        <div class="fii-sub">${m.fii.note}</div>
-      </div>
-      <div class="fii-card">
-        <div class="fii-title">${m.dii.label}</div>
-        <div class="fii-val ${m.dii.type}">${m.dii.value}</div>
-        <div class="fii-sub">${m.dii.note}</div>
-      </div>
-    </div>
-
-    <div class="market-bias">
-      <div class="bias-indicator">
-        <div>
-          <div class="bias-label">Overall Market Bias</div>
-          <div class="bias-value ${m.biasClass}">${m.bias}</div>
-        </div>
-        <div style="font-size:40px; margin-left:16px;">${m.biasClass === 'bullish' ? '🟢' : m.biasClass === 'bearish' ? '🔴' : '🟡'}</div>
-      </div>
-      <div style="flex:2; font-size:13px; color:rgba(255,255,255,0.55); line-height:1.6; padding-left:20px; border-left:1px solid var(--border);">
-        ${m.biasNote}
-      </div>
-    </div>
-
-    <div class="events-section">
-      <h3>📅 Key Events This Week</h3>
-      <div class="event-list">${eventsHtml}</div>
-    </div>
-
-    <div style="margin-top:20px;">
-      <h3 style="font-size:15px;margin-bottom:14px;">🏆 Top Performing Sectors (Week)</h3>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        ${m.topSectors.map((s, i) => `
-          <div style="background:var(--green-dim);border:1px solid rgba(16,245,168,0.25);border-radius:10px;padding:12px 20px;display:flex;align-items:center;gap:12px;">
-            <span style="font-family:var(--font-mono);font-size:18px;font-weight:800;color:var(--green);">#${i + 1}</span>
-            <span style="font-weight:700;">${s}</span>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-}
-
-/* ═══════════════════════════════════════════════
-   TAB 2 — SETUPS
-═══════════════════════════════════════════════ */
-function buildSetups(setups) {
-  const container = document.getElementById('setupsContent');
-
-  container.innerHTML = setups.map(s => {
-    const { rank, name, ticker, cmp, marketCap, setupType, setupLabel, technical, fundamental, trigger, trade, news, chartLink, sources } = s;
-
-    const rsiW = (technical.rsi.value / 100) * 100;
-    const rsiColor = technical.rsi.value < 40 ? 'var(--green)' : technical.rsi.value > 60 ? 'var(--red)' : 'var(--amber)';
-
-    const newsClass = news.clean ? 'clean' : 'warning';
-    const newsIcon = news.clean ? '✅' : '⚠️';
-
-    const riskWidth = 25;
-    const rewardWidth = trade.rrReward;
-
-    return `
-    <div class="setup-card" id="setup-${ticker}">
-      <div class="setup-header">
-        <div class="setup-rank">${rank}</div>
-        <div class="setup-title-block">
-          <div class="setup-name">${name} <span style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.4)">NSE: ${ticker}</span></div>
-          <div class="setup-meta-row">
-            <span class="setup-type ${setupType}">${setupLabel}</span>
-            <span style="font-size:12px;color:rgba(255,255,255,0.4);">${marketCap}</span>
-          </div>
-        </div>
-        <div>
-          <div class="setup-cmp">${cmp}</div>
-          <div class="setup-cap">Current Price</div>
-        </div>
-      </div>
-
-      <div class="setup-body">
-
-        <!-- Technical Snapshot -->
-        <div class="setup-section">
-          <div class="setup-section-title">📈 Technical Snapshot</div>
-
-          <div class="indicator-row">
-            <span class="ind-key">RSI (14)</span>
-            <span class="ind-val" style="color:${rsiColor}">${technical.rsi.label}</span>
-          </div>
-          <div class="rsi-gauge" title="RSI Scale: Green=Oversold, Yellow=Neutral, Red=Overbought">
-            <div class="rsi-track">
-              <div class="rsi-needle" data-rsi="${technical.rsi.value}" style="left:${rsiW}%"></div>
-            </div>
-          </div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px;">${technical.rsi.interpretation}</div>
-
-          <div class="indicator-row">
-            <span class="ind-key">MACD (12,26,9)</span>
-            <span class="ind-val ${technical.macd.signal}">${technical.macd.label}</span>
-          </div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">${technical.macd.detail}</div>
-
-          <div class="indicator-row">
-            <span class="ind-key">Price vs DMAs</span>
-            <span class="ind-val ${technical.dma.above50 ? 'bullish' : 'bearish'}" style="font-size:12px;">${technical.dma.label}</span>
-          </div>
-
-          <div class="indicator-row">
-            <span class="ind-key">Volume</span>
-            <span class="ind-val ${technical.volume.status === 'surge' ? 'bullish' : technical.volume.status === 'dry' ? 'neutral' : ''}">${technical.volume.status.toUpperCase()}</span>
-          </div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">${technical.volume.label}</div>
-
-          <div class="indicator-row">
-            <span class="ind-key">Key Support</span>
-            <span class="ind-val" style="color:var(--green)">${technical.support}</span>
-          </div>
-          <div class="indicator-row">
-            <span class="ind-key">Key Resistance</span>
-            <span class="ind-val" style="color:var(--red)">${technical.resistance}</span>
-          </div>
-        </div>
-
-        <!-- Fundamental Snapshot -->
-        <div class="setup-section">
-          <div class="setup-section-title">🔬 Fundamental Snapshot</div>
-
-          <div class="indicator-row">
-            <span class="ind-key">P/E Ratio</span>
-            <span class="ind-val">${fundamental.pe}</span>
-          </div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">Sector PE: ${fundamental.sectorPe}</div>
-
-          <div class="indicator-row">
-            <span class="ind-key">Debt / Equity</span>
-            <span class="ind-val">${fundamental.de}</span>
-          </div>
-
-          <div class="indicator-row">
-            <span class="ind-key">Promoter Holding</span>
-            <span class="ind-val">${fundamental.promoterHolding}</span>
-          </div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">${fundamental.promoterTrend} · as of ${fundamental.lastQtr}</div>
-
-          <div class="indicator-row">
-            <span class="ind-key">Revenue Growth</span>
-            <span class="ind-val bullish">${fundamental.salesGrowth}</span>
-          </div>
-          <div class="indicator-row">
-            <span class="ind-key">Profit Growth</span>
-            <span class="ind-val bullish">${fundamental.profitGrowth}</span>
-          </div>
-
-          <div style="margin-top:16px;">
-            <div class="setup-section-title">📰 Recent News</div>
-            <div class="news-pill ${newsClass}">${newsIcon} ${news.summary}</div>
-          </div>
-
-          <div style="margin-top:12px;">
-            <a class="chart-link" href="${chartLink}" target="_blank" rel="noopener">
-              📊 View Chart on TradingView ↗
-            </a>
-          </div>
-        </div>
-
-        <!-- Trigger -->
-        <div style="grid-column:1/-1;">
-          <div class="trigger-box">
-            <strong>⚡ Recent Trigger / Setup Rationale</strong>
-            ${trigger}
-          </div>
-        </div>
-
-        <!-- Trade Setup -->
-        <div class="trade-box">
-          <div class="setup-section-title" style="margin-bottom:16px;">🎯 Trade Setup (Educational — Not Investment Advice)</div>
-          <div class="trade-grid">
-            <div class="trade-item">
-              <div class="trade-label">Entry Zone</div>
-              <div class="trade-val entry">₹${trade.entryLow}–${trade.entryHigh}</div>
-              <div class="trade-sub">Buy zone</div>
-            </div>
-            <div class="trade-item">
-              <div class="trade-label">Stop Loss</div>
-              <div class="trade-val sl">₹${trade.sl}</div>
-              <div class="trade-sub">Risk: ${trade.slPct}</div>
-            </div>
-            <div class="trade-item">
-              <div class="trade-label">Target 1</div>
-              <div class="trade-val t1">₹${trade.t1}</div>
-              <div class="trade-sub">+${trade.t1Pct}</div>
-            </div>
-            <div class="trade-item">
-              <div class="trade-label">Target 2</div>
-              <div class="trade-val t2">₹${trade.t2}</div>
-              <div class="trade-sub">+${trade.t2Pct}</div>
-            </div>
-          </div>
-
-          <div class="rr-bar">
-            <span class="rr-label">Risk/Reward:</span>
-            <div class="rr-visual">
-              <div class="rr-risk"></div>
-              <div class="rr-reward" style="width:${rewardWidth}%"></div>
-            </div>
-            <span class="rr-ratio">${trade.rrRatio}</span>
-          </div>
-
-          <div class="position-chip">
-            <span>💰 Position Size (₹10L capital): <strong>${trade.positionAmount}</strong></span>
-            <span>📦 Quantity: <strong>${trade.shares}</strong></span>
-            <span>⚠️ Max Risk: <strong>₹${(REPORT_DATA.capitalBase * REPORT_DATA.maxRiskPct).toLocaleString('en-IN')}</strong> (2% cap)</span>
-          </div>
-        </div>
-
-        <div style="grid-column:1/-1;font-size:11px;color:rgba(255,255,255,0.3);padding-top:4px;">
-          📊 Sources: ${sources}
-        </div>
-
-      </div>
-    </div>
-    `;
-  }).join('');
-}
-
-/* ═══════════════════════════════════════════════
-   TAB 3 — WATCHLIST
-═══════════════════════════════════════════════ */
-function buildWatchlist(watchlist) {
-  const container = document.getElementById('watchlistContent');
-
-  const rows = watchlist.map(w => `
-    <div class="wl-row">
-      <div class="wl-name">${w.name} <span style="font-size:11px;color:rgba(255,255,255,0.35)">· ${w.ticker}</span></div>
-      <div class="wl-cmp">${w.cmp}</div>
-      <div><span class="readiness ${w.readiness}">${w.readiness.toUpperCase()}</span></div>
-      <div class="wl-level">${w.watchLevel}</div>
-      <div class="wl-trigger">${w.trigger}</div>
-    </div>
-  `).join('');
-
-  container.innerHTML = `
-    <div style="background:var(--amber-dim);border:1px solid rgba(245,166,35,0.2);border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.65);">
-      <strong style="color:var(--amber);">👁️ Watchlist Philosophy:</strong>
-      These stocks are <em>not yet ready</em> for entry. Watch them for the specified trigger levels. Patience is the most underrated edge in swing trading.
-    </div>
-    <div class="watchlist-table">
-      <div class="wl-header">
-        <div>Stock</div>
-        <div>CMP</div>
-        <div>Status</div>
-        <div>Watch Level</div>
-        <div>Entry Trigger</div>
-      </div>
-      ${rows}
-    </div>
-
-    <div style="margin-top:24px;">
-      <h3 style="font-size:15px;margin-bottom:14px;">🔴 Stocks to AVOID This Week</h3>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        ${['F&O Ban Stocks', 'Pledged >50%', 'Stocks near results (unconfirmed)', 'Penny Stocks <₹50', 'China-linked Metal Stocks'].map(s => `
-          <div style="background:var(--red-dim);border:1px solid rgba(245,54,92,0.2);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--red);">✕ ${s}</div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-}
-
-/* ═══════════════════════════════════════════════
-   TAB 4 — SECTOR HEATMAP
-═══════════════════════════════════════════════ */
-function buildHeatmap(sectors) {
-  const container = document.getElementById('heatmapContent');
-  const top2 = sectors.filter(s => parseFloat(s.change) > 0).slice(0, 2);
-
-  const topHtml = top2.map(s => `
-    <div class="top-sector-chip">
-      <span style="font-size:20px">🔥</span>
-      <div>
-        <div class="ts-label">Top Sector</div>
-        <div class="ts-name">${s.name}</div>
-      </div>
-      <div class="ts-val">${s.change}</div>
-    </div>
-  `).join('');
-
-  const cellsHtml = sectors
-    .sort((a, b) => parseFloat(b.change) - parseFloat(a.change))
-    .map(s => {
-      const pct = parseFloat(s.change);
-      return `
-      <div class="heatmap-cell ${s.hm}" title="${s.index}: ${s.change}">
-        <div class="hm-rank">#${s.rank}</div>
-        <div class="hm-name">${s.name}</div>
-        <div class="hm-index">${s.index}</div>
-        <div class="hm-change">${s.change}</div>
-        <div class="hm-vol">Vol: ${s.vol}</div>
-      </div>
-    `;
-    }).join('');
-
-  container.innerHTML = `
-    <div style="margin-bottom:20px;">
-      <h3 style="font-size:15px;margin-bottom:14px;">🏆 Top Performing Sectors (This Week)</h3>
-      <div class="top-sectors">${topHtml}</div>
-    </div>
-
-    <div class="heatmap-grid">${cellsHtml}</div>
-
-    <div style="margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;">
-      <h3 style="font-size:14px;margin-bottom:12px;">🔄 Sector Rotation Signal</h3>
-      <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;">
-        Money is rotating <strong style="color:var(--green)">INTO</strong> defensive sectors:
-        <strong>Pharma</strong>, <strong>FMCG</strong>, <strong>PSU Banks</strong> (rate cut beneficiaries).
-        Money is rotating <strong style="color:var(--red)">OUT OF</strong> cyclical risk:
-        <strong>IT</strong> (expensive valuations + US recession fear), <strong>Metals</strong> (China slowdown + tariff wars), <strong>Realty</strong> (FII exit).
-      </p>
-    </div>
-  `;
-}
-
-/* ═══════════════════════════════════════════════
-   TAB 5 — RISK DASHBOARD
-═══════════════════════════════════════════════ */
-function buildRiskDashboard(risk) {
-  const container = document.getElementById('riskContent');
-
-  const macroRows = risk.macro.map(m => `
-    <tr>
-      <td>${m.indicator}</td>
-      <td style="font-weight:700;">${m.value}</td>
-      <td style="color:${m.impactClass === 'bullish' ? 'var(--green)' : m.impactClass === 'bearish' ? 'var(--red)' : 'var(--amber)'};font-size:12px;">${m.impact}</td>
-    </tr>
-  `).join('');
-
-  const eventsHtml = risk.upcomingEvents.map(e => `
-    <li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:rgba(255,255,255,0.65);">${e}</li>
-  `).join('');
-
-  const supportHtml = risk.niftySupport.map(s => `
-    <div class="sr-item">
-      <div class="sr-type">Support</div>
-      <div class="sr-val sup">${s.split(' ')[0]}</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;">${s.split(' ').slice(1).join(' ')}</div>
-    </div>
-  `).join('');
-
-  const resistanceHtml = risk.niftyResistance.map(r => `
-    <div class="sr-item">
-      <div class="sr-type">Resistance</div>
-      <div class="sr-val res">${r.split(' ')[0]}</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;">${r.split(' ').slice(1).join(' ')}</div>
-    </div>
-  `).join('');
-
-  const vixPct = Math.min((parseFloat(risk.vix.value) / 35) * 100, 100);
-
-  container.innerHTML = `
-    <div class="risk-grid">
-      <div class="risk-card">
-        <div class="risk-label">India VIX</div>
-        <div class="risk-value ${risk.vix.class}">${risk.vix.value}</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Volatility Index · Status: <strong style="color:var(--amber)">${risk.vix.status}</strong></div>
-        <div class="vix-track" id="vixTrack">
-          <div class="vix-needle" id="vixNeedle" data-pct="${vixPct}" style="left:${vixPct}%"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;">
-          <span>0 — Low</span><span>17 — Med</span><span>25 — High</span><span>35+</span>
-        </div>
-      </div>
-
-      <div class="risk-card">
-        <div class="risk-label">Nifty 50 CMP</div>
-        <div class="risk-value medium">${risk.niftyCurrent}</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.4);">
-          Between key support (22,000) and resistance (22,800)<br/>
-          Watch for directional breakout
-        </div>
-      </div>
-
-      <div class="risk-card">
-        <div class="risk-label">Overall Market Risk</div>
-        <div class="risk-value ${risk.overallRisk.class}">${risk.overallRisk.level}</div>
-        <div class="or-meter">
-          <div class="or-segment low ${risk.overallRisk.level === 'Low' ? 'active' : ''}"></div>
-          <div class="or-segment medium ${risk.overallRisk.level === 'Medium' ? 'active' : ''}"></div>
-          <div class="or-segment high ${risk.overallRisk.level === 'High' ? 'active' : ''}"></div>
-        </div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.4);">Reduce position sizes in high-risk environment. Use trailing SLs.</div>
-      </div>
-    </div>
-
-    <div class="support-res">
-      <h3>Nifty 50 — Key Levels</h3>
-      <div class="sr-row">
-        ${resistanceHtml}
-        <div class="sr-item" style="background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.2);">
-          <div class="sr-type">Current</div>
-          <div class="sr-val curr">${risk.niftyCurrent}</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;">CMP</div>
-        </div>
-        ${supportHtml}
-      </div>
-    </div>
-
-    <div style="margin-bottom:24px;">
-      <h3 style="font-size:15px;margin-bottom:14px;">📊 Macro Indicators</h3>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
-        <table class="macro-table">
-          <thead>
-            <tr>
-              <th>Indicator</th><th>Value</th><th>Market Impact</th>
-            </tr>
-          </thead>
-          <tbody>${macroRows}</tbody>
-        </table>
-      </div>
-    </div>
-
-    <div>
-      <h3 style="font-size:15px;margin-bottom:14px;">📅 Key Events & Catalysts This Week</h3>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;">
-        <ul style="list-style:none;">${eventsHtml}</ul>
-      </div>
-    </div>
-
-    <div style="margin-top:20px;background:var(--red-dim);border:1px solid rgba(245,54,92,0.2);border-radius:var(--radius);padding:16px 20px;">
-      <strong style="color:var(--red);font-size:13px;">⚠️ Risk Management Checklist for This Week:</strong>
-      <ul style="list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:8px;">
-        ${[
-          'Never enter without a stop loss pre-defined',
-          'Max position: 20-40% of capital per trade',
-          'Total deployed: max 3-5 positions (₹3-5L max for ₹10L capital)',
-          'Exit half position at Target 1 — protect profits',
-          'Do not trade on results day unless you understand the risk',
-          'Market holiday on 14 Apr — plan your exits before Thursday close',
-        ].map(i => `<li style="font-size:13px;color:rgba(255,255,255,0.65);display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--red)">☑</span>${i}</li>`).join('')}
-      </ul>
-    </div>
-  `;
-}
-
-/* ═══════════════════════════════════════════════
-   ANIMATIONS
-═══════════════════════════════════════════════ */
-function animateRsiNeedles() {
-  document.querySelectorAll('.rsi-needle').forEach(needle => {
-    const rsi = parseFloat(needle.dataset.rsi);
-    const pct = (rsi / 100) * 100;
-    // Trigger transition by setting left slightly then to target
-    needle.style.left = '50%';
-    requestAnimationFrame(() => {
-      setTimeout(() => { needle.style.left = pct + '%'; }, 50);
-    });
-  });
-}
-
-function animateVix(vixVal) {
-  const needle = document.getElementById('vixNeedle');
-  if (!needle) return;
-  const pct = Math.min((vixVal / 35) * 100, 100);
-  needle.style.left = '50%';
-  requestAnimationFrame(() => {
-    setTimeout(() => { needle.style.left = pct + '%'; }, 100);
-  });
-}
-
-/* ═══════════════════════════════════════════════
-   TAB 7 — FULL SCAN TABLE
-═══════════════════════════════════════════════ */
-let _fullScanData = [];    // master list
-let _fsSortCol = '1M';     // default sort
-let _fsSortAsc = false;
-let _fsFilter  = '';
-let _fsTfFilter = '';
-
-function buildFullScanTab() {
-  const container = document.getElementById('fullscanContent');
-  const TFS = ['1W','2W','1M','3M','6M','12M'];
-
-  if (!fetchedFullScan || !fetchedFullScan.stocks || fetchedFullScan.stocks.length === 0) {
-    container.innerHTML = `
-      <div style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);">
-        <div style="font-size:48px;margin-bottom:16px;">📋</div>
-        <div style="font-size:16px;">Full scan data not yet available.</div>
-        <div style="font-size:13px;margin-top:8px;">Run <code>python scanner.py</code> locally to generate <code>scan_results/full_summary.json</code>, then push to GitHub.</div>
-      </div>`;
-    return;
-  }
-
-  _fullScanData = fetchedFullScan.stocks;
-  document.getElementById('fullscanBadge').textContent = _fullScanData.length;
-
-  container.innerHTML = `
-    <!-- Stats bar -->
-    <div id="fs-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;"></div>
-
-    <!-- Controls -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
-      <input id="fs-search" type="text" placeholder="🔍 Search ticker..."
-        style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
-               color:#fff;font-size:13px;width:200px;outline:none;"
-        oninput="_fsFilter=this.value.toUpperCase();_fsRender()">
-
-      <select id="fs-tf-filter"
-        style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
-               color:#fff;font-size:13px;cursor:pointer;"
-        onchange="_fsTfFilter=this.value;_fsRender()">
-        <option value="">All Stocks</option>
-        ${TFS.map(tf => `<option value="${tf}">✅ ${tf} Gainers Only</option>`).join('')}
-      </select>
-
-      <span id="fs-count" style="font-size:12px;color:rgba(255,255,255,0.4);margin-left:auto;">Loading...</span>
-    </div>
-
-    <!-- Table -->
-    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
-      <table id="fs-table" style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead style="background:#0d1520;position:sticky;top:0;z-index:2;">
-          <tr>
-            <th style="padding:12px 16px;text-align:left;color:var(--primary);cursor:pointer;" onclick="_fsSort('t')">Ticker ▲▼</th>
-            <th style="padding:12px 16px;text-align:right;color:rgba(255,255,255,0.5);">Price (₹)</th>
-            <th style="padding:12px 16px;text-align:center;color:rgba(255,255,255,0.5);">Date</th>
-            ${TFS.map(tf => `<th style="padding:12px 16px;text-align:right;color:var(--primary);cursor:pointer;" onclick="_fsSort('${tf}')">${tf} ▲▼</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody id="fs-tbody"></tbody>
-      </table>
-    </div>
-    <div id="fs-pagination" style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;"></div>
-  `;
-
-  _fsComputeStats(TFS);
-  _fsSortCol = '1M';
-  _fsSortAsc = false;
-  _fsRender();
-}
-
-const FS_PAGE_SIZE = 100;
-let _fsPage = 0;
-
-function _fsFilteredData() {
-  let data = _fullScanData;
-  if (_fsFilter) data = data.filter(s => s.t && s.t.toUpperCase().includes(_fsFilter));
-  if (_fsTfFilter) data = data.filter(s => s[_fsTfFilter] !== null && s[_fsTfFilter] > 0);
-  // Sort
-  data = [...data].sort((a, b) => {
+function fsFilteredData() {
+  let d = fullScanData;
+  if (_fsFilter)   d = d.filter(s => s.t?.toUpperCase().includes(_fsFilter));
+  if (_fsTfFilter) d = d.filter(s => s[_fsTfFilter] != null && s[_fsTfFilter] > 0);
+  return [...d].sort((a, b) => {
     const av = a[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
     const bv = b[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
     if (typeof av === 'string') return _fsSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
     return _fsSortAsc ? av - bv : bv - av;
   });
-  return data;
 }
 
-function _fsRender() {
+function fsRender() {
   const TFS = ['1W','2W','1M','3M','6M','12M'];
-  const data = _fsFilteredData();
+  const data = fsFilteredData();
   const total = data.length;
-  const pageData = data.slice(_fsPage * FS_PAGE_SIZE, (_fsPage + 1) * FS_PAGE_SIZE);
+  const page  = data.slice(_fsPage * FS_PAGE, (_fsPage + 1) * FS_PAGE);
 
-  document.getElementById('fs-count').textContent = `Showing ${pageData.length} of ${total} stocks`;
+  document.getElementById('fsCount').textContent =
+    `Showing ${(_fsPage * FS_PAGE) + 1}–${Math.min((_fsPage+1)*FS_PAGE, total)} of ${total} stocks`;
 
-  const tbody = document.getElementById('fs-tbody');
-  tbody.innerHTML = pageData.map((s, i) => {
-    const bg = i % 2 === 0 ? 'background:transparent' : 'background:rgba(255,255,255,0.015)';
+  // Update sort indicators
+  ['t','c','1W','2W','1M','3M','6M','12M'].forEach(col => {
+    const el = document.getElementById(`th-${col}`);
+    if (el) el.textContent = _fsSortCol === col ? (_fsSortAsc ? '▲' : '▼') : '';
+  });
+
+  document.getElementById('fsTbody').innerHTML = page.map((s, i) => {
     const cells = TFS.map(tf => {
       const v = s[tf];
-      if (v === null || v === undefined) return `<td style="text-align:right;padding:9px 16px;color:rgba(255,255,255,0.2);">—</td>`;
-      const color = v >= 0 ? '#3fb950' : '#f85149';
-      const arrow = v >= 0 ? '▲' : '▼';
-      const weight = Math.abs(v) > 50 ? '800' : Math.abs(v) > 10 ? '700' : '500';
-      return `<td style="text-align:right;padding:9px 16px;color:${color};font-weight:${weight};">${arrow} ${Math.abs(v).toFixed(2)}%</td>`;
+      if (v == null) return `<td class="na">—</td>`;
+      const pos = v >= 0;
+      const abs = Math.abs(v);
+      const weight = abs > 50 ? 'bold-hi' : abs > 10 ? 'bold-md' : '';
+      const arrow = pos ? '▲' : '▼';
+      return `<td class="${pos ? 'pos' : 'neg'} ${weight}">${arrow} ${abs.toFixed(2)}%</td>`;
     }).join('');
-    return `<tr style="${bg};border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s;"
-            onmouseover="this.style.background='rgba(16,245,168,0.04)'"
-            onmouseout="this.style.background='${i%2===0?'transparent':'rgba(255,255,255,0.015)'}'">
-      <td style="padding:9px 16px;font-weight:700;color:#fff;">
-        <a href="https://in.tradingview.com/chart/?symbol=NSE:${s.t}" target="_blank" rel="noopener"
-           style="color:var(--primary);text-decoration:none;">${s.t}</a>
-      </td>
-      <td style="padding:9px 16px;text-align:right;color:rgba(255,255,255,0.7);">₹${s.c.toFixed(2)}</td>
-      <td style="padding:9px 16px;text-align:center;color:rgba(255,255,255,0.35);font-size:11px;">${s.d}</td>
+
+    return `<tr>
+      <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${s.t}" target="_blank" rel="noopener">${s.t}</a></td>
+      <td class="td-price">₹${s.c.toFixed(2)}</td>
+      <td class="td-date">${s.d}</td>
       ${cells}
     </tr>`;
   }).join('');
 
   // Pagination
-  const totalPages = Math.ceil(total / FS_PAGE_SIZE);
-  const pagDiv = document.getElementById('fs-pagination');
-  if (totalPages <= 1) { pagDiv.innerHTML = ''; return; }
+  const totalPages = Math.ceil(total / FS_PAGE);
+  const pag = document.getElementById('fsPagination');
+  if (totalPages <= 1) { pag.innerHTML = ''; return; }
 
-  const btnStyle = (active) => `padding:6px 14px;border-radius:6px;border:1px solid ${active?'var(--primary)':'var(--border)'};
-    background:${active?'var(--primary)':'var(--surface)'};color:#fff;cursor:pointer;font-size:12px;`;
+  const pages = [];
+  pages.push(`<button class="pg-btn" onclick="fsGo(Math.max(0,${_fsPage}-1))">← Prev</button>`);
 
-  pagDiv.innerHTML = [
-    `<button style="${btnStyle(false)}" onclick="_fsPage=Math.max(0,_fsPage-1);_fsRender()">← Prev</button>`,
-    ...Array.from({length: totalPages}, (_, p) =>
-      p === _fsPage
-        ? `<button style="${btnStyle(true)}" onclick="_fsPage=${p};_fsRender()">${p+1}</button>`
-        : `<button style="${btnStyle(false)}" onclick="_fsPage=${p};_fsRender()">${p+1}</button>`
-    ).slice(Math.max(0, _fsPage-2), _fsPage+5),
-    `<button style="${btnStyle(false)}" onclick="_fsPage=Math.min(${totalPages-1},_fsPage+1);_fsRender()">Next →</button>`
-  ].join('');
+  const start = Math.max(0, _fsPage - 2);
+  const end   = Math.min(totalPages, _fsPage + 4);
+  if (start > 0) pages.push(`<button class="pg-btn" onclick="fsGo(0)">1</button><span style="color:rgba(255,255,255,0.3)">…</span>`);
+  for (let p = start; p < end; p++) {
+    pages.push(`<button class="pg-btn ${p === _fsPage ? 'active' : ''}" onclick="fsGo(${p})">${p+1}</button>`);
+  }
+  if (end < totalPages) pages.push(`<span style="color:rgba(255,255,255,0.3)">…</span><button class="pg-btn" onclick="fsGo(${totalPages-1})">${totalPages}</button>`);
+  pages.push(`<button class="pg-btn" onclick="fsGo(Math.min(${totalPages-1},${_fsPage}+1))">Next →</button>`);
+
+  pag.innerHTML = pages.join('');
 }
 
-function _fsSort(col) {
-  if (_fsSortCol === col) { _fsSortAsc = !_fsSortAsc; }
+function fsGo(page) { _fsPage = page; fsRender(); window.scrollTo({top: 200, behavior:'smooth'}); }
+function fsSort(col) {
+  if (_fsSortCol === col) _fsSortAsc = !_fsSortAsc;
   else { _fsSortCol = col; _fsSortAsc = col === 't'; }
-  _fsPage = 0;
-  _fsRender();
+  _fsPage = 0; fsRender();
+}
+function onFsSearch() { _fsFilter = document.getElementById('fsSearch').value.toUpperCase(); _fsPage = 0; fsRender(); }
+function onFsFilter() { _fsTfFilter = document.getElementById('fsTfFilter').value; _fsPage = 0; fsRender(); }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOP SETUPS (from backend data + static fallback)
+═══════════════════════════════════════════════════════════════ */
+function onTfChange(btn) {
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTf = btn.dataset.tf;
+  buildSetups(currentTf);
 }
 
-function _fsComputeStats(TFS) {
-  const data = _fullScanData;
-  const total = data.length;
-  const gainers1M = data.filter(s => s['1M'] > 0).length;
-  const losers1M  = data.filter(s => s['1M'] < 0).length;
-  const multi12M  = data.filter(s => s['12M'] > 100).length;
-  const top1W     = data.filter(s => s['1W'] > 0).length;
+function buildSetups(tf) {
+  const container = document.getElementById('setupsContent');
+  let setups = [];
 
-  const statsEl = document.getElementById('fs-stats');
-  const statCard = (val, label, color) =>
-    `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;text-align:center;min-width:90px;">
-      <div style="font-size:22px;font-weight:800;color:${color};">${val}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">${label}</div>
+  // Try live backend data first
+  if (summaryData?.top_10_by_timeframe?.[tf]) {
+    const stocks = summaryData.top_10_by_timeframe[tf];
+    const breadth = summaryData.market_breadth?.[tf];
+    setups = stocks.slice(0,5).map((s, i) => buildSetupFromScan(s, tf, i+1, breadth));
+  }
+
+  // Fallback to static data.js setups
+  if (setups.length === 0) {
+    const S = typeof REPORT_DATA !== 'undefined' ? REPORT_DATA : null;
+    if (S?.setups) setups = S.setups.map(s => renderStaticSetup(s));
+  }
+
+  if (setups.length === 0) {
+    container.innerHTML = `<div style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);">No setups available for this timeframe.</div>`;
+    return;
+  }
+  container.innerHTML = setups.join('');
+}
+
+function buildSetupFromScan(stock, tf, rank, breadth) {
+  const pct = stock[tf] ?? stock[Object.keys(stock).find(k => k !== 'ticker' && k !== 'last_close')] ?? 0;
+  const isBreakout = pct > 20;
+  const badgeCls = isBreakout ? 'badge-breakout' : 'badge-reversion';
+  const badgeLbl = isBreakout ? 'Strong Breakout' : 'Momentum Leader';
+  const entry = stock.last_close;
+  const sl = (entry * 0.92).toFixed(2);
+  const t1 = (entry * 1.08).toFixed(2);
+  const t2 = (entry * 1.16).toFixed(2);
+  const adNote = breadth ? `Market breadth: ${breadth.advancing} advancing / ${breadth.declining} declining (A/D ${breadth.advance_decline_ratio})` : '';
+
+  return `<div class="setup-card">
+    <div class="setup-header">
+      <div class="setup-rank">#${rank}</div>
+      <div style="flex:1">
+        <div class="setup-name">${stock.ticker} <span class="setup-ticker">NSE: ${stock.ticker}</span></div>
+        <span class="setup-type-badge ${badgeCls}">${badgeLbl}</span>
+      </div>
+      <div style="text-align:right">
+        <div class="setup-cmp">₹${entry.toFixed(2)}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);">Last Close</div>
+        <div style="color:var(--green);font-weight:800;font-size:16px;margin-top:2px;">${pct > 0 ? '+' : ''}${pct.toFixed(2)}% (${tf})</div>
+      </div>
+    </div>
+    <div class="trigger-note">
+      ⚡ <strong>${tf} momentum leader</strong> — ranked #${rank} out of ${summaryData?.total_stocks_scanned || '2200+'} NSE stocks.
+      ${adNote}
+    </div>
+    <div class="trade-grid">
+      <div class="trade-box-item"><div class="trade-label">Entry Zone</div><div class="trade-val entry-val">₹${entry.toFixed(2)}</div></div>
+      <div class="trade-box-item"><div class="trade-label">Stop Loss (8%)</div><div class="trade-val sl-val">₹${sl}</div></div>
+      <div class="trade-box-item"><div class="trade-label">Target 1 (+8%)</div><div class="trade-val t1-val">₹${t1}</div></div>
+      <div class="trade-box-item"><div class="trade-label">Target 2 (+16%)</div><div class="trade-val t2-val">₹${t2}</div></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:4px;">
+      <a href="https://in.tradingview.com/chart/?symbol=NSE:${stock.ticker}" target="_blank" rel="noopener"
+         style="font-size:12px;padding:6px 14px;border:1px solid var(--border);border-radius:6px;color:var(--primary);">
+        📊 View Chart on TradingView ↗
+      </a>
+      <span style="font-size:11px;color:rgba(255,255,255,0.2);">⚠️ Educational only. Not investment advice.</span>
+    </div>
+  </div>`;
+}
+
+function renderStaticSetup(s) {
+  const rsiColor = s.technical.rsi.value < 40 ? 'bull' : s.technical.rsi.value > 65 ? 'bear' : 'neut';
+  return `<div class="setup-card">
+    <div class="setup-header">
+      <div class="setup-rank">#${s.rank}</div>
+      <div style="flex:1">
+        <div class="setup-name">${s.name} <span class="setup-ticker">NSE: ${s.ticker}</span></div>
+        <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.35);">${s.marketCap}</div>
+        <span class="setup-type-badge badge-${s.setupType}">${s.setupLabel}</span>
+      </div>
+      <div style="text-align:right">
+        <div class="setup-cmp">${s.cmp}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);">Current Price</div>
+      </div>
+    </div>
+    <div class="setup-grid">
+      <div>
+        <div class="setup-section-title">📈 Technical</div>
+        <div class="ind-row"><span class="ind-key">RSI (14)</span><span class="ind-val ${rsiColor}">${s.technical.rsi.label}</span></div>
+        <div class="ind-row"><span class="ind-key">MACD</span><span class="ind-val ${s.technical.macd.signal === 'bullish' ? 'bull' : 'bear'}">${s.technical.macd.label}</span></div>
+        <div class="ind-row"><span class="ind-key">Moving Avgs</span><span class="ind-val" style="font-size:11px;">${s.technical.dma.label}</span></div>
+        <div class="ind-row"><span class="ind-key">Volume</span><span class="ind-val ${s.technical.volume.status === 'surge' ? 'bull' : ''}">${s.technical.volume.status.toUpperCase()}</span></div>
+        <div class="ind-row"><span class="ind-key">Support</span><span class="ind-val bull">${s.technical.support}</span></div>
+        <div class="ind-row"><span class="ind-key">Resistance</span><span class="ind-val bear">${s.technical.resistance}</span></div>
+      </div>
+      <div>
+        <div class="setup-section-title">🔬 Fundamental</div>
+        <div class="ind-row"><span class="ind-key">P/E</span><span class="ind-val">${s.fundamental.pe}</span></div>
+        <div class="ind-row"><span class="ind-key">Debt/Equity</span><span class="ind-val">${s.fundamental.de}</span></div>
+        <div class="ind-row"><span class="ind-key">Promoter %</span><span class="ind-val">${s.fundamental.promoterHolding}</span></div>
+        <div class="ind-row"><span class="ind-key">Revenue Growth</span><span class="ind-val bull">${s.fundamental.salesGrowth}</span></div>
+        <div class="ind-row"><span class="ind-key">Profit Growth</span><span class="ind-val bull">${s.fundamental.profitGrowth}</span></div>
+      </div>
+    </div>
+    <div class="trigger-note" style="margin-top:14px;">⚡ ${s.trigger}</div>
+    <div class="trade-grid" style="margin-top:14px;">
+      <div class="trade-box-item"><div class="trade-label">Entry Zone</div><div class="trade-val entry-val">₹${s.trade.entryLow}–${s.trade.entryHigh}</div></div>
+      <div class="trade-box-item"><div class="trade-label">Stop Loss</div><div class="trade-val sl-val">₹${s.trade.sl} (${s.trade.slPct})</div></div>
+      <div class="trade-box-item"><div class="trade-label">Target 1</div><div class="trade-val t1-val">₹${s.trade.t1} (${s.trade.t1Pct})</div></div>
+      <div class="trade-box-item"><div class="trade-label">Target 2</div><div class="trade-val t2-val">₹${s.trade.t2} (${s.trade.t2Pct})</div></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;align-items:center;">
+      <a href="${s.chartLink}" target="_blank" rel="noopener" style="font-size:12px;padding:6px 14px;border:1px solid var(--border);border-radius:6px;color:var(--primary);">📊 View Chart ↗</a>
+      <span style="font-size:11px;color:rgba(255,255,255,0.2);">⚠️ Educational only. R/R: ${s.trade.rrRatio}</span>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MARKET SNAPSHOT
+═══════════════════════════════════════════════════════════════ */
+function buildMarket(S) {
+  const el = document.getElementById('marketContent');
+  if (!S?.market) {
+    el.innerHTML = `<div class="card" style="color:rgba(255,255,255,0.4);">Market snapshot data not available.</div>`;
+    return;
+  }
+  const m = S.market;
+
+  // Inject live breadth if we have it
+  let biasNote = m.biasNote;
+  let bias = m.bias, biasCls = m.biasClass;
+  if (summaryData?.market_breadth?.['1W']) {
+    const mb = summaryData.market_breadth['1W'];
+    bias = mb.advance_decline_ratio > 1 ? 'Bullish' : 'Bearish';
+    biasCls = mb.advance_decline_ratio > 1 ? 'bull' : 'bear';
+    biasNote = `1W Market Breadth: ${mb.advancing} Advancing vs ${mb.declining} Declining. A/D Ratio: ${mb.advance_decline_ratio}. Avg return: ${mb.avg_return_pct > 0 ? '+' : ''}${mb.avg_return_pct}%.`;
+  }
+
+  const idxHtml = m.indices.map(idx => `
+    <div class="index-card">
+      <div class="ic-label">${idx.label}</div>
+      <div class="ic-value">${idx.value}</div>
+      <div class="ic-change ${idx.trend === 'bullish' ? 'up' : idx.trend === 'bearish' ? 'dn' : 'flat'}">
+        ${idx.trend === 'bullish' ? '▲' : '▼'} ${idx.change} (${idx.pts})
+      </div>
+      <div class="ic-sub">Weekly: ${idx.weekly} · ${idx.sub}</div>
+    </div>`).join('');
+
+  const evHtml = m.events.map(ev => `
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+      <span style="font-size:12px;font-family:var(--mono);color:rgba(255,255,255,0.4);white-space:nowrap;">${ev.date}</span>
+      <span style="background:rgba(61,142,244,0.15);color:var(--blue);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;">${ev.tag.toUpperCase()}</span>
+      <span style="font-size:13px;color:rgba(255,255,255,0.65);">${ev.desc}</span>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="index-grid">${idxHtml}</div>
+    <div class="card" style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;">
+      <div style="flex:0 0 auto;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Market Bias</div>
+        <div style="font-size:24px;font-weight:800;" class="${biasCls}">${bias}</div>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;border-left:1px solid var(--border);padding-left:16px;">${biasNote}</div>
+    </div>
+    <div class="card">
+      <div style="font-size:15px;font-weight:600;margin-bottom:14px;">📅 Key Events This Week</div>
+      ${evHtml}
+    </div>
+    <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;">
+      <strong style="font-size:13px;">🏆 Top Sectors:</strong>
+      ${m.topSectors.map(s => `<span style="background:rgba(16,245,168,0.1);color:var(--green);padding:4px 14px;border-radius:6px;font-size:13px;">${s}</span>`).join('')}
     </div>`;
-
-  statsEl.innerHTML = [
-    statCard(total,      'Total Stocks',    'var(--primary)'),
-    statCard(top1W,      '1W Gainers',      '#3fb950'),
-    statCard(gainers1M,  '1M Gainers',      '#3fb950'),
-    statCard(losers1M,   '1M Losers',       '#f85149'),
-    statCard(multi12M,   '12M > 100%',      '#a78bfa'),
-  ].join('');
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   WATCHLIST
+═══════════════════════════════════════════════════════════════ */
+function buildWatchlist(S) {
+  const el = document.getElementById('watchlistContent');
+  if (!S?.watchlist) { el.innerHTML = `<div class="card" style="color:rgba(255,255,255,0.4);">Watchlist not available.</div>`; return; }
+
+  const rows = S.watchlist.map(w => `
+    <div class="wl-row">
+      <div><strong>${w.name}</strong><div style="font-size:11px;color:rgba(255,255,255,0.35);">${w.ticker}</div></div>
+      <div style="font-family:var(--mono);">${w.cmp}</div>
+      <div class="readiness-${w.readiness}">${w.readiness.toUpperCase()}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);">${w.watchLevel}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);">${w.trigger}</div>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="wl-table">
+      <div class="wl-row wl-header">
+        <div>Stock</div><div>CMP</div><div>Status</div><div>Watch Level</div><div>Entry Trigger</div>
+      </div>
+      ${rows}
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTOR HEATMAP
+═══════════════════════════════════════════════════════════════ */
+function buildHeatmap(S) {
+  const el = document.getElementById('heatmapContent');
+  if (!S?.sectors) { el.innerHTML = `<div class="card" style="color:rgba(255,255,255,0.4);">Heatmap data not available.</div>`; return; }
+
+  const sorted = [...S.sectors].sort((a,b) => parseFloat(b.change) - parseFloat(a.change));
+  const cells = sorted.map(s => {
+    const pct = parseFloat(s.change);
+    const cls = pct > 2 ? 'hm-sb' : pct > 0.5 ? 'hm-b' : pct > 0 ? 'hm-slb' :
+                pct > -1 ? 'hm-f' : pct > -2 ? 'hm-sbe' : pct > -3 ? 'hm-be' : 'hm-sbe2';
+    return `<div class="hm-cell ${cls}">
+      <div class="hm-name">${s.name}</div>
+      <div class="hm-idx">${s.index}</div>
+      <div class="hm-chng">${s.change}</div>
+      <div class="hm-vol">Vol: ${s.vol}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="heatmap-grid">${cells}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RISK DASHBOARD
+═══════════════════════════════════════════════════════════════ */
+function buildRisk(S) {
+  const el = document.getElementById('riskContent');
+  if (!S?.risk) { el.innerHTML = `<div class="card" style="color:rgba(255,255,255,0.4);">Risk data not available.</div>`; return; }
+  const r = S.risk;
+  const vixPct = Math.min((parseFloat(r.vix.value) / 35) * 100, 100);
+
+  const macroRows = r.macro.map(m => `
+    <tr>
+      <td>${m.indicator}</td>
+      <td style="font-weight:700;font-family:var(--mono);">${m.value}</td>
+      <td style="font-size:12px;color:${m.impactClass === 'bullish' ? 'var(--green)' : m.impactClass === 'bearish' ? 'var(--red)' : 'var(--amber)'};">${m.impact}</td>
+    </tr>`).join('');
+
+  const evHtml = r.upcomingEvents.map(e =>
+    `<li style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:rgba(255,255,255,0.6);">${e}</li>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="risk-grid">
+      <div class="risk-card">
+        <div class="risk-label">India VIX</div>
+        <div class="risk-val" style="color:var(--amber);">${r.vix.value}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);">Status: ${r.vix.status}</div>
+        <div class="vix-track"><div class="vix-needle" id="vixNeedle" data-pct="${vixPct}" style="left:${vixPct}%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.25);margin-top:2px;"><span>0</span><span>17</span><span>25</span><span>35+</span></div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-label">Nifty 50</div>
+        <div class="risk-val" style="color:var(--blue);">${r.niftyCurrent}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);">Support: ${r.niftySupport[0]} · Resistance: ${r.niftyResistance[0]}</div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-label">Overall Risk</div>
+        <div class="risk-val" style="color:${r.overallRisk.level === 'Low' ? 'var(--green)' : r.overallRisk.level === 'High' ? 'var(--red)' : 'var(--amber)'};">${r.overallRisk.level}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);">Reduce sizes in high-risk environment.</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📊 Macro Indicators</div>
+      <table class="macro-table">
+        <thead><tr><th>Indicator</th><th>Value</th><th>Market Impact</th></tr></thead>
+        <tbody>${macroRows}</tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;">📅 Key Events This Week</div>
+      <ul style="list-style:none;">${evHtml}</ul>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEWS
+═══════════════════════════════════════════════════════════════ */
+function buildNews() {
+  const el = document.getElementById('newsContent');
+  if (!newsData || newsData.length === 0) {
+    el.innerHTML = `<div class="card" style="color:rgba(255,255,255,0.4);">No news data available.</div>`;
+    return;
+  }
+  el.innerHTML = newsData.map(item => `
+    <div class="news-item">
+      <div class="news-source">[${item.source}]</div>
+      <div class="news-title">
+        <a href="${item.link}" target="_blank" rel="noopener" style="color:#e6edf3;">${item.title}</a>
+      </div>
+      <div class="news-time">${item.time}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════════════════ */
+function animateNeedles() {
+  const needle = document.getElementById('vixNeedle');
+  if (!needle) return;
+  const target = needle.dataset.pct + '%';
+  needle.style.left = '50%';
+  requestAnimationFrame(() => setTimeout(() => { needle.style.left = target; }, 50));
+}
