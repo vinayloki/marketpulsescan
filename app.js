@@ -15,11 +15,12 @@ let opportunitiesData = [];  // opportunities.json → opportunities[]
 let currentTf      = '1M';
 
 // Full Scan table state
-let _fsSortCol = '1M', _fsSortAsc = false, _fsFilter = '', _fsTfFilter = '', _fsPage = 0;
+let _fsSortCol = '1M', _fsSortAsc = false, _fsFilter = '', _fsTfFilter = '', _fsMcapFilter = '', _fsPage = 0;
 const FS_PAGE = 100;
 
 // Top Movers filter state
-let _tmSearch = '', _tmSector = '', _tmPe = '', _tmMcap = '';
+let _tmSearch = '', _tmSector = '', _tmPe = '', _tmMcap = '', _tmPage = 0;
+const TM_PAGE = 40;
 
 // Opportunity filter state
 let _oppSearch = '', _oppSignal = '', _oppMinScore = 50, _oppSector = '';
@@ -165,26 +166,8 @@ function buildStatsRow() {
 /* ═══════════════════════════════════════════════════════════════
    TOP MOVERS (with fundamentals)
 ═══════════════════════════════════════════════════════════════ */
-function buildTopMovers() {
-  // Collect unique top movers across all timeframes
-  const seen = new Set();
-  const movers = [];
-
-  for (const tf of TFS) {
-    const sorted = fullScanData
-      .filter(s => s[tf] != null)
-      .sort((a, b) => (b[tf] || 0) - (a[tf] || 0));
-
-    for (const s of sorted.slice(0, 20)) {
-      if (!seen.has(s.t)) {
-        seen.add(s.t);
-        movers.push(s);
-      }
-    }
-  }
-
-  // Sort by best 1M performance by default
-  movers.sort((a, b) => (b['1M'] || 0) - (a['1M'] || 0));
+  // Use all sorted data
+  const movers = [...fullScanData].sort((a, b) => (b['1M'] || 0) - (a['1M'] || 0));
 
   document.getElementById('moversBadge').textContent = movers.length;
   window._moversData = movers;
@@ -219,25 +202,22 @@ function renderTopMovers() {
     });
   }
   if (_tmMcap) {
-    data = data.filter(s => {
-      const mc = fundamentals[s.t]?.mcap;
-      if (!mc) return false;
-      if (_tmMcap === 'large') return mc >= 20000;
-      if (_tmMcap === 'mid')   return mc >= 5000 && mc < 20000;
-      if (_tmMcap === 'small') return mc < 5000;
-      return true;
-    });
+    data = data.filter(s => s.m === _tmMcap);
   }
 
-  document.getElementById('tmCount').textContent = `${data.length} stocks`;
+  const total = data.length;
+  const page = data.slice(_tmPage * TM_PAGE, (_tmPage + 1) * TM_PAGE);
+
+  document.getElementById('tmCount').textContent = `Showing ${_tmPage * TM_PAGE + 1}–${Math.min((_tmPage+1)*TM_PAGE, total)} of ${total}`;
 
   const grid = document.getElementById('moversGrid');
   if (data.length === 0) {
     grid.innerHTML = `<div style="padding:40px;text-align:center;color:rgba(255,255,255,0.3);grid-column:1/-1;">No stocks match your filters.</div>`;
+    document.getElementById('tmPagination').innerHTML = '';
     return;
   }
 
-  grid.innerHTML = data.map((s, i) => {
+  grid.innerHTML = page.map((s, i) => {
     const f  = fundamentals[s.t] || {};
     const pct1M  = s['1M'];
     const pct12M = s['12M'];
@@ -269,7 +249,7 @@ function renderTopMovers() {
     return `<div class="mover-card">
       <div class="mc-glow ${isUp ? 'up' : 'dn'}"></div>
       <div class="mc-top">
-        <div class="mc-rank">#${i+1}</div>
+        <div class="mc-rank">#${(_tmPage * TM_PAGE) + i + 1}</div>
         <div class="mc-info">
           <div class="mc-name"><a href="https://in.tradingview.com/chart/?symbol=NSE:${s.t}" target="_blank" rel="noopener">${s.t}</a></div>
           <div class="mc-sub">
@@ -299,12 +279,27 @@ function renderTopMovers() {
       </div>
     </div>`;
   }).join('');
+
+  // Pagination for Top Movers
+  const totalPages = Math.ceil(total / TM_PAGE);
+  const pag = document.getElementById('tmPagination');
+  if (totalPages <= 1) { pag.innerHTML = ''; return; }
+  const pages = [];
+  pages.push(`<button class="pg-btn" onclick="tmGo(Math.max(0,${_tmPage}-1))">← Prev</button>`);
+  const start = Math.max(0, _tmPage - 2), end = Math.min(totalPages, _tmPage + 5);
+  if (start > 0) pages.push(`<button class="pg-btn" onclick="tmGo(0)">1</button><span style="color:rgba(255,255,255,0.2)">…</span>`);
+  for (let p = start; p < end; p++) pages.push(`<button class="pg-btn ${p === _tmPage ? 'active' : ''}" onclick="tmGo(${p})">${p+1}</button>`);
+  if (end < totalPages) pages.push(`<span style="color:rgba(255,255,255,0.2)">…</span><button class="pg-btn" onclick="tmGo(${totalPages-1})">${totalPages}</button>`);
+  pages.push(`<button class="pg-btn" onclick="tmGo(Math.min(${totalPages-1},${_tmPage}+1))">Next →</button>`);
+  pag.innerHTML = pages.join('');
 }
 
-function onTmSearch() { _tmSearch = document.getElementById('tmSearch').value.toUpperCase(); renderTopMovers(); }
-function onTmSector() { _tmSector = document.getElementById('tmSector').value; renderTopMovers(); }
-function onTmPe()     { _tmPe     = document.getElementById('tmPe').value;     renderTopMovers(); }
-function onTmMcap()   { _tmMcap   = document.getElementById('tmMcap').value;   renderTopMovers(); }
+function tmGo(page) { _tmPage = page; renderTopMovers(); window.scrollTo({top: 200, behavior:'smooth'}); }
+
+function onTmSearch() { _tmSearch = document.getElementById('tmSearch').value.toUpperCase(); _tmPage = 0; renderTopMovers(); }
+function onTmSector() { _tmSector = document.getElementById('tmSector').value; _tmPage = 0; renderTopMovers(); }
+function onTmPe()     { _tmPe     = document.getElementById('tmPe').value;     _tmPage = 0; renderTopMovers(); }
+function onTmMcap()   { _tmMcap   = document.getElementById('tmMcap').value;   _tmPage = 0; renderTopMovers(); }
 
 /* ═══════════════════════════════════════════════════════════════
    FULL SCAN TABLE
@@ -323,6 +318,7 @@ function fsFilteredData() {
   let d = fullScanData;
   if (_fsFilter)   d = d.filter(s => s.t?.toUpperCase().includes(_fsFilter));
   if (_fsTfFilter) d = d.filter(s => s[_fsTfFilter] != null && s[_fsTfFilter] > 0);
+  if (_fsMcapFilter) d = d.filter(s => s.m === _fsMcapFilter);
   return [...d].sort((a, b) => {
     const av = a[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
     const bv = b[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
@@ -381,6 +377,7 @@ function fsSort(col) {
 }
 function onFsSearch() { _fsFilter = document.getElementById('fsSearch').value.toUpperCase(); _fsPage = 0; fsRender(); }
 function onFsFilter() { _fsTfFilter = document.getElementById('fsTfFilter').value; _fsPage = 0; fsRender(); }
+function onFsMcap()   { _fsMcapFilter = document.getElementById('fsMcapFilter').value; _fsPage = 0; fsRender(); }
 
 /* ═══════════════════════════════════════════════════════════════
    NEWS

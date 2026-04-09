@@ -466,7 +466,7 @@
       <button class="tab-btn" data-tab="about">ℹ️ About &amp; Guide</button>
     </nav>
 
-    <!-- TAB: OPPORTUNITIES (new — first tab) -->
+    <!-- TAB: OPPORTUNITIES -->
     <div class="tab-panel active" id="tab-opportunities">
       <div class="section-head">
         <h2>🎯 Opportunity Engine — Ranked Setups</h2>
@@ -495,8 +495,8 @@
     <!-- TAB: TOP MOVERS -->
     <div class="tab-panel" id="tab-movers">
       <div class="section-head">
-        <h2>🏆 Top Movers — Fundamentals + Momentum</h2>
-        <span class="sh-sub">Top performers across all timeframes · Click ticker for TradingView</span>
+        <h2>🏆 All NSE Stocks — Fundamentals + Momentum</h2>
+        <span class="sh-sub">All 2000+ NSE stocks by 1M performance · Fundamentals for top movers · MCap from NSE index</span>
       </div>
       <div class="tm-controls">
         <input class="tm-input" id="tmSearch" type="text" placeholder="🔍 Search ticker..." oninput="onTmSearch()">
@@ -518,6 +518,7 @@
         <span class="tm-count" id="tmCount"></span>
       </div>
       <div class="cards-grid" id="moversGrid"></div>
+      <div class="pagination" id="tmPagination"></div>
     </div>
 
     <!-- TAB: FULL SCAN -->
@@ -536,6 +537,12 @@
           <option value="3M">✅ 3M Gainers</option>
           <option value="6M">✅ 6M Gainers</option>
           <option value="12M">✅ 12M Gainers</option>
+        </select>
+        <select class="fs-select" id="fsMcapFilter" onchange="onFsMcap()">
+          <option value="">All Cap Sizes</option>
+          <option value="L">🔵 Large Cap (Nifty 100)</option>
+          <option value="M">🟡 Mid Cap (Nifty 150)</option>
+          <option value="S">⚪ Small Cap</option>
         </select>
         <span class="fs-count" id="fsCount">Loading…</span>
       </div>

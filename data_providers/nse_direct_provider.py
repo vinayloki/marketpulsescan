@@ -319,3 +319,41 @@ class NSEDirectProvider(BaseDataProvider):
         except Exception as e:
             log.debug(f"   fundamentals error {symbol}: {e}")
             return {"s": symbol}
+
+    # ═══════════════════════════════════════════════════════════════
+    #  MARKET CAP CATEGORISATION
+    # ═══════════════════════════════════════════════════════════════
+
+    def fetch_mcap_categories(self) -> dict[str, str]:
+        """
+        Fetch NIFTY 100 and NIFTY MIDCAP 150 indices to map tickers to
+        Large (L) and Mid (M) cap arrays. Default is Small (S).
+        Returns: Dict mapping ticker to 'L', 'M' or 'S'.
+        """
+        log.info("📊 Fetching NSE indices for Market Cap classification...")
+        mcap_map = {}
+        
+        # 1. Large Caps (Nifty 100)
+        url_100 = "https://archives.nseindia.com/content/indices/ind_nifty100list.csv"
+        try:
+            r = requests.get(url_100, headers=_HEADERS, timeout=10)
+            r.raise_for_status()
+            df = pd.read_csv(io.StringIO(r.text))
+            for t in df["Symbol"].dropna().unique():
+                mcap_map[str(t).strip().upper()] = "L"
+        except Exception as e:
+            log.warning(f"   ⚠️ Could not fetch Nifty 100: {e}")
+
+        # 2. Mid Caps (Nifty Midcap 150)
+        url_150 = "https://archives.nseindia.com/content/indices/ind_niftymidcap150list.csv"
+        try:
+            r = requests.get(url_150, headers=_HEADERS, timeout=10)
+            r.raise_for_status()
+            df = pd.read_csv(io.StringIO(r.text))
+            for t in df["Symbol"].dropna().unique():
+                mcap_map[str(t).strip().upper()] = "M"
+        except Exception as e:
+            log.warning(f"   ⚠️ Could not fetch Nifty 150: {e}")
+
+        log.info(f"   ✅ Market Cap mapping complete: {list(mcap_map.values()).count('L')} Large, {list(mcap_map.values()).count('M')} Mid")
+        return mcap_map

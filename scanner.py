@@ -172,10 +172,10 @@ def calculate_performance(prices: pd.DataFrame) -> pd.DataFrame:
 #  STEP 4: Rank & Export (existing output files — unchanged)
 # ═══════════════════════════════════════════════════════════════════════
 
-def rank_and_export(perf_df: pd.DataFrame):
+def rank_and_export(perf_df: pd.DataFrame, mcap_map: dict[str, str]):
     """
     Rank stocks by timeframe and export all existing output files.
-    Unchanged from V1 output schema.
+    Includes 'm' (Market Cap category) into full_summary.json.
     """
     log.info("🏆 Ranking stocks and exporting results...")
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
@@ -243,7 +243,12 @@ def rank_and_export(perf_df: pd.DataFrame):
     # ── Full summary JSON (compact — for browser table) ────────────
     full_records = []
     for _, row in perf_sorted.iterrows():
-        record = {"t": row["ticker"], "c": row["last_close"], "d": row["last_date"]}
+        record = {
+            "t": row["ticker"], 
+            "c": row["last_close"], 
+            "d": row["last_date"],
+            "m": mcap_map.get(row["ticker"], "S")
+        }
         for tf in TIMEFRAMES:
             if tf in perf_df.columns:
                 val = row.get(tf)
@@ -385,7 +390,9 @@ def main():
     performance = calculate_performance(prices)
 
     # Step 4: Rank and export (existing output files)
-    rank_and_export(performance)
+    provider = get_provider()
+    mcap_map = getattr(provider, "fetch_mcap_categories", lambda: {})()
+    rank_and_export(performance, mcap_map)
 
     # Step 5: Fundamentals for top movers
     fundamentals = fetch_fundamentals(performance)
