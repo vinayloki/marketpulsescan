@@ -358,6 +358,93 @@ def rank_and_export(perf_df: pd.DataFrame):
 
 
 # ═══════════════════════════════════════════════════════════════════
+#  STEP 5: Fetch Fundamentals for Top Movers (Parallel)
+# ═══════════════════════════════════════════════════════════════════
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
+def _fetch_single_info(symbol: str) -> dict:
+    """Fetch fundamental data for a single stock from Yahoo Finance."""
+    try:
+        info = yf.Ticker(f"{symbol}.NS").info
+        mcap = info.get("marketCap")
+        return {
+            "s": symbol,
+            "mcap": round(mcap / 1e7, 1) if mcap else None,  # Convert to ₹ Cr
+            "pe": round(info.get("trailingPE"), 1) if info.get("trailingPE") else None,
+            "eps": round(info.get("trailingEps"), 2) if info.get("trailingEps") else None,
+            "sector": info.get("sector"),
+            "ind": info.get("industry"),
+            "52h": round(info.get("fiftyTwoWeekHigh"), 2) if info.get("fiftyTwoWeekHigh") else None,
+            "52l": round(info.get("fiftyTwoWeekLow"), 2) if info.get("fiftyTwoWeekLow") else None,
+            "bv": round(info.get("bookValue"), 2) if info.get("bookValue") else None,
+            "dy": round(info.get("dividendYield", 0) * 100, 2) if info.get("dividendYield") else None,
+            "name": info.get("shortName") or info.get("longName") or symbol,
+        }
+    except Exception as e:
+        log.warning(f"   ⚠️  Failed to fetch fundamentals for {symbol}: {e}")
+        return {"s": symbol}
+
+
+def fetch_fundamentals(perf_df: pd.DataFrame):
+    """
+    Fetch fundamental data for top movers across all timeframes.
+    Uses ThreadPoolExecutor for parallel fetching (~5-10s instead of 30s+).
+    Saves to a separate fundamentals.json to keep full_summary.json lightweight.
+    """
+    log.info("🔬 Fetching fundamental data for top movers...")
+
+    # Collect unique top movers across all timeframes
+    top_symbols = set()
+    for tf_name in TIMEFRAMES.keys():
+        if tf_name not in perf_df.columns:
+            continue
+        valid = perf_df.dropna(subset=[tf_name])
+        # Top 20 gainers per timeframe
+        top = valid.nlargest(20, tf_name).index.tolist()
+        top_symbols.update(top)
+
+    # Also add top by ticker name (from the ticker column)
+    if "ticker" in perf_df.columns:
+        for tf_name in TIMEFRAMES.keys():
+            if tf_name not in perf_df.columns:
+                continue
+            valid = perf_df.dropna(subset=[tf_name])
+            top = valid.nlargest(20, tf_name)["ticker"].tolist()
+            top_symbols.update(top)
+
+    top_list = sorted(list(top_symbols))
+    log.info(f"   📊 Fetching fundamentals for {len(top_list)} unique top movers...")
+
+    # Parallel fetch
+    results = []
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        future_map = {executor.submit(_fetch_single_info, sym): sym for sym in top_list}
+        done_count = 0
+        for future in as_completed(future_map):
+            done_count += 1
+            result = future.result()
+            results.append(result)
+            if done_count % 20 == 0:
+                log.info(f"   📦 Fetched {done_count}/{len(top_list)} fundamentals...")
+
+    # Validate: count how many have real data
+    valid_count = sum(1 for r in results if r.get("pe") is not None or r.get("mcap") is not None)
+    log.info(f"   ✅ Fetched fundamentals: {valid_count}/{len(results)} with data")
+
+    # Save as separate JSON
+    fundamentals_path = OUTPUT_DIR / "fundamentals.json"
+    with open(fundamentals_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "generated": datetime.now().strftime("%d %b %Y"),
+            "count": len(results),
+            "stocks": results,
+        }, f, separators=(",", ":"), ensure_ascii=False)
+    log.info(f"   📄 Fundamentals JSON saved: {fundamentals_path.name}")
+
+
+# ═══════════════════════════════════════════════════════════════════
 #  MAIN ENTRY POINT
 # ═══════════════════════════════════════════════════════════════════
 
@@ -386,6 +473,9 @@ def main():
 
     # Step 4: Rank and export
     rank_and_export(performance)
+
+    # Step 5: Fetch fundamentals for top movers (parallel)
+    fetch_fundamentals(performance)
 
     elapsed = time.time() - start_time
     log.info(f"⏱️  Total scan time: {elapsed:.1f} seconds")
