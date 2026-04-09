@@ -164,9 +164,10 @@ function buildStatsRow() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TOP MOVERS (with fundamentals)
+   TOP MOVERS — All NSE Stocks
 ═══════════════════════════════════════════════════════════════ */
-  // Use all sorted data
+function buildTopMovers() {
+  // All stocks, sorted by 1M performance by default
   const movers = [...fullScanData].sort((a, b) => (b['1M'] || 0) - (a['1M'] || 0));
 
   document.getElementById('moversBadge').textContent = movers.length;
@@ -202,7 +203,7 @@ function renderTopMovers() {
     });
   }
   if (_tmMcap) {
-    data = data.filter(s => s.m === _tmMcap);
+    data = data.filter(s => (s.m || 'S') === _tmMcap);
   }
 
   const total = data.length;
@@ -318,7 +319,7 @@ function fsFilteredData() {
   let d = fullScanData;
   if (_fsFilter)   d = d.filter(s => s.t?.toUpperCase().includes(_fsFilter));
   if (_fsTfFilter) d = d.filter(s => s[_fsTfFilter] != null && s[_fsTfFilter] > 0);
-  if (_fsMcapFilter) d = d.filter(s => s.m === _fsMcapFilter);
+  if (_fsMcapFilter) d = d.filter(s => (s.m || 'S') === _fsMcapFilter);
   return [...d].sort((a, b) => {
     const av = a[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
     const bv = b[_fsSortCol] ?? (_fsSortAsc ? Infinity : -Infinity);
