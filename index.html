@@ -251,6 +251,47 @@
     .news-title a { color: #e6edf3; } .news-title a:hover { color: var(--primary); }
     .news-time { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 4px; }
 
+    /* ═══ ABOUT / GUIDE ═════════════════════════════════════ */
+    .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+    .info-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px 22px;
+    }
+    .info-card h3 {
+      font-size: 14px; font-weight: 700; font-family: var(--heading);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .info-card h3 .ic-icon { font-size: 18px; }
+    .info-card p, .info-card li {
+      font-size: 12.5px; color: rgba(255,255,255,0.55); line-height: 1.8;
+    }
+    .info-card ul { list-style: none; padding: 0; }
+    .info-card li { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .info-card li:last-child { border-bottom: none; }
+    .info-card li strong { color: rgba(255,255,255,0.8); }
+    .info-card .tag-example {
+      display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px;
+      border-radius: 3px; text-transform: uppercase; letter-spacing: 0.04em;
+      vertical-align: middle; margin-right: 4px;
+    }
+    .info-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+    .info-table th {
+      text-align: left; padding: 8px 10px; background: var(--bg2);
+      color: rgba(255,255,255,0.4); font-size: 10px; text-transform: uppercase;
+      font-weight: 600; border-bottom: 1px solid var(--border);
+    }
+    .info-table td {
+      text-align: left; padding: 8px 10px; color: rgba(255,255,255,0.55);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .info-table td:first-child { color: rgba(255,255,255,0.8); font-weight: 600; }
+    .info-disclaimer {
+      background: rgba(245,166,35,0.06); border: 1px solid rgba(245,166,35,0.12);
+      border-radius: var(--radius); padding: 18px 22px; margin-top: 14px;
+    }
+    .info-disclaimer h3 { color: var(--amber); }
+    .info-disclaimer p { color: rgba(255,255,255,0.45); }
+
     /* ═══ FOOTER ═════════════════════════════════════════════ */
     .footer {
       margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border);
@@ -323,6 +364,7 @@
       <button class="tab-btn active" data-tab="movers">🏆 Top Movers <span class="tab-badge" id="moversBadge">0</span></button>
       <button class="tab-btn" data-tab="fullscan">📋 Full Scan <span class="tab-badge" id="fsBadge">0</span></button>
       <button class="tab-btn" data-tab="news">📰 News</button>
+      <button class="tab-btn" data-tab="about">ℹ️ About & Guide</button>
     </nav>
 
     <!-- TAB: TOP MOVERS -->
@@ -398,6 +440,131 @@
         <span class="sh-sub">LiveMint · Economic Times · Latest updates</span>
       </div>
       <div id="newsContent"></div>
+    </div>
+
+    <!-- TAB: ABOUT & GUIDE -->
+    <div class="tab-panel" id="tab-about">
+      <div class="section-head">
+        <h2>ℹ️ About & User Guide</h2>
+        <span class="sh-sub">Everything you need to know about this scanner</span>
+      </div>
+
+      <div class="about-grid">
+
+        <!-- WHAT IS THIS -->
+        <div class="info-card">
+          <h3><span class="ic-icon">🎯</span> What is SwingScan India?</h3>
+          <p>SwingScan India is a <strong>free, automated stock scanner</strong> that tracks the performance of <strong>2,200+ NSE-listed stocks</strong> across 6 timeframes (1 week to 12 months). It identifies the strongest momentum movers and enriches them with fundamental data like P/E, Market Cap, Sector, and 52-week range.</p>
+          <p style="margin-top:8px;">Built for swing traders and investors who want a quick, data-driven view of which NSE stocks are moving — and whether they're backed by solid fundamentals.</p>
+        </div>
+
+        <!-- HOW IT WORKS -->
+        <div class="info-card">
+          <h3><span class="ic-icon">⚙️</span> How It Works</h3>
+          <ul>
+            <li><strong>1.</strong> Every weekday at <strong>4:45 PM IST</strong>, an automated bot fetches all NSE tickers from the official NSE API.</li>
+            <li><strong>2.</strong> It downloads 13 months of daily closing prices from <strong>Yahoo Finance</strong> for every stock.</li>
+            <li><strong>3.</strong> It calculates % change across 6 timeframes: <strong>1W, 2W, 1M, 3M, 6M, 12M</strong>.</li>
+            <li><strong>4.</strong> For the top ~85 movers, it fetches <strong>fundamental data</strong> (P/E, Market Cap, Sector, EPS, etc.) in parallel.</li>
+            <li><strong>5.</strong> It scrapes the latest <strong>market news</strong> from LiveMint and Economic Times RSS feeds.</li>
+            <li><strong>6.</strong> All data is pushed to this website automatically — <strong>no manual intervention</strong>.</li>
+          </ul>
+        </div>
+
+        <!-- DATA SOURCES -->
+        <div class="info-card">
+          <h3><span class="ic-icon">📊</span> Data Sources</h3>
+          <table class="info-table">
+            <thead><tr><th>Data</th><th>Source</th><th>Update Frequency</th></tr></thead>
+            <tbody>
+              <tr><td>Stock Universe</td><td><a href="https://www.nseindia.com" target="_blank">NSE India</a> (via stock-nse-india API)</td><td>Daily at 4:45 PM IST</td></tr>
+              <tr><td>Price Data</td><td><a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> (yfinance)</td><td>Daily at 4:45 PM IST</td></tr>
+              <tr><td>Fundamentals</td><td><a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> (P/E, MCap, EPS, etc.)</td><td>Daily (top ~85 stocks)</td></tr>
+              <tr><td>Market News</td><td><a href="https://www.livemint.com" target="_blank">LiveMint</a> · <a href="https://economictimes.indiatimes.com" target="_blank">Economic Times</a></td><td>Daily (last 36h of articles)</td></tr>
+              <tr><td>Charts</td><td><a href="https://www.tradingview.com" target="_blank">TradingView</a> (external link)</td><td>Real-time on click</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- REFRESH TIMELINE -->
+        <div class="info-card">
+          <h3><span class="ic-icon">🔄</span> Refresh Schedule</h3>
+          <table class="info-table">
+            <thead><tr><th>Event</th><th>Time (IST)</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>NSE Market Close</td><td>3:30 PM</td><td>Final closing prices available</td></tr>
+              <tr><td>Scanner Runs</td><td>4:45 PM</td><td>Automated via GitHub Actions</td></tr>
+              <tr><td>Data Available</td><td>~4:50 PM</td><td>Website auto-updates (refresh page)</td></tr>
+              <tr><td>Weekends / Holidays</td><td>—</td><td>No scan — last trading day data persists</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:11px; color:rgba(255,255,255,0.3);">💡 <strong>Tip:</strong> Refresh this page after 4:50 PM IST on weekdays to see the latest data. The page loads data from static JSON files — no server-side processing on your end.</p>
+        </div>
+
+        <!-- HOW TO READ -->
+        <div class="info-card">
+          <h3><span class="ic-icon">📖</span> How to Read the Data</h3>
+          <ul>
+            <li><strong>% Change columns (1W–12M):</strong> Shows how much a stock's price moved over that period. Formula: <code style="font-size:11px;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px;">((Today - Past) / Past) × 100</code></li>
+            <li><strong>Green ▲</strong> = price went UP · <strong>Red ▼</strong> = price went DOWN</li>
+            <li><strong>Bold numbers</strong> = strong moves (>10% medium bold, >50% extra bold)</li>
+            <li><strong>P/E Ratio:</strong> Price-to-Earnings — lower generally means "cheaper" relative to earnings</li>
+            <li><strong>Market Cap:</strong> Total company value (in ₹ Crores)</li>
+            <li><strong>EPS:</strong> Earnings Per Share (TTM) — how much the company earned per share</li>
+            <li><strong>52W Range:</strong> The stock's lowest and highest price in the last 52 weeks</li>
+            <li><strong>Dividend Yield:</strong> Annual dividend as a % of stock price</li>
+            <li><strong>Book Value:</strong> Net asset value per share on the balance sheet</li>
+          </ul>
+        </div>
+
+        <!-- AUTO TAGS -->
+        <div class="info-card">
+          <h3><span class="ic-icon">🏷️</span> Auto-Tag Legend</h3>
+          <p>Stocks on the Top Movers tab are automatically tagged based on their data:</p>
+          <ul style="margin-top:8px;">
+            <li><span class="tag-example tag-value">Value</span> <strong>P/E below 15</strong> — Stock is priced cheaply relative to earnings. May indicate undervaluation.</li>
+            <li><span class="tag-example tag-highpe">High P/E</span> <strong>P/E above 50</strong> — Expensive relative to earnings. Could signal overvaluation or growth premium.</li>
+            <li><span class="tag-example tag-income">Income</span> <strong>Dividend Yield above 3%</strong> — Pays meaningful dividends. Attractive for income-seeking investors.</li>
+            <li><span class="tag-example tag-multi">Multibagger</span> <strong>12-month return above 100%</strong> — Stock has more than doubled in the last year.</li>
+            <li><span class="tag-example tag-breakout">Breakout</span> <strong>1-week return above 20%</strong> — Sharp recent surge. Could indicate a breakout or momentum event.</li>
+          </ul>
+        </div>
+
+        <!-- MARKET CAP -->
+        <div class="info-card">
+          <h3><span class="ic-icon">📐</span> Market Cap Categories</h3>
+          <table class="info-table">
+            <thead><tr><th>Category</th><th>Range</th><th>Characteristics</th></tr></thead>
+            <tbody>
+              <tr><td>Large Cap</td><td>>₹20,000 Cr</td><td>Blue-chip, lower risk, higher liquidity</td></tr>
+              <tr><td>Mid Cap</td><td>₹5,000–₹20,000 Cr</td><td>Growth potential with moderate risk</td></tr>
+              <tr><td>Small Cap</td><td><₹5,000 Cr</td><td>High growth potential, higher risk & volatility</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- WHAT'S NOT INCLUDED -->
+        <div class="info-card">
+          <h3><span class="ic-icon">🚫</span> Limitations</h3>
+          <ul>
+            <li><strong>No intraday data:</strong> Scanner uses daily closing prices only — not live/real-time quotes.</li>
+            <li><strong>~80 fundamentals only:</strong> Fundamental data (P/E, Sector, etc.) is fetched for the top ~85 movers, not all 2,200 stocks.</li>
+            <li><strong>No buy/sell signals:</strong> This is a momentum + fundamentals scanner, not a trading algorithm. It shows data, not recommendations.</li>
+            <li><strong>Yahoo Finance data:</strong> Occasionally incomplete for small/micro-cap stocks. Some fields may show "—".</li>
+            <li><strong>No BSE stocks:</strong> Only NSE-listed equities are scanned.</li>
+          </ul>
+        </div>
+
+      </div><!-- /about-grid -->
+
+      <!-- DISCLAIMER -->
+      <div class="info-disclaimer">
+        <h3><span class="ic-icon">⚖️</span> Important Disclaimer</h3>
+        <p style="margin-top:8px;">This scanner is built strictly for <strong>educational and informational purposes</strong>. The creators are <strong>not SEBI-registered investment advisors</strong>. Nothing on this website constitutes a buy, sell, or hold recommendation for any security.</p>
+        <p style="margin-top:8px;">Stock market investments are subject to market risks. <strong>Past performance does not guarantee future results.</strong> Always consult a qualified, SEBI-registered financial advisor before making investment decisions. Always do your own research (DYOR).</p>
+        <p style="margin-top:8px;">Data is sourced from third-party providers (Yahoo Finance, NSE India) and may contain inaccuracies or delays. The scanner is provided <strong>"as is"</strong> with no warranty of accuracy, completeness, or fitness for any particular purpose.</p>
+      </div>
+
     </div>
 
   </div><!-- /dashboard -->
