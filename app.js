@@ -1,7 +1,7 @@
 /**
- * SWINGSCAN INDIA — MAIN APP
- * 3 tabs: Top Movers (with fundamentals), Full Scan (2200+), News
- * Auto-loads on page open. No button needed.
+ * MarketPulse India — Main App
+ * 5 tabs: Opportunities (engine), Top Movers, Full Scan, News, About
+ * Auto-loads on page open. Zero maintenance. GitHub Pages hosted.
  */
 
 /* ═══════════════════════════════════════════════════════════════
@@ -11,6 +11,7 @@ let summaryData    = null;   // latest_scan_summary.json
 let fullScanData   = [];     // full_summary.json → stocks[]
 let fundamentals   = {};     // fundamentals.json → keyed by symbol
 let newsData       = [];     // daily_news.json
+let opportunitiesData = [];  // opportunities.json → opportunities[]
 let currentTf      = '1M';
 
 // Full Scan table state
@@ -19,6 +20,9 @@ const FS_PAGE = 100;
 
 // Top Movers filter state
 let _tmSearch = '', _tmSector = '', _tmPe = '', _tmMcap = '';
+
+// Opportunity filter state
+let _oppSearch = '', _oppSignal = '', _oppMinScore = 50, _oppSector = '';
 
 const TFS = ['1W','2W','1M','3M','6M','12M'];
 
@@ -62,11 +66,12 @@ function initTabs() {
 ═══════════════════════════════════════════════════════════════ */
 async function loadEverything() {
   try {
-    const [summRes, fullRes, fundRes, newsRes] = await Promise.allSettled([
+    const [summRes, fullRes, fundRes, newsRes, oppRes] = await Promise.allSettled([
       fetch('scan_results/latest_scan_summary.json'),
       fetch('scan_results/full_summary.json'),
       fetch('scan_results/fundamentals.json'),
       fetch('scan_results/daily_news.json'),
+      fetch('scan_results/opportunities.json'),
     ]);
 
     // Parse summary
@@ -95,6 +100,12 @@ async function loadEverything() {
       newsData = await newsRes.value.json();
     }
 
+    // Parse opportunities
+    if (oppRes && oppRes.status === 'fulfilled' && oppRes.value.ok) {
+      const oj = await oppRes.value.json();
+      opportunitiesData = oj.opportunities || [];
+    }
+
     buildDashboard();
     document.getElementById('loadScreen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
@@ -118,6 +129,7 @@ function buildDashboard() {
   document.getElementById('footerDate').textContent   = scanDate;
 
   buildStatsRow();
+  buildOpportunities();
   buildTopMovers();
   buildFullScan();
   buildNews();
@@ -133,7 +145,7 @@ function buildStatsRow() {
   const g1M   = fullScanData.filter(s => s['1M'] > 0).length;
   const l1M   = fullScanData.filter(s => s['1M'] < 0).length;
   const multi = fullScanData.filter(s => s['12M'] > 100).length;
-  const fundCount = Object.keys(fundamentals).length;
+  const oppCount = opportunitiesData.length;
 
   const mb1W = summaryData?.market_breadth?.['1W'];
   const adRatio = mb1W ? mb1W.advance_decline_ratio.toFixed(1) : '—';
@@ -141,12 +153,12 @@ function buildStatsRow() {
   const sc = (v, l, c) => `<div class="stat-card"><div class="sv ${c}">${v}</div><div class="sl">${l}</div></div>`;
   el.innerHTML = [
     sc(total,     'Stocks Scanned', 'col-blue'),
+    sc(oppCount,  '🎯 Opportunities','col-emerald'),
     sc(g1W,       '1W Gainers',     'col-green'),
     sc(g1M,       '1M Gainers',     'col-green'),
     sc(l1M,       '1M Losers',      'col-red'),
     sc(multi,     '12M > 100%',     'col-purple'),
-    sc(adRatio,   '1W A/D Ratio',   'col-emerald'),
-    sc(fundCount, 'With Fundamentals', 'col-amber'),
+    sc(adRatio,   '1W A/D Ratio',   'col-amber'),
   ].join('');
 }
 
@@ -385,4 +397,167 @@ function buildNews() {
       <div class="news-title"><a href="${item.link}" target="_blank" rel="noopener">${item.title}</a></div>
       <div class="news-time">${item.time}</div>
     </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OPPORTUNITIES TAB
+═══════════════════════════════════════════════════════════════ */
+function buildOpportunities() {
+  document.getElementById('oppBadge').textContent = opportunitiesData.length;
+
+  // Populate sector filter
+  const sectors = new Set();
+  opportunitiesData.forEach(o => { if (o.fundamental?.sector) sectors.add(o.fundamental.sector); });
+  const selSec = document.getElementById('oppSector');
+  [...sectors].sort().forEach(sec => {
+    const opt = document.createElement('option');
+    opt.value = sec; opt.textContent = sec;
+    selSec.appendChild(opt);
+  });
+
+  // Set initial score filter from the select
+  _oppMinScore = parseInt(document.getElementById('oppMinScore').value) || 50;
+
+  renderOpportunities();
+}
+
+function renderOpportunities() {
+  let data = opportunitiesData;
+
+  // Search
+  if (_oppSearch) data = data.filter(o => o.ticker.includes(_oppSearch));
+
+  // Signal filter
+  if (_oppSignal) data = data.filter(o => (o.signals || []).includes(_oppSignal));
+
+  // Score threshold
+  if (_oppMinScore > 0) data = data.filter(o => o.score >= _oppMinScore);
+
+  // Sector filter
+  if (_oppSector) data = data.filter(o => o.fundamental?.sector === _oppSector);
+
+  document.getElementById('oppCount').textContent = `${data.length} opportunities`;
+
+  const grid = document.getElementById('oppGrid');
+
+  if (!data.length) {
+    grid.innerHTML = `<div class="opp-empty" style="grid-column:1/-1">
+      <div class="oe-icon">🎯</div>
+      <p>No opportunities match your filters.<br>Try lowering the score threshold or selecting a different signal.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = data.map(opp => buildOppCard(opp)).join('');
+
+  // Animate score rings after render
+  requestAnimationFrame(() => {
+    grid.querySelectorAll('.score-ring-fg').forEach(el => {
+      const score = parseFloat(el.dataset.score);
+      const r = 26;
+      const circ = 2 * Math.PI * r;
+      el.style.strokeDasharray = circ;
+      el.style.strokeDashoffset = circ - (score / 100) * circ;
+    });
+  });
+}
+
+function buildOppCard(opp) {
+  const score  = opp.score || 0;
+  const f      = opp.fundamental || {};
+  const ind    = opp.indicators  || {};
+  const signals = opp.signals || [];
+
+  // Score ring color (green=high, amber=mid, blue=low)
+  const ringColor = score >= 75 ? 'var(--emerald)' : score >= 50 ? 'var(--amber)' : 'var(--blue)';
+  const r = 26, circ = 2 * Math.PI * r;
+
+  // Signal chips
+  const signalMap = {
+    '52W_BREAKOUT': ['sig-breakout', '📈 52W Breakout'],
+    'VOLUME_SPIKE': ['sig-volume',   '📊 Volume Spike'],
+    'EMA_MOMENTUM':['sig-momentum', '🚀 EMA Momentum'],
+    'HIGH_VOLUME': ['sig-highvol',  '🔥 High Volume'],
+  };
+  const chips = signals.map(s => {
+    const [cls, label] = signalMap[s] || ['sig-momentum', s];
+    return `<span class="signal-chip ${cls}">${label}</span>`;
+  }).join('');
+
+  // Indicator cells
+  const iv = (v, suffix='', decimals=1) =>
+    v != null ? `${parseFloat(v).toFixed(decimals)}${suffix}` : '—';
+  const ivCls = v => v != null ? '' : 'na';
+
+  const indItems = [
+    { lbl: 'RSI (14)',   val: ind.rsi_14,      suffix: '', dec: 1 },
+    { lbl: 'Vol Ratio',  val: ind.volume_ratio, suffix: '×', dec: 1 },
+    { lbl: '1M Return',  val: ind.return_1m,    suffix: '%', dec: 1 },
+    { lbl: 'EMA 9',      val: ind.ema_9,        suffix: '', dec: 0 },
+    { lbl: 'EMA 21',     val: ind.ema_21,       suffix: '', dec: 0 },
+    { lbl: '52W High%',  val: ind.pct_from_52w_high != null ? -ind.pct_from_52w_high : null, suffix: '%', dec: 1 },
+  ].map(it => `
+    <div class="opp-ind-item">
+      <div class="opp-ind-lbl">${it.lbl}</div>
+      <div class="opp-ind-val ${ivCls(it.val)}">${iv(it.val, it.suffix, it.dec)}</div>
+    </div>`).join('');
+
+  // Fundamentals row
+  const mcapStr = f.mcap_cr ? (f.mcap_cr >= 10000 ? `₹${(f.mcap_cr/1000).toFixed(1)}K Cr` : `₹${Math.round(f.mcap_cr)} Cr`) : null;
+  const funds = [
+    mcapStr   ? `<span class="opp-fund-item">MCap <strong>${mcapStr}</strong></span>` : '',
+    f.pe      ? `<span class="opp-fund-item">P/E <strong>${f.pe}x</strong></span>` : '',
+    f.sector  ? `<span class="opp-fund-item">Sector <strong>${f.sector}</strong></span>` : '',
+  ].filter(Boolean).join('');
+
+  const displayName = (f.name && f.name !== opp.ticker) ? f.name : opp.ticker;
+  const price = ind.price ? `₹${parseFloat(ind.price).toFixed(2)}` : '—';
+
+  return `<div class="opp-card">
+    <div class="opp-header">
+      <div class="score-ring-wrap">
+        <svg class="score-ring-svg" viewBox="0 0 60 60">
+          <circle class="score-ring-bg" cx="30" cy="30" r="${r}"/>
+          <circle class="score-ring-fg" cx="30" cy="30" r="${r}"
+            data-score="${score}"
+            stroke="${ringColor}"
+            style="stroke-dasharray:${circ};stroke-dashoffset:${circ}"/>
+        </svg>
+        <div class="score-ring-text">
+          <span class="score-val" style="color:${ringColor}">${score}</span>
+          <span class="score-lbl">SCORE</span>
+        </div>
+      </div>
+      <div class="opp-meta">
+        <div class="opp-rank">#${opp.rank} · ${price}</div>
+        <div class="opp-name">
+          <a href="https://in.tradingview.com/chart/?symbol=NSE:${opp.ticker}" target="_blank" rel="noopener">${opp.ticker}</a>
+        </div>
+        <div class="opp-sector">${displayName !== opp.ticker ? displayName : (f.sector || '')}</div>
+      </div>
+    </div>
+    <div class="signal-chips">${chips}</div>
+    <div class="opp-indicators">${indItems}</div>
+    ${funds ? `<div class="opp-funds">${funds}</div>` : ''}
+    <div class="opp-footer">
+      <a class="opp-chart-link" href="https://in.tradingview.com/chart/?symbol=NSE:${opp.ticker}" target="_blank" rel="noopener">📊 Chart ↗</a>
+      ${f['52h'] && f['52l'] ? `<span style="font-size:10px;color:rgba(255,255,255,0.2);margin-left:auto;">52W: ₹${f['52l']} – ₹${f['52h']}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function onOppSearch() {
+  _oppSearch = document.getElementById('oppSearch').value.toUpperCase().trim();
+  renderOpportunities();
+}
+function onOppFilter() {
+  _oppMinScore = parseInt(document.getElementById('oppMinScore').value) || 0;
+  _oppSector   = document.getElementById('oppSector').value;
+  renderOpportunities();
+}
+function onOppChip(btn) {
+  document.querySelectorAll('#oppSignalChips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  _oppSignal = btn.dataset.signal;
+  renderOpportunities();
 }

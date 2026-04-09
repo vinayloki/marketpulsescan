@@ -1,0 +1,1 @@
+# MarketPulse India — Config Package

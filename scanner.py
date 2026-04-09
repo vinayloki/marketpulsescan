@@ -1,19 +1,20 @@
 """
-╔══════════════════════════════════════════════════════════════════════╗
-║  INDIA SWING TRADING SCANNER — DAILY NSE STOCK SCANNER             ║
-║  Scans all NSE-listed stocks and ranks by multi-timeframe momentum ║
-║  Timeframes: 1W, 2W, 1M, 3M, 6M, 12M                             ║
-║  Data Source: Yahoo Finance (free, no API key)                     ║
-║  Schedule: Run once daily after 4:00 PM IST                       ║
-╚══════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════╗
+║  MarketPulse India — NSE Market Intelligence Engine                     ║
+║  (formerly India Swing Trading Scanner)                                  ║
+║                                                                          ║
+║  Steps 1–5  : Performance scanner (unchanged — existing output files)    ║
+║  Steps 6–7  : Opportunity Engine (new — opportunities.json)              ║
+║                                                                          ║
+║  Zero cost. Fully automated. Runs daily via GitHub Actions.             ║
+╚══════════════════════════════════════════════════════════════════════════╝
 """
 
 import json
-import os
+import logging
 import sys
 import time
-import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 # Fix Windows console encoding for Unicode characters
@@ -22,181 +23,117 @@ if sys.platform == "win32":
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 import pandas as pd
-import yfinance as yf
-import requests
 
-# ─── Configuration ──────────────────────────────────────────────────
-SCRIPT_DIR = Path(__file__).parent.resolve()
-OUTPUT_DIR = SCRIPT_DIR / "scan_results"
-OUTPUT_DIR.mkdir(exist_ok=True)
+# ── MarketPulse modules ───────────────────────────────────────────────────
+from config.settings import (
+    BATCH_DELAY_SECONDS,
+    BATCH_SIZE,
+    DOWNLOAD_INTERVAL,
+    DOWNLOAD_PERIOD,
+    FUNDAMENTALS_TOP_N,
+    MIN_DATA_POINTS,
+    OUTPUT_DIR,
+    SCANNER_LOG,
+    TIMEFRAMES,
+    TOP_N,
+    LOG_FORMAT,
+    LOG_DATEFMT,
+)
+from data_providers import get_provider
+from scanners import BreakoutScanner, MomentumScanner, VolumeScanner
+from engine import ScoringEngine
 
-# Timeframes in approximate trading days
-TIMEFRAMES = {
-    "1W":  5,
-    "2W":  10,
-    "1M":  21,
-    "3M":  63,
-    "6M":  126,
-    "12M": 252,
-}
-
-# How many top performers to include in each timeframe ranking
-TOP_N = 20
-
-# yfinance download period (must cover 12 months + buffer)
-DOWNLOAD_PERIOD = "13mo"
-
-# Batch size for yfinance downloads (to avoid rate limits)
-BATCH_SIZE = 50
-BATCH_DELAY_SECONDS = 2
-
-# ─── Logging ────────────────────────────────────────────────────────
+# ── Logging ──────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s │ %(levelname)-7s │ %(message)s",
-    datefmt="%H:%M:%S",
+    format=LOG_FORMAT,
+    datefmt=LOG_DATEFMT,
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler(OUTPUT_DIR / "scanner.log", mode="w", encoding="utf-8"),
+        logging.FileHandler(SCANNER_LOG, mode="w", encoding="utf-8"),
     ],
 )
 log = logging.getLogger("scanner")
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  STEP 1: Fetch the NSE Stock Universe
-# ═══════════════════════════════════════════════════════════════════
-
-import subprocess
+# ═══════════════════════════════════════════════════════════════════════
+#  STEP 1: Fetch NSE Stock Universe
+# ═══════════════════════════════════════════════════════════════════════
 
 def fetch_nse_tickers() -> list[str]:
     """
-    Fetch all NSE equity tickers.
-    Uses the Node.js stock-nse-india package as the official source.
+    Fetch all NSE equity tickers via the DataProvider.
+    Three-level fallback: NSE CSV → GitHub mirror → disk cache.
+    No Node.js required.
     """
-    log.info("🔍 Fetching official symbols from NSE API via stock-nse-india (Node.js)...")
-    
-    node_script = SCRIPT_DIR / "nse_fetcher.js"
-    json_output = OUTPUT_DIR / "nse_symbols.json"
-    
-    try:
-        # Run the Node script
-        result = subprocess.run(
-            ["node", str(node_script)],
-            cwd=str(SCRIPT_DIR),
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        if result.stdout:
-            log.info(f"   ℹ️  Node output: {result.stdout.strip()}")
-            
-        # Read the generated JSON
-        if json_output.exists():
-            with open(json_output, "r", encoding="utf-8") as f:
-                tickers = json.load(f)
-            
-            # Additional cleanup
-            tickers = [t.strip().upper() for t in tickers if t.strip() and not t.strip().isdigit()]
-            tickers = sorted(list(set(tickers)))
-            
-            # For testing and avoiding IP blocks on bulk downloads, we will keep the universe to a manageable size.
-            # However, the user asked to scan all NSE stocks. yfinance handles thousands fine, but we'll limit to 1000 
-            # to be safe for memory, or use everything. We will use everything since user wants everything.
-            log.info(f"📊 Total unique tickers to scan: {len(tickers)}")
-            return tickers
-        else:
-            log.error("   ❌ Node script completed but no JSON output file found.")
-            sys.exit(1)
-            
-    except subprocess.CalledProcessError as e:
-        log.error(f"   ❌ Node script failed: {e.stderr}")
-        sys.exit(1)
-    except Exception as e:
-        log.error(f"   ❌ Failed to fetch symbols via Node: {e}")
+    log.info("🔍 Fetching NSE ticker universe...")
+    provider = get_provider()
+    tickers = provider.fetch_ticker_universe()
+
+    if not tickers:
+        log.error("❌ Could not fetch any tickers. Aborting.")
         sys.exit(1)
 
+    log.info(f"📊 Total unique tickers: {len(tickers)}")
+    return tickers
 
-# ═══════════════════════════════════════════════════════════════════
-#  STEP 2: Download Historical Price Data
-# ═══════════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════════════
+#  STEP 2: Download Historical Price Data (Full OHLCV)
+# ═══════════════════════════════════════════════════════════════════════
 
 def download_price_data(tickers: list[str]) -> pd.DataFrame:
     """
-    Download closing price history for all tickers using yfinance.
-    Downloads in batches to respect rate limits.
-    Returns a DataFrame with dates as index and tickers as columns.
+    Download full OHLCV (Open, High, Low, Close, Volume) for all tickers.
+    Returns a MultiIndex DataFrame: (field, ticker).
+
+    Also derives a Close-only DataFrame for backward compatibility
+    with Steps 3–4 performance calculations.
     """
-    log.info(f"📡 Downloading {DOWNLOAD_PERIOD} of price data for {len(tickers)} stocks...")
+    log.info(
+        f"📡 Downloading {DOWNLOAD_PERIOD} OHLCV for "
+        f"{len(tickers)} stocks..."
+    )
+    provider = get_provider()
+    ohlcv = provider.fetch_ohlcv(
+        tickers,
+        period=DOWNLOAD_PERIOD,
+        interval=DOWNLOAD_INTERVAL,
+    )
 
-    # Append .NS suffix for NSE tickers
-    yf_tickers = [f"{t}.NS" for t in tickers]
+    if ohlcv.empty:
+        log.error("❌ No price data downloaded. Aborting.")
+        sys.exit(1)
 
-    all_data = pd.DataFrame()
-    total_batches = (len(yf_tickers) + BATCH_SIZE - 1) // BATCH_SIZE
-
-    for i in range(0, len(yf_tickers), BATCH_SIZE):
-        batch = yf_tickers[i:i + BATCH_SIZE]
-        batch_num = (i // BATCH_SIZE) + 1
-        log.info(f"   📦 Batch {batch_num}/{total_batches} — downloading {len(batch)} stocks...")
-
-        try:
-            data = yf.download(
-                tickers=batch,
-                period=DOWNLOAD_PERIOD,
-                interval="1d",
-                group_by="ticker",
-                auto_adjust=True,
-                threads=True,
-                progress=False,
-            )
-
-            if not data.empty:
-                # Extract Close prices
-                if len(batch) == 1:
-                    # Single ticker returns flat columns
-                    close = data[["Close"]].rename(columns={"Close": batch[0]})
-                else:
-                    # Multi-ticker returns multi-level columns
-                    close = data.xs("Close", level=1, axis=1) if isinstance(data.columns, pd.MultiIndex) else data[["Close"]]
-
-                if all_data.empty:
-                    all_data = close
-                else:
-                    all_data = all_data.join(close, how="outer")
-
-        except Exception as e:
-            log.warning(f"   ⚠️  Batch {batch_num} failed: {e}")
-
-        # Rate limit protection
-        if batch_num < total_batches:
-            time.sleep(BATCH_DELAY_SECONDS)
-
-    # Clean column names (remove .NS suffix)
-    all_data.columns = [str(c).replace(".NS", "") for c in all_data.columns]
-
-    # Drop tickers with insufficient data (< 10 data points)
-    min_data_points = 10
-    valid_cols = [c for c in all_data.columns if all_data[c].dropna().shape[0] >= min_data_points]
-    all_data = all_data[valid_cols]
-
-    log.info(f"   ✅ Downloaded data for {len(all_data.columns)} stocks ({len(all_data)} trading days)")
-    return all_data
+    return ohlcv
 
 
-# ═══════════════════════════════════════════════════════════════════
+def extract_close(ohlcv: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extract the Close level for performance calculations (Steps 3–4).
+    Returns a flat DataFrame: columns = tickers, index = dates.
+    """
+    if "Close" not in ohlcv.columns.get_level_values(0):
+        log.error("❌ OHLCV DataFrame missing 'Close' field.")
+        sys.exit(1)
+    close = ohlcv["Close"].copy()
+    # Drop tickers with insufficient data
+    valid = [c for c in close.columns
+             if close[c].dropna().shape[0] >= MIN_DATA_POINTS]
+    return close[valid]
+
+
+# ═══════════════════════════════════════════════════════════════════════
 #  STEP 3: Calculate Multi-Timeframe Performance
-# ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════
 
 def calculate_performance(prices: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculate percentage change for each stock across all timeframes.
-    Returns a DataFrame with tickers as rows and timeframes as columns.
+    Calculate % change for each stock across all timeframes.
+    Unchanged from V1 — same output format.
     """
     log.info("📊 Calculating multi-timeframe performance metrics...")
-
     results = {}
-    latest_prices = prices.iloc[-1]
 
     for ticker in prices.columns:
         series = prices[ticker].dropna()
@@ -204,9 +141,9 @@ def calculate_performance(prices: pd.DataFrame) -> pd.DataFrame:
             continue
 
         row = {
-            "ticker": ticker,
+            "ticker":     ticker,
             "last_close": round(float(series.iloc[-1]), 2),
-            "last_date": str(series.index[-1].date()),
+            "last_date":  str(series.index[-1].date()),
         }
 
         for tf_name, tf_days in TIMEFRAMES.items():
@@ -214,8 +151,8 @@ def calculate_performance(prices: pd.DataFrame) -> pd.DataFrame:
                 old_price = float(series.iloc[-tf_days])
                 new_price = float(series.iloc[-1])
                 if old_price > 0:
-                    pct_change = ((new_price - old_price) / old_price) * 100
-                    row[tf_name] = round(pct_change, 2)
+                    pct = ((new_price - old_price) / old_price) * 100
+                    row[tf_name] = round(pct, 2)
                 else:
                     row[tf_name] = None
             else:
@@ -224,261 +161,240 @@ def calculate_performance(prices: pd.DataFrame) -> pd.DataFrame:
         results[ticker] = row
 
     df = pd.DataFrame.from_dict(results, orient="index")
-    log.info(f"   ✅ Calculated performance for {len(df)} stocks across {len(TIMEFRAMES)} timeframes")
+    log.info(
+        f"   ✅ Performance calculated for {len(df)} stocks "
+        f"across {len(TIMEFRAMES)} timeframes"
+    )
     return df
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  STEP 4: Rank & Export Results
-# ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════
+#  STEP 4: Rank & Export (existing output files — unchanged)
+# ═══════════════════════════════════════════════════════════════════════
 
 def rank_and_export(perf_df: pd.DataFrame):
     """
-    Rank stocks by each timeframe and export results.
-    Generates:
-      1. Full scan CSV (all stocks, all timeframes)
-      2. Top performers JSON (top N per timeframe)
-      3. Summary JSON for dashboard integration
+    Rank stocks by timeframe and export all existing output files.
+    Unchanged from V1 output schema.
     """
     log.info("🏆 Ranking stocks and exporting results...")
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
-    date_str = datetime.now().strftime("%d %b %Y")
+    date_str  = datetime.now().strftime("%d %b %Y")
 
-    # ── 1. Full scan CSV ──
-    csv_path = OUTPUT_DIR / f"full_scan_{timestamp}.csv"
-    # Sort by 1M performance by default
+    # ── Full scan CSV ──────────────────────────────────────────────
     sort_col = "1M" if "1M" in perf_df.columns else "1W"
-    perf_df_sorted = perf_df.sort_values(by=sort_col, ascending=False, na_position="last")
-    perf_df_sorted.to_csv(csv_path, index=False)
-    log.info(f"   📄 Full scan CSV saved: {csv_path.name}")
+    perf_sorted = perf_df.sort_values(sort_col, ascending=False, na_position="last")
 
-    # ── 2. Top performers per timeframe ──
+    csv_path = OUTPUT_DIR / f"full_scan_{timestamp}.csv"
+    perf_sorted.to_csv(csv_path, index=False)
+    (OUTPUT_DIR / "latest_full_scan.csv").write_bytes(csv_path.read_bytes())
+    log.info(f"   📄 Full scan CSV: {csv_path.name}")
+
+    # ── Top performers JSON ────────────────────────────────────────
     top_performers = {}
-    for tf_name in TIMEFRAMES.keys():
-        if tf_name not in perf_df.columns:
+    for tf in TIMEFRAMES:
+        if tf not in perf_df.columns:
             continue
-        valid = perf_df.dropna(subset=[tf_name]).sort_values(by=tf_name, ascending=False)
-        top = valid.head(TOP_N)[["ticker", "last_close", tf_name]].to_dict(orient="records")
-        bottom = valid.tail(TOP_N)[["ticker", "last_close", tf_name]].to_dict(orient="records")
-        top_performers[tf_name] = {
-            "top_gainers": top,
-            "top_losers": list(reversed(bottom)),
+        valid = perf_df.dropna(subset=[tf]).sort_values(tf, ascending=False)
+        top_performers[tf] = {
+            "top_gainers": valid.head(TOP_N)[["ticker", "last_close", tf]].to_dict("records"),
+            "top_losers":  list(reversed(valid.tail(TOP_N)[["ticker", "last_close", tf]].to_dict("records"))),
         }
 
-    top_json_path = OUTPUT_DIR / f"top_performers_{timestamp}.json"
-    with open(top_json_path, "w", encoding="utf-8") as f:
+    tp_path = OUTPUT_DIR / f"top_performers_{timestamp}.json"
+    with open(tp_path, "w", encoding="utf-8") as f:
         json.dump(top_performers, f, indent=2, ensure_ascii=False)
-    log.info(f"   📄 Top performers JSON saved: {top_json_path.name}")
+    latest_tp = OUTPUT_DIR / "latest_top_performers.json"
+    with open(latest_tp, "w", encoding="utf-8") as f:
+        json.dump(top_performers, f, indent=2, ensure_ascii=False)
+    log.info(f"   📄 Top performers JSON: {tp_path.name}")
 
-    # ── 3. Summary JSON for dashboard ──
+    # ── Summary JSON (for dashboard stats row) ─────────────────────
     summary = {
-        "scan_date": date_str,
-        "scan_timestamp": timestamp,
+        "scan_date":           date_str,
+        "scan_timestamp":      timestamp,
         "total_stocks_scanned": len(perf_df),
-        "timeframes": list(TIMEFRAMES.keys()),
-        "market_breadth": {},
+        "timeframes":          list(TIMEFRAMES.keys()),
+        "market_breadth":      {},
         "top_10_by_timeframe": {},
     }
-
-    for tf_name in TIMEFRAMES.keys():
-        if tf_name not in perf_df.columns:
+    for tf in TIMEFRAMES:
+        if tf not in perf_df.columns:
             continue
-        col = perf_df[tf_name].dropna()
-        advancing = int((col > 0).sum())
-        declining = int((col < 0).sum())
-        unchanged = int((col == 0).sum())
-
-        summary["market_breadth"][tf_name] = {
-            "advancing": advancing,
-            "declining": declining,
-            "unchanged": unchanged,
-            "advance_decline_ratio": round(advancing / max(declining, 1), 2),
-            "avg_return_pct": round(float(col.mean()), 2),
-            "median_return_pct": round(float(col.median()), 2),
+        col = perf_df[tf].dropna()
+        summary["market_breadth"][tf] = {
+            "advancing":           int((col > 0).sum()),
+            "declining":           int((col < 0).sum()),
+            "unchanged":           int((col == 0).sum()),
+            "advance_decline_ratio": round(int((col > 0).sum()) / max(int((col < 0).sum()), 1), 2),
+            "avg_return_pct":      round(float(col.mean()), 2),
+            "median_return_pct":   round(float(col.median()), 2),
         }
-
-        # Top 10 for dashboard
-        top10 = perf_df.dropna(subset=[tf_name]).nlargest(10, tf_name)
-        summary["top_10_by_timeframe"][tf_name] = top10[["ticker", "last_close", tf_name]].to_dict(orient="records")
+        top10 = perf_df.dropna(subset=[tf]).nlargest(10, tf)
+        summary["top_10_by_timeframe"][tf] = (
+            top10[["ticker", "last_close", tf]].to_dict("records")
+        )
 
     summary_path = OUTPUT_DIR / "latest_scan_summary.json"
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
-    log.info(f"   📄 Summary JSON saved: {summary_path.name}")
+    log.info(f"   📄 Summary JSON: {summary_path.name}")
 
-    # ── 4. Also save as 'latest' for easy access ──
-    latest_csv = OUTPUT_DIR / "latest_full_scan.csv"
-    perf_df_sorted.to_csv(latest_csv, index=False)
-    latest_top = OUTPUT_DIR / "latest_top_performers.json"
-    with open(latest_top, "w", encoding="utf-8") as f:
-        json.dump(top_performers, f, indent=2, ensure_ascii=False)
-    log.info(f"   📄 Latest files updated ✅")
-
-    # ── 5. Full summary JSON for browser table (compact — no raw prices) ──
-    full_summary_records = []
-    for _, row in perf_df_sorted.iterrows():
-        record = {
-            "t": row["ticker"],
-            "c": row["last_close"],
-            "d": row["last_date"],
-        }
-        for tf in TIMEFRAMES.keys():
+    # ── Full summary JSON (compact — for browser table) ────────────
+    full_records = []
+    for _, row in perf_sorted.iterrows():
+        record = {"t": row["ticker"], "c": row["last_close"], "d": row["last_date"]}
+        for tf in TIMEFRAMES:
             if tf in perf_df.columns:
                 val = row.get(tf)
-                record[tf] = round(float(val), 2) if val is not None and not pd.isna(val) else None
-        full_summary_records.append(record)
+                record[tf] = (
+                    round(float(val), 2)
+                    if val is not None and not pd.isna(val)
+                    else None
+                )
+        full_records.append(record)
 
     full_summary_path = OUTPUT_DIR / "full_summary.json"
     with open(full_summary_path, "w", encoding="utf-8") as f:
-        json.dump({"generated": date_str, "stocks": full_summary_records}, f, separators=(",", ":"), ensure_ascii=False)
-    log.info(f"   📄 Full summary JSON saved: {full_summary_path.name} ({len(full_summary_records)} stocks)")
+        json.dump(
+            {"generated": date_str, "stocks": full_records},
+            f, separators=(",", ":"), ensure_ascii=False,
+        )
+    log.info(f"   📄 Full summary JSON: {full_summary_path.name} ({len(full_records)} stocks)")
 
-    # ── Print summary to console ──
+    # ── Console summary ────────────────────────────────────────────
     print("\n" + "═" * 70)
     print(f"  📊 SCAN COMPLETE — {date_str}")
-    print(f"  Total Stocks Scanned: {len(perf_df)}")
+    print(f"  Stocks scanned: {len(perf_df)}")
     print("═" * 70)
-
-    for tf_name in TIMEFRAMES.keys():
-        if tf_name not in summary.get("market_breadth", {}):
+    for tf in TIMEFRAMES:
+        if tf not in summary.get("market_breadth", {}):
             continue
-        mb = summary["market_breadth"][tf_name]
-        print(f"\n  ⏱️  {tf_name} Performance:")
-        print(f"     Advancing: {mb['advancing']}  |  Declining: {mb['declining']}  |  A/D Ratio: {mb['advance_decline_ratio']}")
-        print(f"     Avg Return: {mb['avg_return_pct']}%  |  Median: {mb['median_return_pct']}%")
-
-        if tf_name in summary.get("top_10_by_timeframe", {}):
-            top3 = summary["top_10_by_timeframe"][tf_name][:3]
-            top3_str = ", ".join([f"{s['ticker']} ({s[tf_name]:+.1f}%)" for s in top3])
-            print(f"     🏆 Top 3: {top3_str}")
-
+        mb = summary["market_breadth"][tf]
+        print(f"\n  ⏱️  {tf}: ▲ {mb['advancing']} · ▼ {mb['declining']} · A/D {mb['advance_decline_ratio']}")
+        if tf in summary.get("top_10_by_timeframe", {}):
+            top3 = summary["top_10_by_timeframe"][tf][:3]
+            print(f"     🏆 " + ", ".join(
+                f"{s['ticker']} ({s[tf]:+.1f}%)" for s in top3
+            ))
     print("\n" + "═" * 70)
-    print(f"  📁 Results saved to: {OUTPUT_DIR}")
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  STEP 5: Fetch Fundamentals for Top Movers
+# ═══════════════════════════════════════════════════════════════════════
+
+def fetch_fundamentals(perf_df: pd.DataFrame) -> dict[str, dict]:
+    """
+    Fetch fundamental data for top movers across all timeframes.
+    Returns dict for use by both Step 4 (existing) and Step 6 (engine).
+    """
+    log.info("🔬 Fetching fundamentals for top movers...")
+    provider = get_provider()
+
+    # Collect top movers across all timeframes
+    top_symbols = set()
+    for tf in TIMEFRAMES:
+        if tf not in perf_df.columns:
+            continue
+        valid = perf_df.dropna(subset=[tf])
+        top = valid.nlargest(TOP_N, tf).index.tolist()
+        top_symbols.update(top)
+        if "ticker" in perf_df.columns:
+            top_symbols.update(valid.nlargest(TOP_N, tf)["ticker"].tolist())
+
+    top_list = sorted(list(top_symbols))[:FUNDAMENTALS_TOP_N]
+    fundamentals = provider.fetch_fundamentals(top_list)
+
+    # Save standalone fundamentals.json (existing format)
+    fund_list = list(fundamentals.values())
+    fund_path = OUTPUT_DIR / "fundamentals.json"
+    with open(fund_path, "w", encoding="utf-8") as f:
+        json.dump(
+            {"generated": datetime.now().strftime("%d %b %Y"),
+             "count": len(fund_list), "stocks": fund_list},
+            f, separators=(",", ":"), ensure_ascii=False,
+        )
+    log.info(f"   📄 Fundamentals JSON saved: {fund_path.name}")
+    return fundamentals
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  STEP 6: Run Opportunity Engine (NEW)
+# ═══════════════════════════════════════════════════════════════════════
+
+def run_opportunity_engine(ohlcv: pd.DataFrame, fundamentals: dict[str, dict]):
+    """
+    Run all three scanners on the full OHLCV dataset,
+    fuse their signals, rank by score, and write opportunities.json.
+    """
+    log.info("🎯 Running Opportunity Engine...")
+
+    # ── Run all scanners ────────────────────────────────────────────
+    scanners = [BreakoutScanner(), VolumeScanner(), MomentumScanner()]
+    scanner_results: dict[str, dict] = {}
+
+    for scanner in scanners:
+        log.info(f"   ⚡ Running {scanner.NAME}...")
+        scanner_results[scanner.NAME] = scanner.scan(ohlcv)
+
+    total_signals = sum(len(v) for v in scanner_results.values())
+    log.info(f"   📊 Total raw signals: {total_signals}")
+
+    # ── Fuse and rank ───────────────────────────────────────────────
+    engine = ScoringEngine()
+    opportunities = engine.fuse(scanner_results, fundamentals)
+
+    # ── Save output ─────────────────────────────────────────────────
+    engine.save(opportunities)
+
+    # ── Console summary ─────────────────────────────────────────────
+    print("\n" + "═" * 70)
+    print(f"  🎯 OPPORTUNITY ENGINE — {len(opportunities)} ranked setups")
+    print("═" * 70)
+    for opp in opportunities[:5]:
+        signals_str = " · ".join(opp.signals)
+        print(f"  #{opp.rank:>3}  {opp.ticker:<15} Score: {opp.score:>3}  [{signals_str}]")
+    if len(opportunities) > 5:
+        print(f"  ... and {len(opportunities) - 5} more in opportunities.json")
     print("═" * 70 + "\n")
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  STEP 5: Fetch Fundamentals for Top Movers (Parallel)
-# ═══════════════════════════════════════════════════════════════════
-
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-
-def _fetch_single_info(symbol: str) -> dict:
-    """Fetch fundamental data for a single stock from Yahoo Finance."""
-    try:
-        info = yf.Ticker(f"{symbol}.NS").info
-        mcap = info.get("marketCap")
-        return {
-            "s": symbol,
-            "mcap": round(mcap / 1e7, 1) if mcap else None,  # Convert to ₹ Cr
-            "pe": round(info.get("trailingPE"), 1) if info.get("trailingPE") else None,
-            "eps": round(info.get("trailingEps"), 2) if info.get("trailingEps") else None,
-            "sector": info.get("sector"),
-            "ind": info.get("industry"),
-            "52h": round(info.get("fiftyTwoWeekHigh"), 2) if info.get("fiftyTwoWeekHigh") else None,
-            "52l": round(info.get("fiftyTwoWeekLow"), 2) if info.get("fiftyTwoWeekLow") else None,
-            "bv": round(info.get("bookValue"), 2) if info.get("bookValue") else None,
-            "dy": round(info.get("dividendYield", 0) * 100, 2) if info.get("dividendYield") else None,
-            "name": info.get("shortName") or info.get("longName") or symbol,
-        }
-    except Exception as e:
-        log.warning(f"   ⚠️  Failed to fetch fundamentals for {symbol}: {e}")
-        return {"s": symbol}
-
-
-def fetch_fundamentals(perf_df: pd.DataFrame):
-    """
-    Fetch fundamental data for top movers across all timeframes.
-    Uses ThreadPoolExecutor for parallel fetching (~5-10s instead of 30s+).
-    Saves to a separate fundamentals.json to keep full_summary.json lightweight.
-    """
-    log.info("🔬 Fetching fundamental data for top movers...")
-
-    # Collect unique top movers across all timeframes
-    top_symbols = set()
-    for tf_name in TIMEFRAMES.keys():
-        if tf_name not in perf_df.columns:
-            continue
-        valid = perf_df.dropna(subset=[tf_name])
-        # Top 20 gainers per timeframe
-        top = valid.nlargest(20, tf_name).index.tolist()
-        top_symbols.update(top)
-
-    # Also add top by ticker name (from the ticker column)
-    if "ticker" in perf_df.columns:
-        for tf_name in TIMEFRAMES.keys():
-            if tf_name not in perf_df.columns:
-                continue
-            valid = perf_df.dropna(subset=[tf_name])
-            top = valid.nlargest(20, tf_name)["ticker"].tolist()
-            top_symbols.update(top)
-
-    top_list = sorted(list(top_symbols))
-    log.info(f"   📊 Fetching fundamentals for {len(top_list)} unique top movers...")
-
-    # Parallel fetch
-    results = []
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        future_map = {executor.submit(_fetch_single_info, sym): sym for sym in top_list}
-        done_count = 0
-        for future in as_completed(future_map):
-            done_count += 1
-            result = future.result()
-            results.append(result)
-            if done_count % 20 == 0:
-                log.info(f"   📦 Fetched {done_count}/{len(top_list)} fundamentals...")
-
-    # Validate: count how many have real data
-    valid_count = sum(1 for r in results if r.get("pe") is not None or r.get("mcap") is not None)
-    log.info(f"   ✅ Fetched fundamentals: {valid_count}/{len(results)} with data")
-
-    # Save as separate JSON
-    fundamentals_path = OUTPUT_DIR / "fundamentals.json"
-    with open(fundamentals_path, "w", encoding="utf-8") as f:
-        json.dump({
-            "generated": datetime.now().strftime("%d %b %Y"),
-            "count": len(results),
-            "stocks": results,
-        }, f, separators=(",", ":"), ensure_ascii=False)
-    log.info(f"   📄 Fundamentals JSON saved: {fundamentals_path.name}")
-
-
-# ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════
 #  MAIN ENTRY POINT
-# ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════
 
 def main():
-    start_time = time.time()
+    start = time.time()
 
     print("""
 ╔══════════════════════════════════════════════════════════════════╗
-║       🇮🇳 INDIA SWING TRADING SCANNER — DAILY NSE SCAN          ║
-║       Timeframes: 1W · 2W · 1M · 3M · 6M · 12M                ║
+║  🇮🇳  MarketPulse India — Daily NSE Intelligence Engine          ║
+║  Performance · Breakout · Volume · Momentum · Opportunities     ║
 ╚══════════════════════════════════════════════════════════════════╝
     """)
 
-    # Step 1: Get ticker universe
+    # Step 1: Ticker universe (now via Python, no Node.js)
     tickers = fetch_nse_tickers()
 
-    # Step 2: Download price data
-    prices = download_price_data(tickers)
+    # Step 2: Full OHLCV download
+    ohlcv = download_price_data(tickers)
+    prices = extract_close(ohlcv)  # Close-only view for Steps 3–4
 
-    if prices.empty:
-        log.error("❌ No price data was downloaded. Check internet connection or yfinance.")
-        sys.exit(1)
-
-    # Step 3: Calculate performance
+    # Step 3: Multi-timeframe performance
     performance = calculate_performance(prices)
 
-    # Step 4: Rank and export
+    # Step 4: Rank and export (existing output files)
     rank_and_export(performance)
 
-    # Step 5: Fetch fundamentals for top movers (parallel)
-    fetch_fundamentals(performance)
+    # Step 5: Fundamentals for top movers
+    fundamentals = fetch_fundamentals(performance)
 
-    elapsed = time.time() - start_time
-    log.info(f"⏱️  Total scan time: {elapsed:.1f} seconds")
+    # Step 6: Opportunity Engine (new)
+    run_opportunity_engine(ohlcv, fundamentals)
+
+    elapsed = time.time() - start
+    log.info(f"⏱️  Total time: {elapsed:.1f}s")
 
 
 if __name__ == "__main__":

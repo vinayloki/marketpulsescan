@@ -1,3 +1,14 @@
 node_modules/
+
+# MarketPulse runtime cache (never commit)
+cache/
+*.parquet
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
 __pycache__/
 *.pyc
