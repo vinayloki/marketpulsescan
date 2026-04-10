@@ -579,7 +579,7 @@ const AI_PICKS_DATA = [
     confidence: 82,
     reasons: [
       'Price above 200 DMA — sustained structural uptrend',
-      'Strong volume breakout on Friday's session (2.4× avg vol)',
+      'Strong volume breakout on Friday\'s session (2.4× avg vol)',
       'Momentum positive: 3-month return +14.2%',
       'Revenue growth healthy at 11% YoY (Q3 FY25)',
     ],
