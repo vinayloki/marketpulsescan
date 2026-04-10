@@ -134,6 +134,7 @@ function buildDashboard() {
   buildTopMovers();
   buildFullScan();
   buildNews();
+  buildAIPicksTab(); // AI Picks uses static data — always safe to call
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -558,4 +559,200 @@ function onOppChip(btn) {
   btn.classList.add('active');
   _oppSignal = btn.dataset.signal;
   renderOpportunities();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AI PICKS TAB — Static/Mock Data + Renderer
+   Structure designed for easy backend integration later:
+   replace AI_PICKS_DATA with an API fetch in loadEverything()
+═══════════════════════════════════════════════════════════════ */
+
+const AI_PICKS_DATA = [
+  {
+    ticker: 'RELIANCE',
+    name: 'Reliance Industries Ltd.',
+    price: '₹2,847.60',
+    recommendation: 'buy',
+    trend: 'up',
+    trendLabel: '↑ Uptrend',
+    horizon: 'Medium Term · 2 Months',
+    confidence: 82,
+    reasons: [
+      'Price above 200 DMA — sustained structural uptrend',
+      'Strong volume breakout on Friday's session (2.4× avg vol)',
+      'Momentum positive: 3-month return +14.2%',
+      'Revenue growth healthy at 11% YoY (Q3 FY25)',
+    ],
+    risks: [
+      'RSI(14) near overbought zone at 71.3 — pullback possible',
+    ],
+  },
+  {
+    ticker: 'HDFCBANK',
+    name: 'HDFC Bank Ltd.',
+    price: '₹1,612.30',
+    recommendation: 'hold',
+    trend: 'side',
+    trendLabel: '→ Sideways',
+    horizon: 'Short Term · 3 Weeks',
+    confidence: 61,
+    reasons: [
+      'Price consolidating between ₹1,580 and ₹1,650 support/resistance',
+      'EMA 9 and EMA 21 converging — trend resolution imminent',
+      'Fundamentals solid: P/E 18x, strong NII growth',
+    ],
+    risks: [
+      'Breakout direction unclear — wait for confirmation above ₹1,655',
+      'Broader market weakness could trigger range breakdown',
+    ],
+  },
+  {
+    ticker: 'ZOMATO',
+    name: 'Zomato Ltd.',
+    price: '₹208.45',
+    recommendation: 'buy',
+    trend: 'up',
+    trendLabel: '↑ Uptrend',
+    horizon: 'Short Term · 4 Weeks',
+    confidence: 74,
+    reasons: [
+      '52-week breakout confirmed on above-average volume',
+      'Momentum indicator (3M return: +38.7%) strongly bullish',
+      'Quick Commerce segment driving re-rating from analysts',
+      'EMA 9 crossed above EMA 21 last week — golden cross',
+    ],
+    risks: [
+      'High P/E (120x) leaves limited margin of safety',
+      'Profit booking likely near ₹225–230 resistance zone',
+    ],
+  },
+  {
+    ticker: 'TATASTEEL',
+    name: 'Tata Steel Ltd.',
+    price: '₹142.80',
+    recommendation: 'sell',
+    trend: 'down',
+    trendLabel: '↓ Downtrend',
+    horizon: 'Short Term · 3 Weeks',
+    confidence: 68,
+    reasons: [
+      'Price below 200 DMA for 3 consecutive weeks',
+      'Volume on down days 1.8× higher than up days — distribution pattern',
+      'European operations reporting losses; guidance cut in Q3',
+    ],
+    risks: [
+      'Any China steel demand pickup could reverse this call quickly',
+      'Partial hedge: core India ops remain profitable',
+    ],
+  },
+  {
+    ticker: 'INFY',
+    name: 'Infosys Ltd.',
+    price: '₹1,478.55',
+    recommendation: 'buy',
+    trend: 'up',
+    trendLabel: '↑ Uptrend',
+    horizon: 'Long Term · 9 Months',
+    confidence: 79,
+    reasons: [
+      'AI and cloud deal wins accelerating — deal TCV up 22% QoQ',
+      'Price above all key EMAs (9, 21, 50, 200)',
+      'Dividend yield 3.1% provides income cushion',
+      '12M return momentum positive at +19.4%',
+    ],
+    risks: [
+      'USD appreciation risk — revenue is USD-denominated',
+      'Macro slowdown in US/Europe could delay IT spend recovery',
+    ],
+  },
+  {
+    ticker: 'IRFC',
+    name: 'Indian Railway Finance Corp.',
+    price: '₹175.20',
+    recommendation: 'hold',
+    trend: 'side',
+    trendLabel: '→ Sideways',
+    horizon: 'Medium Term · 6 Weeks',
+    confidence: 55,
+    reasons: [
+      'Post-IPO run-up already priced in; valuation stretched vs peers',
+      'Railway capex cycle intact — long-term thesis valid',
+      'Dividend yield 1.1% provides some support',
+    ],
+    risks: [
+      'Government policy changes could affect loan disbursement pipeline',
+      'PSU sector rotation risk if broader market favors private banks',
+    ],
+  },
+];
+
+/**
+ * Build the AI Picks tab in the DOM.
+ * Called once on DOMContentLoaded — data is static for now.
+ * To integrate backend: replace AI_PICKS_DATA with fetched JSON.
+ */
+function buildAIPicksTab() {
+  const grid = document.getElementById('aiPicksGrid');
+  if (!grid) return;
+
+  grid.innerHTML = AI_PICKS_DATA.map(pick => buildAIPickCard(pick)).join('');
+
+  // Animate confidence bars after paint
+  requestAnimationFrame(() => {
+    grid.querySelectorAll('.ai-conf-fill').forEach(el => {
+      el.style.width = el.dataset.confidence + '%';
+    });
+  });
+}
+
+function buildAIPickCard(pick) {
+  const trendCls = { up: 'trend-up', down: 'trend-down', side: 'trend-side' }[pick.trend] || 'trend-side';
+  const recLabel = pick.recommendation.toUpperCase();
+
+  const reasons = pick.reasons.map(r => `<li>${r}</li>`).join('');
+  const risks   = pick.risks.map(r => `<div class="ai-risk-item">${r}</div>`).join('');
+
+  return `
+  <div class="ai-pick-card ${pick.recommendation}">
+    <div class="ai-pick-header">
+      <div class="ai-rec-badge ${pick.recommendation}">${recLabel}</div>
+      <div class="ai-pick-meta">
+        <div class="ai-pick-ticker">
+          <a href="https://in.tradingview.com/chart/?symbol=NSE:${pick.ticker}" target="_blank" rel="noopener" style="color:#fff;">${pick.ticker}</a>
+        </div>
+        <div class="ai-pick-name">${pick.name}</div>
+      </div>
+      <div class="ai-pick-price" style="color:${pick.recommendation === 'buy' ? 'var(--green)' : pick.recommendation === 'sell' ? 'var(--red)' : 'var(--amber)'}">${pick.price}</div>
+    </div>
+
+    <div class="ai-pick-row">
+      <span class="ai-trend-chip ${trendCls}">${pick.trendLabel}</span>
+      <span class="ai-horizon-chip">⏱ ${pick.horizon}</span>
+    </div>
+
+    <div class="ai-conf-wrap">
+      <div class="ai-conf-label">
+        <span>AI Confidence</span>
+        <strong>${pick.confidence}%</strong>
+      </div>
+      <div class="ai-conf-track">
+        <div class="ai-conf-fill ${pick.recommendation}" data-confidence="${pick.confidence}" style="width:0%"></div>
+      </div>
+    </div>
+
+    <hr class="ai-pick-divider">
+
+    <div class="ai-pick-section-title">Why</div>
+    <ul class="ai-pick-reasons">${reasons}</ul>
+
+    <hr class="ai-pick-divider">
+
+    <div class="ai-pick-section-title">Risk Indicators</div>
+    ${risks}
+
+    <div class="ai-pick-footer">
+      <a class="ai-chart-link" href="https://in.tradingview.com/chart/?symbol=NSE:${pick.ticker}" target="_blank" rel="noopener">📊 Chart ↗</a>
+      <span class="ai-pick-demo-tag">Demo Data</span>
+    </div>
+  </div>`;
 }

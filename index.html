@@ -394,6 +394,305 @@
       font-size: 10px; color: rgba(255,255,255,0.2); text-align: center; line-height: 1.8;
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       AI PICKS TAB — STYLES
+    ═══════════════════════════════════════════════════════════ */
+
+    /* Hero banner */
+    .ai-hero {
+      background: linear-gradient(135deg, rgba(16,245,168,0.07) 0%, rgba(61,232,245,0.04) 50%, rgba(61,142,244,0.06) 100%);
+      border: 1px solid rgba(16,245,168,0.12);
+      border-radius: 16px; padding: 32px 36px; margin-bottom: 28px;
+      position: relative; overflow: hidden;
+    }
+    .ai-hero::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(16,245,168,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .ai-hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(16,245,168,0.1); border: 1px solid rgba(16,245,168,0.2);
+      border-radius: 20px; padding: 4px 14px; font-size: 11px; font-weight: 700;
+      color: var(--primary); letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .ai-hero h1 {
+      font-family: var(--heading); font-size: 26px; font-weight: 800;
+      color: #fff; line-height: 1.25; margin-bottom: 10px;
+    }
+    .ai-hero h1 span { color: var(--primary); }
+    .ai-hero p {
+      font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 580px;
+    }
+    .ai-hero-pulse {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--primary); animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* Section labels */
+    .ai-section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .ai-section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* How It Works — step cards */
+    .ai-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px; margin-bottom: 32px;
+    }
+    .ai-step-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px 18px;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .ai-step-card:hover {
+      border-color: rgba(16,245,168,0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(16,245,168,0.05);
+    }
+    .ai-step-num {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      color: var(--primary); margin-bottom: 10px; opacity: 0.7;
+    }
+    .ai-step-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+    .ai-step-title {
+      font-family: var(--heading); font-size: 13px; font-weight: 700;
+      color: #fff; margin-bottom: 6px;
+    }
+    .ai-step-desc {
+      font-size: 11.5px; color: rgba(255,255,255,0.45); line-height: 1.65;
+    }
+    .ai-step-connector {
+      display: none;
+    }
+
+    /* AI Stock Recommendation Card */
+    .ai-picks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 14px; margin-bottom: 32px;
+    }
+    .ai-pick-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .ai-pick-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .ai-pick-card.buy  { border-color: rgba(63,185,80,0.25); }
+    .ai-pick-card.hold { border-color: rgba(245,166,35,0.25); }
+    .ai-pick-card.sell { border-color: rgba(248,81,73,0.25); }
+    .ai-pick-card.buy:hover  { box-shadow: 0 8px 32px rgba(63,185,80,0.08); }
+    .ai-pick-card.hold:hover { box-shadow: 0 8px 32px rgba(245,166,35,0.08); }
+    .ai-pick-card.sell:hover { box-shadow: 0 8px 32px rgba(248,81,73,0.08); }
+    /* card glow accent */
+    .ai-pick-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .ai-pick-card.buy::before  { background: linear-gradient(90deg, var(--green), transparent); }
+    .ai-pick-card.hold::before { background: linear-gradient(90deg, var(--amber), transparent); }
+    .ai-pick-card.sell::before { background: linear-gradient(90deg, var(--red), transparent); }
+
+    .ai-pick-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+    .ai-rec-badge {
+      font-family: var(--mono); font-size: 12px; font-weight: 800;
+      padding: 5px 12px; border-radius: 6px; flex-shrink: 0; letter-spacing: 0.06em;
+    }
+    .ai-rec-badge.buy  { background: rgba(63,185,80,0.15);  color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+    .ai-rec-badge.hold { background: rgba(245,166,35,0.15); color: var(--amber); border: 1px solid rgba(245,166,35,0.3); }
+    .ai-rec-badge.sell { background: rgba(248,81,73,0.15);  color: var(--red);   border: 1px solid rgba(248,81,73,0.3); }
+
+    .ai-pick-meta { flex: 1; min-width: 0; }
+    .ai-pick-ticker {
+      font-family: var(--heading); font-size: 17px; font-weight: 800;
+      color: #fff; margin-bottom: 2px;
+    }
+    .ai-pick-name { font-size: 11px; color: rgba(255,255,255,0.35); }
+    .ai-pick-price {
+      font-family: var(--mono); font-size: 15px; font-weight: 700;
+      text-align: right; flex-shrink: 0;
+    }
+
+    /* Trend + horizon row */
+    .ai-pick-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+    .ai-trend-chip {
+      font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 4px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .trend-up   { background: rgba(63,185,80,0.12);  color: var(--green); }
+    .trend-down { background: rgba(248,81,73,0.12);  color: var(--red); }
+    .trend-side { background: rgba(245,166,35,0.1);  color: var(--amber); }
+    .ai-horizon-chip {
+      font-size: 10px; color: rgba(255,255,255,0.4); padding: 3px 9px;
+      background: rgba(255,255,255,0.04); border-radius: 4px; border: 1px solid var(--border);
+    }
+
+    /* Confidence bar */
+    .ai-conf-wrap { margin-bottom: 12px; }
+    .ai-conf-label {
+      display: flex; justify-content: space-between;
+      font-size: 10px; color: rgba(255,255,255,0.35); margin-bottom: 5px;
+    }
+    .ai-conf-label strong { color: rgba(255,255,255,0.75); font-family: var(--mono); font-size: 12px; }
+    .ai-conf-track {
+      height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;
+    }
+    .ai-conf-fill {
+      height: 100%; border-radius: 3px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+    .ai-conf-fill.buy  { background: linear-gradient(90deg, var(--green), #6ee7b7); }
+    .ai-conf-fill.hold { background: linear-gradient(90deg, var(--amber), #fcd34d); }
+    .ai-conf-fill.sell { background: linear-gradient(90deg, var(--red),   #fca5a5); }
+
+    /* Why / Risk sections */
+    .ai-pick-divider {
+      border: none; border-top: 1px solid var(--border); margin: 12px 0;
+    }
+    .ai-pick-section-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: rgba(255,255,255,0.25); margin-bottom: 7px;
+    }
+    .ai-pick-reasons { list-style: none; padding: 0; margin: 0; }
+    .ai-pick-reasons li {
+      font-size: 12px; color: rgba(255,255,255,0.6); padding: 3px 0;
+      display: flex; align-items: flex-start; gap: 7px; line-height: 1.5;
+    }
+    .ai-pick-reasons li::before { content: '•'; color: var(--primary); flex-shrink: 0; }
+    .ai-risk-item {
+      font-size: 11.5px; color: rgba(245,166,35,0.8); display: flex;
+      align-items: flex-start; gap: 6px; line-height: 1.5;
+    }
+    .ai-risk-item::before { content: '⚠'; font-size: 10px; flex-shrink: 0; margin-top: 1px; }
+
+    /* Card footer */
+    .ai-pick-footer { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+    .ai-chart-link {
+      font-size: 11px; padding: 4px 10px; border: 1px solid var(--border);
+      border-radius: 5px; color: var(--primary); transition: all 0.15s;
+    }
+    .ai-chart-link:hover { border-color: var(--primary); background: rgba(16,245,168,0.06); }
+    .ai-pick-demo-tag {
+      margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.2); text-transform: uppercase;
+      background: rgba(255,255,255,0.04); padding: 2px 7px; border-radius: 3px;
+    }
+
+    /* Market coverage */
+    .ai-coverage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px; margin-bottom: 32px;
+    }
+    .ai-cov-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .ai-cov-card:hover { border-color: rgba(16,245,168,0.18); transform: translateY(-1px); }
+    .ai-cov-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+    .ai-cov-title {
+      font-family: var(--heading); font-size: 14px; font-weight: 700;
+      color: #fff; margin-bottom: 4px;
+    }
+    .ai-cov-range {
+      font-family: var(--mono); font-size: 11px; color: var(--primary);
+      margin-bottom: 8px;
+    }
+    .ai-cov-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+
+    /* Value proposition + trust */
+    .ai-value-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+      gap: 12px; margin-bottom: 32px;
+    }
+    .ai-value-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px;
+      transition: border-color 0.15s;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .ai-value-item:hover { border-color: rgba(16,245,168,0.15); }
+    .ai-value-icon {
+      flex-shrink: 0; width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      background: rgba(16,245,168,0.08);
+    }
+    .ai-value-text {}
+    .ai-value-title {
+      font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px;
+    }
+    .ai-value-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+
+    /* Daily report block */
+    .ai-report-block {
+      background: linear-gradient(135deg, rgba(61,142,244,0.07) 0%, rgba(167,139,250,0.05) 100%);
+      border: 1px solid rgba(61,142,244,0.15);
+      border-radius: 14px; padding: 24px 28px; margin-bottom: 32px;
+      display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap;
+    }
+    .ai-report-left { flex: 1; min-width: 220px; }
+    .ai-report-title {
+      font-family: var(--heading); font-size: 16px; font-weight: 800;
+      color: #fff; margin-bottom: 8px;
+    }
+    .ai-report-sub { font-size: 12.5px; color: rgba(255,255,255,0.45); line-height: 1.7; }
+    .ai-report-right { display: flex; flex-direction: column; gap: 8px; min-width: 200px; }
+    .ai-report-feature {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12.5px; color: rgba(255,255,255,0.55);
+    }
+    .ai-report-feature-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-green  { background: var(--green); }
+    .dot-red    { background: var(--red); }
+    .dot-amber  { background: var(--amber); }
+    .dot-purple { background: var(--purple); }
+
+    /* Trust block */
+    .ai-trust-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px; margin-bottom: 32px;
+    }
+    .ai-trust-item {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px; padding: 16px 18px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .ai-trust-icon { font-size: 20px; flex-shrink: 0; }
+    .ai-trust-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 3px; }
+    .ai-trust-desc  { font-size: 11.5px; color: rgba(255,255,255,0.35); line-height: 1.5; }
+
+    /* AI Disclaimer */
+    .ai-disclaimer {
+      background: rgba(248,81,73,0.05); border: 1px solid rgba(248,81,73,0.12);
+      border-radius: var(--radius); padding: 16px 20px; margin-bottom: 8px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .ai-disclaimer-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .ai-disclaimer p {
+      font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.7;
+    }
+    .ai-disclaimer strong { color: rgba(255,255,255,0.65); }
+
     /* ═══ MOBILE ═════════════════════════════════════════════ */
     @media (max-width: 768px) {
       .app { padding: 12px 12px 36px; }
@@ -405,9 +704,15 @@
       .stats-row { grid-template-columns: repeat(3, 1fr); }
       .opp-grid { grid-template-columns: 1fr; }
       .opp-indicators { grid-template-columns: repeat(2, 1fr); }
+      .ai-picks-grid { grid-template-columns: 1fr; }
+      .ai-steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .ai-hero { padding: 22px 20px; }
+      .ai-hero h1 { font-size: 20px; }
+      .ai-report-block { flex-direction: column; gap: 18px; }
     }
     @media (max-width: 480px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .ai-steps-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -463,6 +768,7 @@
       <button class="tab-btn" data-tab="movers">🏆 Top Movers <span class="tab-badge" id="moversBadge">0</span></button>
       <button class="tab-btn" data-tab="fullscan">📋 Full Scan <span class="tab-badge" id="fsBadge">0</span></button>
       <button class="tab-btn" data-tab="news">📰 News</button>
+      <button class="tab-btn" data-tab="aipicks" id="aiPicksTab">🤖 AI Picks <span class="tab-badge" style="background:var(--blue);color:#fff">NEW</span></button>
       <button class="tab-btn" data-tab="about">ℹ️ About &amp; Guide</button>
     </nav>
 
@@ -573,6 +879,166 @@
       </div>
       <div id="newsContent"></div>
     </div>
+
+    <!-- TAB: AI PICKS -->
+    <div class="tab-panel" id="tab-aipicks">
+
+      <!-- ① HERO -->
+      <div class="ai-hero">
+        <div class="ai-hero-badge"><span class="ai-hero-pulse"></span> EOD Intelligence Engine</div>
+        <h1>AI-Powered Stock Picks<br><span>EOD Intelligence</span></h1>
+        <p>Daily post-market insights with Buy, Hold, and Sell recommendations—powered by data, not noise. Every signal is explained so you always know the <em>why</em> behind each call.</p>
+      </div>
+
+      <!-- ② HOW IT WORKS -->
+      <div class="ai-section-label">⚙️ How It Works</div>
+      <div class="ai-steps-grid" id="ai-steps-grid">
+        <div class="ai-step-card">
+          <div class="ai-step-num">STEP 01</div>
+          <span class="ai-step-icon">📡</span>
+          <div class="ai-step-title">Data Collection</div>
+          <div class="ai-step-desc">After market close (3:30 PM IST), the engine collects EOD price, volume, and fundamental data for all NSE-listed stocks.</div>
+        </div>
+        <div class="ai-step-card">
+          <div class="ai-step-num">STEP 02</div>
+          <span class="ai-step-icon">📈</span>
+          <div class="ai-step-title">Trend Analysis</div>
+          <div class="ai-step-desc">Each stock is classified as Uptrend, Downtrend, or Sideways using EMAs, price action relative to 200 DMA, and multi-timeframe returns.</div>
+        </div>
+        <div class="ai-step-card">
+          <div class="ai-step-num">STEP 03</div>
+          <span class="ai-step-icon">🔎</span>
+          <div class="ai-step-title">Signal Detection</div>
+          <div class="ai-step-desc">Breakouts, momentum shifts, RSI patterns, and abnormal volume spikes are flagged and scored for conviction strength.</div>
+        </div>
+        <div class="ai-step-card">
+          <div class="ai-step-num">STEP 04</div>
+          <span class="ai-step-icon">🤖</span>
+          <div class="ai-step-title">AI Decision Engine</div>
+          <div class="ai-step-desc">A rules-based AI engine weighs all signals and fundamentals to generate a Buy / Hold / Sell verdict with a confidence score.</div>
+        </div>
+        <div class="ai-step-card">
+          <div class="ai-step-num">STEP 05</div>
+          <span class="ai-step-icon">💡</span>
+          <div class="ai-step-title">Insight Generation</div>
+          <div class="ai-step-desc">Every recommendation is accompanied by clear, plain-English reasoning and key risk indicators—no black-box outputs.</div>
+        </div>
+      </div>
+
+      <!-- ③ SAMPLE OUTPUT CARDS -->
+      <div class="ai-section-label">📊 Sample AI Recommendations — Demo Data</div>
+      <div class="ai-picks-grid" id="aiPicksGrid"></div>
+
+      <!-- ④ MARKET COVERAGE -->
+      <div class="ai-section-label">🏦 Market Coverage</div>
+      <div class="ai-coverage-grid">
+        <div class="ai-cov-card">
+          <span class="ai-cov-icon">🔵</span>
+          <div class="ai-cov-title">Large Cap</div>
+          <div class="ai-cov-range">&gt; ₹20,000 Cr</div>
+          <div class="ai-cov-desc">Blue-chip Nifty 50 &amp; Nifty 100 stocks. High liquidity, lower volatility—ideal for medium to long-term conviction picks.</div>
+        </div>
+        <div class="ai-cov-card">
+          <span class="ai-cov-icon">🟡</span>
+          <div class="ai-cov-title">Mid Cap</div>
+          <div class="ai-cov-range">₹5,000 – ₹20,000 Cr</div>
+          <div class="ai-cov-desc">Growth-oriented companies with strong sector tailwinds. Balances upside potential with moderate risk exposure.</div>
+        </div>
+        <div class="ai-cov-card">
+          <span class="ai-cov-icon">⚪</span>
+          <div class="ai-cov-title">Small Cap</div>
+          <div class="ai-cov-range">₹500 – ₹5,000 Cr</div>
+          <div class="ai-cov-desc">High-momentum emerging companies. Greater alpha potential but require tighter risk management and careful position sizing.</div>
+        </div>
+        <div class="ai-cov-card">
+          <span class="ai-cov-icon">🔮</span>
+          <div class="ai-cov-title">Micro Cap</div>
+          <div class="ai-cov-range">&lt; ₹500 Cr</div>
+          <div class="ai-cov-desc">Early-stage and niche players. Highest return potential with commensurately higher liquidity risk. For experienced investors only.</div>
+        </div>
+      </div>
+
+      <!-- ⑤ DAILY AI MARKET REPORT -->
+      <div class="ai-section-label">📅 Daily AI Market Report</div>
+      <div class="ai-report-block">
+        <div class="ai-report-left">
+          <div class="ai-report-title">Post-Market Intelligence, Every Trading Day</div>
+          <div class="ai-report-sub">After the NSE closes at 3:30 PM IST, the AI engine processes the full EOD dataset and publishes a structured market report by ~4:50 PM IST. Updated automatically—no manual curation.</div>
+        </div>
+        <div class="ai-report-right">
+          <div class="ai-report-feature"><div class="ai-report-feature-dot dot-green"></div> Top BUY picks of the day</div>
+          <div class="ai-report-feature"><div class="ai-report-feature-dot dot-red"></div> SELL / avoid signals</div>
+          <div class="ai-report-feature"><div class="ai-report-feature-dot dot-amber"></div> Trend change alerts</div>
+          <div class="ai-report-feature"><div class="ai-report-feature-dot dot-purple"></div> Sector rotation insights</div>
+        </div>
+      </div>
+
+      <!-- ⑥ VALUE PROPOSITION -->
+      <div class="ai-section-label">✨ Why EOD Intelligence</div>
+      <div class="ai-value-grid">
+        <div class="ai-value-item">
+          <div class="ai-value-icon">🚫</div>
+          <div class="ai-value-text">
+            <div class="ai-value-title">No Intraday Noise</div>
+            <div class="ai-value-desc">Decisions based solely on closing prices eliminate tick-by-tick volatility and emotional triggers.</div>
+          </div>
+        </div>
+        <div class="ai-value-item">
+          <div class="ai-value-icon">🎯</div>
+          <div class="ai-value-text">
+            <div class="ai-value-title">Decision-First Design</div>
+            <div class="ai-value-desc">Every output is a clear action—Buy, Hold, or Sell—with structured reasoning, not raw data dumps.</div>
+          </div>
+        </div>
+        <div class="ai-value-item">
+          <div class="ai-value-icon">📅</div>
+          <div class="ai-value-text">
+            <div class="ai-value-title">Built for Weekend Investors</div>
+            <div class="ai-value-desc">Review picks once a day or over the weekend. No need to watch screens all day to stay informed.</div>
+          </div>
+        </div>
+        <div class="ai-value-item">
+          <div class="ai-value-icon">📖</div>
+          <div class="ai-value-text">
+            <div class="ai-value-title">Clear, Explainable Insights</div>
+            <div class="ai-value-desc">Every recommendation explains the key drivers in plain language—empowering you to verify and decide.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑦ TRUST & TRANSPARENCY -->
+      <div class="ai-section-label">🔒 Trust &amp; Transparency</div>
+      <div class="ai-trust-grid">
+        <div class="ai-trust-item">
+          <div class="ai-trust-icon">📊</div>
+          <div>
+            <div class="ai-trust-title">Based on EOD Data</div>
+            <div class="ai-trust-desc">All signals use verified end-of-day closing prices from NSE, not intraday or proxy feeds.</div>
+          </div>
+        </div>
+        <div class="ai-trust-item">
+          <div class="ai-trust-icon">🧠</div>
+          <div>
+            <div class="ai-trust-title">Reasoning Included</div>
+            <div class="ai-trust-desc">Each pick comes with bullet-point rationale so you can audit every decision before acting on it.</div>
+          </div>
+        </div>
+        <div class="ai-trust-item">
+          <div class="ai-trust-icon">🔓</div>
+          <div>
+            <div class="ai-trust-title">No Black-Box Recommendations</div>
+            <div class="ai-trust-desc">The engine uses a transparent, rules-based scoring system—no opaque neural networks making unexplained calls.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑧ DISCLAIMER -->
+      <div class="ai-disclaimer">
+        <span class="ai-disclaimer-icon">⚖️</span>
+        <p><strong>Important Disclaimer:</strong> This platform provides AI-generated insights based on end-of-day market data. It is for <strong>informational purposes only and does not constitute financial advice</strong>. The creators are not SEBI-registered investment advisors. Stock market investments are subject to market risks. Always consult a SEBI-registered financial advisor and do your own research (DYOR) before making any investment decisions. Past performance does not guarantee future results.</p>
+      </div>
+
+    </div><!-- /tab-aipicks -->
 
     <!-- TAB: ABOUT & GUIDE -->
     <div class="tab-panel" id="tab-about">
