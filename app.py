@@ -208,29 +208,6 @@ try:
     super_perf = full_sum.get("super_performers_12m", 0)
 except: adv_1w=dec_1w=gainers_1w=losers_1m=super_perf=0
 
-st.markdown(f"""
-<div class="hdr">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px">
-    <div>
-      <div style="font-size:24px;font-weight:900;color:#f1f5f9;letter-spacing:-.02em">📈 MarketPulse India</div>
-      <div style="font-size:13px;color:#64748b;margin-top:3px">NSE Intelligence Engine · {total_stocks:,} Stocks · AI-Powered EOD Analysis</div>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <div style="display:inline-flex;align-items:center;gap:6px;background:{rc}11;border:1px solid {rc}44;color:{rc};padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700">{ri} {regime} Market</div>
-      <div style="text-align:right"><div style="font-size:10px;color:#475569">UPDATED</div><div style="font-size:13px;color:#94a3b8;font-weight:700">{gen_date}</div></div>
-    </div>
-  </div>
-  <div style="display:flex;gap:28px;margin-top:16px;flex-wrap:wrap;border-top:1px solid #1e2a3a;padding-top:14px">
-    <div><span style="font-size:20px;font-weight:900;color:#f1f5f9">{total_stocks:,}</span><br><span style="font-size:11px;color:#64748b">Stocks Scanned</span></div>
-    <div><span style="font-size:20px;font-weight:900;color:#38bdf8">{opp_count}</span><br><span style="font-size:11px;color:#64748b">Opportunities</span></div>
-    <div><span style="font-size:20px;font-weight:900;color:#22c55e">{buys}</span><br><span style="font-size:11px;color:#64748b">▲ BUY Signals</span></div>
-    <div><span style="font-size:20px;font-weight:900;color:#fbbf24">{holds}</span><br><span style="font-size:11px;color:#64748b">◆ HOLD</span></div>
-    <div><span style="font-size:20px;font-weight:900;color:#ef4444">{sells}</span><br><span style="font-size:11px;color:#64748b">▼ SELL Signals</span></div>
-    <div style="margin-left:auto;align-self:center"><span style="font-size:11px;color:#475569">⚠️ Educational only · Not SEBI-registered advice</span></div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
 # ─── Tabs ─────────────────────────────────────────────────────────────────────
 st.sidebar.markdown('<div style="font-size:22px;font-weight:900;color:#f1f5f9;margin-bottom:20px;text-align:center">📈 MarketPulse</div>', unsafe_allow_html=True)
 
@@ -250,6 +227,28 @@ def screener_link(ticker):
     return f'<a href="https://www.screener.in/company/{ticker}/" target="_blank" class="chart-btn" style="background:#22c55e11;border:1px solid #22c55e33;color:#4ade80;margin-left:6px">📊 Fundamentals ↗</a>'
 
 if page == "🏠 Home Dashboard":
+    st.markdown(f"""
+    <div class="hdr">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px">
+        <div>
+          <div style="font-size:24px;font-weight:900;color:#f1f5f9;letter-spacing:-.02em">📈 MarketPulse India</div>
+          <div style="font-size:13px;color:#64748b;margin-top:3px">NSE Intelligence Engine · {total_stocks:,} Stocks · AI-Powered EOD Analysis</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div style="display:inline-flex;align-items:center;gap:6px;background:{rc}11;border:1px solid {rc}44;color:{rc};padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700">{ri} {regime} Market</div>
+          <div style="text-align:right"><div style="font-size:10px;color:#475569">UPDATED</div><div style="font-size:13px;color:#94a3b8;font-weight:700">{gen_date}</div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:28px;margin-top:16px;flex-wrap:wrap;border-top:1px solid #1e2a3a;padding-top:14px">
+        <div><span style="font-size:20px;font-weight:900;color:#f1f5f9">{total_stocks:,}</span><br><span style="font-size:11px;color:#64748b">Stocks Scanned</span></div>
+        <div><span style="font-size:20px;font-weight:900;color:#38bdf8">{opp_count}</span><br><span style="font-size:11px;color:#64748b">Opportunities</span></div>
+        <div><span style="font-size:20px;font-weight:900;color:#22c55e">{buys}</span><br><span style="font-size:11px;color:#64748b">▲ BUY Signals</span></div>
+        <div><span style="font-size:20px;font-weight:900;color:#fbbf24">{holds}</span><br><span style="font-size:11px;color:#64748b">◆ HOLD</span></div>
+        <div><span style="font-size:20px;font-weight:900;color:#ef4444">{sells}</span><br><span style="font-size:11px;color:#64748b">▼ SELL Signals</span></div>
+        <div style="margin-left:auto;align-self:center"><span style="font-size:11px;color:#475569">⚠️ Educational only · Not SEBI-registered advice</span></div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown('<div style="font-size:24px;font-weight:900;color:#f1f5f9;margin-bottom:16px">🏠 Overview Dashboard</div>', unsafe_allow_html=True)
     st.markdown('<div class="info-box" style="margin-bottom:24px">Welcome to the quantitative evaluation platform. This dashboard provides a high-level summary of the entire NSE universe based on our nightly EOD scans. Navigate using the sidebar to explore actionable setups and historical simulation data.</div>', unsafe_allow_html=True)
     
