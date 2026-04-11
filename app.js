@@ -661,6 +661,10 @@ function buildAIPicksLive() {
     wrap.style.display = 'none';
     wrap.insertAdjacentHTML('afterend', `
       <div id="aiLiveTable">
+        <div style="background:rgba(255,255,255,0.05);border-left:3px solid var(--blue);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:20px;font-size:13px;line-height:1.5;color:rgba(255,255,255,0.8)">
+          <strong style="color:var(--blue)">🚀 Live AI Picks (Execute Mode)</strong><br>
+          This tab provides today's actionable stock recommendations. <b>These are the trades you actually take.</b> Filter by <strong>BUY</strong> signals and use the dynamically calculated <strong>Entry / SL / TP</strong> prices to execute your swing setups.
+        </div>
         <div class="ai-live-summary">
           <div class="ai-live-stat" style="color:var(--green)"><span class="ai-live-stat-val">${s.buy}</span><span class="ai-live-stat-lbl">🟢 BUY</span></div>
           <div class="ai-live-stat" style="color:var(--amber)"><span class="ai-live-stat-val">${s.hold}</span><span class="ai-live-stat-lbl">🟡 HOLD</span></div>
@@ -983,6 +987,10 @@ function buildBacktestTab() {
 
   el.innerHTML = `
     <div class="bt-container">
+      <div style="background:rgba(255,255,255,0.05);border-left:3px solid var(--amber);padding:14px 20px;border-radius:0 8px 8px 0;margin-bottom:24px;font-size:13px;line-height:1.6;color:rgba(255,255,255,0.8)">
+        <strong style="color:var(--amber)">🧪 Historical Strategy Laboratory (The Safety Check)</strong><br>
+        This tab does <b>not</b> output trades to buy today. It is a historical simulator running your latest AI logic over the past year to measure its mathematical viability. Use this page to test new take-profit and stop-loss strategies until the <strong>Expectancy</strong> turns broadly positive. Only trust the "Live AI Picks" if this simulator has a positive historical expectancy!
+      </div>
       <div class="bt-header">
         <div>
           <div style="font-size:20px;font-weight:700;margin-bottom:4px">Backtest Results</div>
