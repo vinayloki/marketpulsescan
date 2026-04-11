@@ -85,3 +85,69 @@ FUNDAMENTALS_WORKERS    = 10     # parallel threads for yfinance .info
 LOG_FORMAT    = "%(asctime)s │ %(levelname)-7s │ %(message)s"
 LOG_DATEFMT   = "%H:%M:%S"
 SCANNER_LOG   = OUTPUT_DIR / "scanner.log"
+
+# ═════════════════════════════════════════════════════════════════════
+#  BACKTESTING ENGINE
+# ═════════════════════════════════════════════════════════════════════
+
+# Walk-forward window — how many historical weeks to simulate
+BACKTEST_WEEKS          = 52       # 1 full year of Mondays
+
+# Exit levels (configurable — change to test different setups)
+TAKE_PROFIT_PCT         = 4.0      # +4% → TP hit → WIN
+STOP_LOSS_FIXED_PCT     = 2.0      # floor: SL never tighter than -2%
+
+# Hybrid SL = max(STOP_LOSS_FIXED_PCT, ATR_SL_MULTIPLIER × ATR)
+ATR_PERIOD              = 14       # look-back for Average True Range
+ATR_SL_MULTIPLIER       = 1.5      # SL = 1.5 × ATR14 (if wider than 2%)
+
+# Time-based exit: exit at close of the Nth bar after entry
+MAX_HOLD_DAYS           = 5        # ≈ 1 trading week
+
+# Top N picks for Mode B (AI-filtered subset)
+MODE_B_TOP_N            = 20
+
+# Parquet cache for fast OHLCV reloads (avoids repeated 2100-stock download)
+OHLCV_CACHE_FILE        = CACHE_DIR / "ohlcv_backtest.parquet"
+OHLCV_CACHE_MAX_AGE_H   = 24       # hours before cache is considered stale
+
+# ═════════════════════════════════════════════════════════════════════
+#  RISK MANAGEMENT
+# ═════════════════════════════════════════════════════════════════════
+
+# Starting capital — set this to YOUR actual trading capital (₹)
+CAPITAL                 = 1_000_000   # ₹ 10 Lakh default
+
+# Risk per trade as % of total capital
+# qty = (CAPITAL × RISK_PER_TRADE_PCT / 100) / stop_loss_distance
+RISK_PER_TRADE_PCT      = 1.5         # risk ₹15,000 per trade on ₹10L capital
+
+# Portfolio-level controls
+MAX_POSITIONS           = 5           # max concurrent open positions
+MAX_SECTOR_EXPOSURE_PCT = 30          # max % of capital in any one sector
+WEEKLY_DRAWDOWN_CAP_PCT = 5.0         # halt new trades if weekly DD > 5%
+
+# ═════════════════════════════════════════════════════════════════════
+#  MARKET REGIME FILTER
+# ═════════════════════════════════════════════════════════════════════
+
+# yfinance symbol for NIFTY 50 index (no .NS suffix for indices)
+NIFTY_SYMBOL            = "^NSEI"
+
+# EMA period used to classify market regime
+REGIME_EMA_PERIOD       = 200
+
+# ±band around EMA200 that defines "Sideways" (% from EMA200)
+# Outside this band: Bull (above) or Bear (below)
+REGIME_SIDEWAYS_BAND_PCT = 3.0
+
+# Minimum AI score to accept a trade signal in each regime
+REGIME_BULL_MIN_SCORE      = 25    # all qualified signals active
+REGIME_SIDEWAYS_MIN_SCORE  = 55    # only high-confidence in sideways
+REGIME_BEAR_MIN_SCORE      = 75    # only highest conviction in bear
+
+# Sizing multipliers applied per regime (fraction of normal position)
+REGIME_BULL_SIZE_MULT      = 1.0
+REGIME_SIDEWAYS_SIZE_MULT  = 0.5
+REGIME_BEAR_SIZE_MULT      = 0.25
+

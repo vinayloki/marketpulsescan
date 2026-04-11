@@ -13,6 +13,8 @@ let fundamentals   = {};     // fundamentals.json -> keyed by symbol
 let newsData       = [];     // daily_news.json
 let opportunitiesData = [];  // opportunities.json -> opportunities[]
 let aiPicksData    = null;   // ai_picks.json -> full AI recommendations
+let backtestData   = null;   // performance_report.json -> backtest stats
+let regimeData     = null;   // market_regime.json -> current regime
 let currentTf      = '1M';
 
 // Full Scan table state
@@ -68,13 +70,15 @@ function initTabs() {
 ═══════════════════════════════════════════════════════════════ */
 async function loadEverything() {
   try {
-    const [summRes, fullRes, fundRes, newsRes, oppRes, aiRes] = await Promise.allSettled([
+    const [summRes, fullRes, fundRes, newsRes, oppRes, aiRes, btRes, regRes] = await Promise.allSettled([
       fetch('scan_results/latest_scan_summary.json'),
       fetch('scan_results/full_summary.json'),
       fetch('scan_results/fundamentals.json'),
       fetch('scan_results/daily_news.json'),
       fetch('scan_results/opportunities.json'),
       fetch('scan_results/ai_picks.json'),
+      fetch('scan_results/performance_report.json'),
+      fetch('scan_results/market_regime.json'),
     ]);
 
     // Parse summary
@@ -117,6 +121,30 @@ async function loadEverything() {
       console.warn('ai_picks.json not found — AI tab will show demo data');
     }
 
+
+
+
+    // Parse backtest performance report
+
+    if (btRes && btRes.status === 'fulfilled' && btRes.value.ok) {
+
+      backtestData = await btRes.value.json();
+
+      console.log('Backtest report loaded');
+
+    }
+
+
+
+    // Parse market regime
+
+    if (regRes && regRes.status === 'fulfilled' && regRes.value.ok) {
+
+      regimeData = await regRes.value.json();
+
+      console.log('Market regime: ' + regimeData.regime);
+
+    }
   } catch (err) {
     // Network failure — show inline warning banner; AI Picks still works (static data)
     console.warn('Scan data fetch failed:', err.message);
@@ -139,12 +167,23 @@ function buildDashboard() {
   document.getElementById('hStockCount').textContent  = stockCount;
   document.getElementById('footerDate').textContent   = scanDate;
 
+  // Live regime badge in header (requires regimeBadge element in HTML)
+  const regBadge = document.getElementById('regimeBadge');
+  if (regBadge && regimeData) {
+    const r   = regimeData.regime || 'Bull';
+    const pctVal = regimeData.pct_vs_ema200;
+    const pctStr = pctVal != null ? ' ' + (pctVal > 0 ? '+' : '') + pctVal + '%' : '';
+    const cls = r === 'Bull' ? 'regime-bull' : r === 'Bear' ? 'regime-bear' : 'regime-side';
+    regBadge.innerHTML = '<span class="regime-pill ' + cls + '">' + (r === 'Bull' ? '\u25b2' : r === 'Bear' ? '\u25bc' : '\u2192') + ' ' + r + pctStr + '</span>';
+  }
+
   buildStatsRow();
   buildOpportunities();
   buildTopMovers();
   buildFullScan();
   buildNews();
-  buildAIPicksTab(); // AI Picks uses static data — always safe to call
+  buildAIPicksTab();
+  buildBacktestTab();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -654,6 +693,12 @@ function buildAIPicksLive() {
               <th>Rec</th>
               <th>Conf</th>
               <th>Trend</th>
+              <th>Entry</th>
+              <th style="color:var(--red)">SL</th>
+              <th style="color:var(--green)">TP</th>
+              <th>R:R</th>
+              <th>P(Win)</th>
+              <th>Regime</th>
               <th>1W</th><th>2W</th><th>1M</th><th>3M</th><th>6M</th><th>12M</th>
               <th>Horizon</th>
             </tr></thead>
@@ -698,15 +743,24 @@ function renderAIPicksTable() {
   tbodyEl.innerHTML = page.map(p => {
     const td = p.tf_details || {};
     const displayName = (p.name && p.name !== p.ticker) ? p.name : '';
+    const pSuccessColor = p.p_success >= 60 ? 'var(--green)' : p.p_success >= 45 ? 'var(--amber)' : 'var(--red)';
+    const rrColor = (p.risk_reward||0) >= 1.5 ? 'var(--emerald)' : 'var(--amber)';
+    const regimeCls = p.regime === 'Bull' ? 'regime-bull' : p.regime === 'Bear' ? 'regime-bear' : 'regime-side';
     return `<tr>
       <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${p.ticker}" target="_blank" rel="noopener">${p.ticker}</a></td>
-      <td style="text-align:left;max-width:180px">
+      <td style="text-align:left;max-width:160px">
         <div style="font-size:11px;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${displayName}</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.25)">${p.sector||p.cap_label}</div>
       </td>
       <td style="text-align:center"><span class="ai-rec-badge ${p.recommendation}" style="font-size:10px;padding:2px 8px">${p.recommendation.toUpperCase()}</span></td>
       <td style="font-family:var(--mono);text-align:center;color:${recColor[p.recommendation]}">${p.confidence}%</td>
       <td style="text-align:center"><span class="ai-trend-chip ${trendCls[p.trend]||'trend-side'}" style="font-size:9px;padding:2px 7px">${p.trend_label}</span></td>
+      <td style="font-family:var(--mono);text-align:right;font-size:11px">₹${p.entry_price||p.price||'—'}</td>
+      <td style="font-family:var(--mono);text-align:right;font-size:11px;color:var(--red)">₹${p.stop_loss||'—'}</td>
+      <td style="font-family:var(--mono);text-align:right;font-size:11px;color:var(--green)">₹${p.take_profit||'—'}</td>
+      <td style="font-family:var(--mono);text-align:center;font-size:11px;color:${rrColor}">${p.risk_reward||'—'}x</td>
+      <td style="font-family:var(--mono);text-align:center;font-size:11px;color:${pSuccessColor}">${p.p_success||'—'}%</td>
+      <td style="text-align:center"><span class="regime-pill-sm ${regimeCls}">${p.regime||'—'}</span></td>
       ${pct(td['1W']?.pct)}${pct(td['2W']?.pct)}${pct(td['1M']?.pct)}${pct(td['3M']?.pct)}${pct(td['6M']?.pct)}${pct(td['12M']?.pct)}
       <td style="font-size:10px;color:rgba(255,255,255,0.3);white-space:nowrap">${p.horizon}</td>
     </tr>`;
@@ -798,4 +852,202 @@ function animateConfBars(parentEl) {
       el.style.width = el.dataset.confidence + '%';
     });
   });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BACKTEST TAB
+═══════════════════════════════════════════════════════════════ */
+function buildBacktestTab() {
+  const el = document.getElementById('tab-backtest');
+  if (!el) return;
+
+  if (!backtestData) {
+    el.innerHTML = `<div style="padding:60px;text-align:center;color:rgba(255,255,255,0.3)">
+      <div style="font-size:48px;margin-bottom:16px">🧪</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px">No Backtest Data Yet</div>
+      <div style="font-size:14px">Run <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:4px">python backtest.py</code> then <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:4px">python performance.py</code></div>
+    </div>`;
+    return;
+  }
+
+  const cfg = backtestData.config || {};
+  const cmp = backtestData.comparison || {};
+  const mA  = backtestData.mode_a || {};
+  const mB  = backtestData.mode_b || {};
+
+  const fmt   = n  => n != null ? n.toLocaleString() : '—';
+  const pct   = n  => n != null ? `${n > 0 ? '+' : ''}${n.toFixed(2)}%` : '—';
+  const money = n  => n != null ? `₹${Math.round(n).toLocaleString()}` : '—';
+
+  const statCard = (val, lbl, color='') => `
+    <div class="bt-stat-card">
+      <div class="bt-stat-val" style="color:${color||'var(--blue)'}">${val}</div>
+      <div class="bt-stat-lbl">${lbl}</div>
+    </div>`;
+
+  const viableIcon = s => s?.can_achieve_3_5pct_goal ? '✅' : s?.expectancy_pct > 0 ? '⚠️' : '❌';
+
+  const regimeTable = s => {
+    if (!s?.regime_breakdown) return '';
+    const rows = Object.entries(s.regime_breakdown).map(([r, d]) => {
+      const cls = r === 'Bull' ? 'var(--green)' : r === 'Bear' ? 'var(--red)' : 'var(--amber)';
+      return `<tr>
+        <td><span style="color:${cls};font-weight:600">${r}</span></td>
+        <td style="text-align:right">${d.trades}</td>
+        <td style="text-align:right">${d.win_rate_pct}%</td>
+        <td style="text-align:right;color:${d.avg_return>=0?'var(--green)':'var(--red)'}">${d.avg_return>=0?'+':''}${d.avg_return}%</td>
+        <td style="text-align:right;color:${d.expectancy>=0?'var(--green)':'var(--red)'}">${d.expectancy>=0?'+':''}${d.expectancy}%</td>
+      </tr>`;
+    }).join('');
+    return `<table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="color:rgba(255,255,255,0.4);font-size:11px">
+        <th style="text-align:left">Regime</th>
+        <th style="text-align:right">Trades</th>
+        <th style="text-align:right">Win Rate</th>
+        <th style="text-align:right">Avg Return</th>
+        <th style="text-align:right">Expectancy</th>
+      </tr></thead><tbody>${rows}</tbody></table>`;
+  };
+
+  const signalTable = s => {
+    if (!s?.signal_breakdown) return '';
+    const rows = Object.entries(s.signal_breakdown).map(([sig, d]) => {
+      return `<tr>
+        <td style="font-weight:600">${sig}</td>
+        <td style="text-align:right">${d.trades}</td>
+        <td style="text-align:right">${d.win_rate_pct}%</td>
+        <td style="text-align:right;color:${d.avg_return>=0?'var(--green)':'var(--red)'}">${d.avg_return>=0?'+':''}${d.avg_return}%</td>
+      </tr>`;
+    }).join('');
+    return `<table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="color:rgba(255,255,255,0.4);font-size:11px">
+        <th style="text-align:left">Signal</th>
+        <th style="text-align:right">Trades</th>
+        <th style="text-align:right">Win Rate</th>
+        <th style="text-align:right">Avg Return</th>
+      </tr></thead><tbody>${rows}</tbody></table>`;
+  };
+
+  const equityCurveChart = (curve, modeLabel) => {
+    if (!curve || !curve.length) return '';
+    const max = Math.max(...curve.map(p => p.equity));
+    const min = Math.min(...curve.map(p => p.equity));
+    const range = max - min || 1;
+    const w = 400, h = 80;
+    const pts = curve.map((p, i) => {
+      const x = (i / (curve.length - 1)) * w;
+      const y = h - ((p.equity - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return `
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px">${modeLabel} — Equity Curve (last ${curve.length} trades)</div>
+        <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:80px;background:rgba(255,255,255,0.03);border-radius:6px">
+          <polyline points="${pts}" fill="none" stroke="var(--emerald)" stroke-width="1.5"/>
+        </svg>
+      </div>`;
+  };
+
+  const modePanel = (s, mode, label) => {
+    if (!s || !s.total_trades) return `<div style="padding:20px;color:rgba(255,255,255,0.3);text-align:center">No ${label} trades</div>`;
+    const verdict_color = s.can_achieve_3_5pct_goal ? 'var(--green)' : s.expectancy_pct > 0 ? 'var(--amber)' : 'var(--red)';
+    return `
+      <div class="bt-panel">
+        <div class="bt-panel-title">${label}</div>
+        <div class="bt-stats-grid">
+          ${statCard(s.total_trades||0, 'Total Trades', 'var(--blue)')}
+          ${statCard((s.win_rate_pct||0)+'%', 'Win Rate', s.win_rate_pct>=50?'var(--green)':'var(--red)')}
+          ${statCard(pct(s.expectancy_pct), 'Expectancy', s.expectancy_pct>=0?'var(--green)':'var(--red)')}
+          ${statCard((s.profit_factor||0)+'x', 'Profit Factor', s.profit_factor>=1.2?'var(--emerald)':'var(--amber)')}
+          ${statCard((s.max_drawdown_pct||0)+'%', 'Max Drawdown', 'var(--red)')}
+          ${statCard((s.sharpe_like||0), 'Sharpe-like', s.sharpe_like>=0.5?'var(--green)':'var(--amber)')}
+          ${statCard(money(s.total_pnl), 'Total P&L', s.total_pnl>=0?'var(--green)':'var(--red)')}
+          ${statCard(money(s.final_capital), 'Final Capital', 'var(--primary)')}
+          ${statCard(pct(s.total_return_pct), 'Total Return', s.total_return_pct>=0?'var(--green)':'var(--red)')}
+          ${statCard((s.target_hit_rate_pct||0)+'%', '3-5% Target Rate', 'var(--emerald)')}
+        </div>
+        <div class="bt-verdict" style="color:${verdict_color}">
+          ${viableIcon(s)} ${s.viability_verdict||s.verdict||'—'}
+        </div>
+        ${equityCurveChart(s.equity_curve, label)}
+        <div style="margin-top:20px">
+          <div class="bt-section-title">Regime Breakdown</div>
+          ${regimeTable(s)}
+        </div>
+        <div style="margin-top:16px">
+          <div class="bt-section-title">Signal Breakdown</div>
+          ${signalTable(s)}
+        </div>
+      </div>`;
+  };
+
+  el.innerHTML = `
+    <div class="bt-container">
+      <div class="bt-header">
+        <div>
+          <div style="font-size:20px;font-weight:700;margin-bottom:4px">Backtest Results</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.4)">
+            ${backtestData.generated||''}  &middot;
+            TP=${cfg.take_profit_pct||4}%  SL&ge;${cfg.stop_loss_fixed_pct||2}% (ATR${cfg.atr_period||14}&times;${cfg.atr_sl_multiplier||1.5})
+            &middot;  Hold&le;${cfg.max_hold_days||5}d  &middot;  Window: ${cfg.backtest_weeks||52}wk
+          </div>
+        </div>
+        <div style="text-align:right;font-size:12px;color:rgba(255,255,255,0.4)">
+          Capital: ₹${(cfg.capital||1000000).toLocaleString()}<br>
+          Risk/trade: ${cfg.risk_per_trade_pct||1.5}%
+        </div>
+      </div>
+
+      <div class="bt-ai-edge">
+        <div class="bt-edge-item">
+          <div class="bt-edge-lbl">Mode A Expectancy</div>
+          <div class="bt-edge-val" style="color:${(cmp.mode_a_expectancy||0)>=0?'var(--green)':'var(--red)'}">${pct(cmp.mode_a_expectancy)}</div>
+        </div>
+        <div class="bt-edge-arrow">→</div>
+        <div class="bt-edge-item">
+          <div class="bt-edge-lbl">Mode B Expectancy</div>
+          <div class="bt-edge-val" style="color:${(cmp.mode_b_expectancy||0)>=0?'var(--green)':'var(--red)'}">${pct(cmp.mode_b_expectancy)}</div>
+        </div>
+        <div style="border-left:1px solid rgba(255,255,255,0.1);padding-left:24px;margin-left:12px">
+          <div class="bt-edge-lbl">AI Filtering Edge</div>
+          <div class="bt-edge-val" style="color:${(cmp.ai_filtering_edge||0)>0?'var(--emerald)':'var(--amber)'}">
+            ${(cmp.ai_filtering_edge||0)>0?'+':''}${(cmp.ai_filtering_edge||0).toFixed(2)}%
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px">${cmp.recommendation||''}</div>
+        </div>
+      </div>
+
+      <div class="bt-modes">
+        ${modePanel(mA, 'A', 'Mode A — Full NSE Universe')}
+        ${modePanel(mB, 'B', 'Mode B — AI-Filtered Picks')}
+      </div>
+    </div>
+
+    <style>
+      .bt-container{padding:24px;max-width:1400px;margin:0 auto}
+      .bt-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+      .bt-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+      .bt-stat-card{background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;text-align:center}
+      .bt-stat-val{font-size:18px;font-weight:700;font-family:var(--mono);margin-bottom:4px}
+      .bt-stat-lbl{font-size:10px;color:rgba(255,255,255,0.4)}
+      .bt-panel{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:20px}
+      .bt-panel-title{font-size:14px;font-weight:700;margin-bottom:16px;color:rgba(255,255,255,0.9)}
+      .bt-verdict{font-size:13px;font-weight:600;margin:16px 0;padding:10px 14px;background:rgba(0,0,0,0.2);border-radius:6px}
+      .bt-section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px}
+      .bt-modes{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+      @media(max-width:900px){.bt-modes{grid-template-columns:1fr}}
+      .bt-ai-edge{display:flex;align-items:center;gap:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 20px;margin-bottom:20px}
+      .bt-edge-item{text-align:center}
+      .bt-edge-lbl{font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px}
+      .bt-edge-val{font-size:22px;font-weight:700;font-family:var(--mono)}
+      .bt-edge-arrow{font-size:24px;color:rgba(255,255,255,0.2)}
+      .regime-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+      .regime-pill.regime-bull{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+      .regime-pill.regime-bear{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+      .regime-pill.regime-side{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)}
+      .regime-pill-sm{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600}
+      .regime-pill-sm.regime-bull{background:rgba(34,197,94,0.15);color:#22c55e}
+      .regime-pill-sm.regime-bear{background:rgba(239,68,68,0.15);color:#ef4444}
+      .regime-pill-sm.regime-side{background:rgba(245,158,11,0.15);color:#f59e0b}
+    </style>`;
 }
