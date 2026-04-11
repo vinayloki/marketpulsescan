@@ -24,7 +24,7 @@ SCAN_DIR = "scan_results"
 # ─── CSS ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Mono:wght@400;600;700&display=swap');
 
 :root {
   --bg: #080c14; --bg2: #0d1420; --bg3: #111827;
@@ -33,7 +33,7 @@ st.markdown("""
   --green: #22c55e; --red: #ef4444; --yellow: #f59e0b; --purple: #a78bfa;
   --text: #e2e8f0; --text2: #94a3b8; --text3: #64748b; --text4: #475569;
 }
-html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; background: var(--bg) !important; color: var(--text); }
+html, body, [class*="css"] { font-family: 'Roboto', sans-serif !important; background: var(--bg) !important; color: var(--text); }
 
 /* ── Tabs ────────────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] { gap:4px; background:var(--bg2); border-radius:14px; padding:6px; border:1px solid var(--border); }
@@ -46,7 +46,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; backgr
 
 /* ── Metric Card ─────────────────────────────────── */
 .mc { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
-.mc-val { font-size:1.9rem; font-weight:900; font-family:'JetBrains Mono',monospace; line-height:1.1; }
+.mc-val { font-size:1.9rem; font-weight:900; font-family:'Roboto Mono',monospace; line-height:1.1; }
 .mc-lbl { font-size:11px; color:var(--text3); font-weight:600; margin-top:5px; text-transform:uppercase; letter-spacing:.06em; }
 .mc-sub { font-size:11px; color:var(--text4); margin-top:3px; }
 
@@ -79,7 +79,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; backgr
 .tv-table th { background:var(--bg2); color:var(--text3); font-weight:600; padding:10px 12px; text-align:left; border-bottom:1px solid var(--border); font-size:11px; text-transform:uppercase; letter-spacing:.05em; position:sticky; top:0; }
 .tv-table td { padding:9px 12px; border-bottom:1px solid #111827; color:var(--text2); vertical-align:middle; }
 .tv-table tr:hover td { background:#0d1420cc; }
-.tv-link { color:var(--blue-light); text-decoration:none; font-weight:700; font-family:'JetBrains Mono',monospace; }
+.tv-link { color:var(--blue-light); text-decoration:none; font-weight:700; font-family:'Roboto Mono',monospace; }
 .tv-link:hover { color:#60a5fa; text-decoration:underline; }
 .chart-btn { background:#0d1f3c; border:1px solid #1a3a6a; color:var(--blue-light); padding:3px 10px; border-radius:6px; font-size:11px; text-decoration:none; font-weight:600; white-space:nowrap; }
 .chart-btn:hover { background:#1a3a6a; color:#fff; }
@@ -91,8 +91,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; backgr
 .mv-row { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-radius:8px; margin-bottom:5px; background:var(--bg2); border:1px solid var(--border); }
 
 /* ── Header ──────────────────────────────────────── */
-.hdr { background:linear-gradient(135deg,#060a12,#0a1628 60%,#0d1f3c); border-bottom:1px solid var(--border); border-radius:16px; padding:22px 28px; margin-bottom:18px; position:relative; overflow:hidden; }
-.hdr::after { content:''; position:absolute; top:-60%;right:-15%;width:500px;height:500px; background:radial-gradient(circle,rgba(26,86,219,.1) 0%,transparent 70%); pointer-events:none; }
+.hdr { background:#0f172a; border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin-bottom:18px; position:relative; overflow:hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); }
 
 /* ── News ────────────────────────────────────────── */
 .news-item { padding:12px 0; border-bottom:1px solid var(--border); }
@@ -231,9 +230,9 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ─── Tabs ─────────────────────────────────────────────────────────────────────
-t1, t2, t3, t4, t5, t6 = st.tabs([
+t1, t2, t3, t4, t5, t6, t7 = st.tabs([
     "🎯 Opportunities", "🏆 Top Movers", "📋 Full Scan",
-    "📰 News", "🤖 AI Picks", "🧪 Backtest Lab"
+    "📰 News", "🤖 AI Picks", "🧪 Backtest Lab", "📘 Blueprint"
 ])
 
 
@@ -315,7 +314,7 @@ with t1:
                 <div style="flex:1">
                   <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
                     <div>
-                      <span style="font-size:18px;font-weight:800;color:#f1f5f9;font-family:'JetBrains Mono',monospace">
+                      <span style="font-size:18px;font-weight:800;color:#f1f5f9;font-family:'Roboto Mono',monospace">
                         {tv_link(ticker)}
                       </span>
                       <span style="font-size:12px;color:#64748b;margin-left:8px">#{rank} · {name}</span>
@@ -629,7 +628,7 @@ with t5:
             <div class="pick {rec}">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
                 <div>
-                  <span style="font-size:18px;font-weight:800;color:#f1f5f9;font-family:'JetBrains Mono',monospace">
+                  <span style="font-size:18px;font-weight:800;color:#f1f5f9;font-family:'Roboto Mono',monospace">
                     {tv_link(ticker)}
                   </span>
                   <span style="font-size:12px;color:#64748b;margin-left:8px">{p.get("name","")}</span>
@@ -1084,42 +1083,52 @@ with t6:
 
         st.markdown(f'<div style="overflow-x:auto;max-height:400px;border:1px solid #1e2a3a;border-radius:12px"><table class="tv-table"><thead>{ts_th}</thead><tbody>{ts_rows}</tbody></table></div>', unsafe_allow_html=True)
 
-    # ── About & Guide ──
-    st.markdown("---")
-    st.markdown('<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:12px">ℹ️ About & Strategy Guide</div>',unsafe_allow_html=True)
-    with st.expander("📖 How the 5-Step Engine Works", expanded=False):
-        st.markdown("""
-        | Step | Component | Description |
-        |------|-----------|-------------|
-        | 1 | **Data Capture** | Post-market EOD collection from Yahoo Finance / NSEpy across 2,100+ tickers |
-        | 2 | **Trend Engine** | EMA-based multi-timeframe classification (1W, 2W, 1M, 3M, 6M, 12M) |
-        | 3 | **Alpha Scoring** | Breakout detection (52W High), Volume Spike, EMA Momentum — scored 0-100 |
-        | 4 | **AI Verdict** | Rules-based conviction: BUY (uptrend + score), HOLD (sideways), SELL (downtrend) |
-        | 5 | **Transparency** | Human-readable reasons + risks, Entry/SL/TP, R:R, P(Win) calculation |
-        """)
-    with st.expander("📊 Understanding the Metrics"):
-        st.markdown("""
-        - **Win Rate**: % of trades that hit Take Profit target. Target: >60%
-        - **Expectancy**: Average profit per trade = (WR × Avg Win) + (1-WR × Avg Loss). Must be positive
-        - **Profit Factor**: Total wins ÷ Total losses. Must be >1.0 to be profitable. Target: >1.25
-        - **Sharpe Ratio**: Risk-adjusted return. >0.5 = good, >1.0 = great
-        - **Max Drawdown**: Biggest peak-to-trough loss. Target: <15%
-        - **R:R Ratio**: Reward vs Risk per trade = TP% ÷ SL%. Target: >1.5
-        - **P(Win)**: Probability of success for this specific setup based on historical conditions
-        """)
-    with st.expander("🛣️ Improvement Roadmap"):
-        st.markdown("""
-        | Phase | Status | Description |
-        |-------|--------|-------------|
-        | A | ✅ Done | Universe Download + Multi-TF Analysis |
-        | B | ✅ Done | AI Scoring + BUY/HOLD/SELL signals |
-        | C | 🔄 Active | Fix R:R — tighter SL, dynamic TP |
-        | D | Pending | Pullback Entry (EMA9 retest) for better entries |
-        | E | Pending | Dynamic Position Sizing by regime |
-        | F | Pending | Broker API (Kite/Upstox) live execution |
-        """)
+# ══════════════════════════════════════════════════════════════════
+# TAB 7 — BLUEPRINT
+# ══════════════════════════════════════════════════════════════════
+with t7:
+    st.markdown('''
+    <div style="max-width:900px;margin:0 auto">
+        <div style="font-size:24px;font-weight:900;color:#f1f5f9;margin-bottom:8px">📘 Platform Blueprint & Architecture</div>
+        <div style="color:#94a3b8;font-size:14px;margin-bottom:24px">Documentation of functional intent and core calculation logic for each module within the MarketPulse platform.</div>
+        
+        <div class="card" style="border-left:4px solid #38bdf8">
+            <div style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:8px">🎯 1. Opportunities</div>
+            <p style="color:#e2e8f0;font-size:14px;margin-bottom:6px"><b style="color:#94a3b8">Intent:</b> Surface high-conviction, immediate swing trade setups.</p>
+            <p style="color:#94a3b8;font-size:13px;line-height:1.5"><b>Calculation Logic:</b> The engine filters the entire NSE universe for strong base constraints (e.g., Min Volume, Min Price) and evaluates them for categorical Alpha Signals (52-Week Breakouts, Volume Spikes, and strong EMA Momentum). Stocks passing these checks are given an AI Score out of 100 based on price action density. Only stocks with score >= 50 populate this tab.</p>
+        </div>
 
-    st.markdown('<div class="disc">⚠️ Not SEBI-registered advice. All results are backtested simulations, not guarantees of future performance. Risk only what you can afford to lose.</div>',unsafe_allow_html=True)
+        <div class="card" style="border-left:4px solid #22c55e">
+            <div style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:8px">🏆 2. Top Movers</div>
+            <p style="color:#e2e8f0;font-size:14px;margin-bottom:6px"><b style="color:#94a3b8">Intent:</b> Contextualize the broader market momentum across various hold durations (1 Week to 3 Months).</p>
+            <p style="color:#94a3b8;font-size:13px;line-height:1.5"><b>Calculation Logic:</b> Sorts the full market universe by aggregate percentage returns over the specified trailing periods. Excludes illiquid penny stocks to ensure realistic percentage shifts. Incorporates fundamental parameters like P/E and Market Cap for instant screening verification.</p>
+        </div>
+
+        <div class="card" style="border-left:4px solid #f59e0b">
+            <div style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:8px">📋 3. Full Scan</div>
+            <p style="color:#e2e8f0;font-size:14px;margin-bottom:6px"><b style="color:#94a3b8">Intent:</b> Complete transparency and visibility over the entire processed market universe (~2,100+ stocks).</p>
+            <p style="color:#94a3b8;font-size:13px;line-height:1.5"><b>Calculation Logic:</b> Loads the `latest_full_scan.csv` containing normalized closing price adjustments up to the latest trading session. Exposes a localized Pandas dataframe layer allowing fast in-memory filtering by structural criteria (Gainers, Losers, Market Capitalization bins).</p>
+        </div>
+
+        <div class="card" style="border-left:4px solid #a78bfa">
+            <div style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:8px">📰 4. News</div>
+            <p style="color:#e2e8f0;font-size:14px;margin-bottom:6px"><b style="color:#94a3b8">Intent:</b> Provide fundamental macro and micro context to technical setups via live business intelligence.</p>
+            <p style="color:#94a3b8;font-size:13px;line-height:1.5"><b>Calculation Logic:</b> An automated daily GitHub Actions parser scrapes RSS feeds from verified financial publishers (LiveMint, Economic Times, MoneyControl), normalizes the payload into `daily_news.json`, and feeds it directly into the interface with clickable source attribution.</p>
+        </div>
+
+        <div class="card" style="border-left:4px solid #ec4899">
+            <div style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:8px">🤖 5. AI Picks</div>
+            <p style="color:#e2e8f0;font-size:14px;margin-bottom:6px"><b style="color:#94a3b8">Intent:</b> Algorithmic conviction scoring producing absolute BUY, HOLD, or SELL mandates.</p>
+            <p style="color:#94a3b8;font-size:13px;line-height:1.5"><b>Calculation Logic:</b> Evaluates the prevailing master trend (bull/bear/sideways regime) and cross-references it with localized Multi-Timeframe (MTF) EMA alignments. It dynamically computes Stop Loss based on Average True Range (ATR) multipliers, Take Profit ratios, Risk/Reward grids, and historical probability of success before finalizing a position tier.</p>
+        </div>
+
+        <div class="card" style="border-left:4px solid #14b8a6">
+            <div style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:8px">🧪 6. Backtest Lab</div>
+            <p style="color:#e2e8f0;font-size:14px;margin-bottom:6px"><b style="color:#94a3b8">Intent:</b> Validate the quantitative edge of predictions against a historical 52-week timeline.</p>
+            <p style="color:#94a3b8;font-size:13px;line-height:1.5"><b>Calculation Logic:</b> The engine runs a rigid deterministic simulation backward through 1 year of daily EOD ticks (`scan_results/backtest_results.json`). It records entry rules and executes standard portfolio matrix calculations to handle exit events (Take Profit hits, Stop Loss drops, Time-in-market expirations). Produces aggregate portfolio Expectancy, Profit Factor, and simulated Sharpe Ratios.</p>
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
 
 # ─── Footer ───────────────────────────────────────────────────────────────────
 st.markdown("""
