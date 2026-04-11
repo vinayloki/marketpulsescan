@@ -666,6 +666,14 @@ with t5:
 # TAB 6 — BACKTEST LAB  (with full trade log)
 # ══════════════════════════════════════════════════════════════════
 with t6:
+    st.markdown('<div class="info-box" style="margin-bottom:18px"><b style="color:#f8fafc">💡 Why 5 Years?</b> Strategy validation runs on <b>260 weeks (5 full years)</b> of historical data across the entire NSE universe. A strategy that only works during a 1-year bull run is inherently flawed. Testing across half a decade guarantees the algorithm is stress-tested against Bull cycles, Bear crashes, and prolonged Sideways chop.</div>', unsafe_allow_html=True)
+    
+    col_k1, col_k2 = st.columns(2)
+    with col_k1:
+        st.markdown('<div class="card" style="padding:16px"><div style="font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:6px">🌐 Market Regimes</div><div style="font-size:13px;color:#94a3b8">The algorithm categorizes the macro engine state:<br><b>Bull:</b> NIFTY > EMA200 (Risk On)<br><b>Sideways:</b> NIFTY hugging EMA200 (Chop)<br><b>Bear:</b> NIFTY < EMA200 (Risk Off)</div></div>', unsafe_allow_html=True)
+    with col_k2:
+        st.markdown('<div class="card" style="padding:16px"><div style="font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:6px">🚪 Exit Triggers</div><div style="font-size:13px;color:#94a3b8">Why a trade was closed:<br><b>TP (Take Profit):</b> Hit predefined target (+4%)<br><b>SL (Stop Loss):</b> Hit predefined risk limit (-2% or ATR-based)<br><b>TIME (Time Bleed):</b> Expired after 5 trading days</div></div>', unsafe_allow_html=True)
+
     # Load real trade-level data
     @st.cache_data(ttl=3600)
     def load_backtest_trades():
@@ -692,12 +700,12 @@ with t6:
     regime_bk  = mb.get("regime_breakdown",{})
 
     st.markdown("""
-    <div class="info-box">🧪 <b>Backtest Laboratory</b> — Real 52-week historical results with <b>every trade visible</b>.
+    <div class="info-box">🧪 <b>Backtest Laboratory</b> — Real 260 Weeks (5 Years) historical results with <b>every trade visible</b>.
     See exactly which companies were traded, when, and whether they won or lost. Click any ticker to open TradingView.</div>
     """, unsafe_allow_html=True)
 
     # ── Summary Metrics ──
-    st.markdown(f'<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin:8px 0 14px">📊 Real Backtest Results — 52 Weeks · {real_trades_n} Trades</div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin:8px 0 14px">📊 Real Backtest Results — 260 Weeks (5 Years) · {real_trades_n} Trades</div>', unsafe_allow_html=True)
 
     mc1,mc2,mc3,mc4 = st.columns(4)
     wrc = "#22c55e" if real_wr>=60 else ("#f59e0b" if real_wr>=50 else "#ef4444")
@@ -732,11 +740,12 @@ with t6:
     # ══════════════════════════════════════════════════════════════
     st.markdown("---")
     st.markdown(f'<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:6px">📋 Complete Trade Log — All {len(all_trades)} Trades</div>', unsafe_allow_html=True)
-    st.markdown('<div style="color:#64748b;font-size:13px;margin-bottom:12px">Every trade the engine executed over 52 weeks. Click any ticker to open its TradingView chart.</div>', unsafe_allow_html=True)
+    st.markdown('<div style="color:#64748b;font-size:13px;margin-bottom:12px">Every trade the engine executed over 260 weeks. Click any ticker to open its TradingView chart.</div>', unsafe_allow_html=True)
 
     if all_trades:
+        pick_mcap_map = {p.get("ticker",""): p.get("mcap_cr", 0) for p in picks}
         # Filters for trade log
-        tl1, tl2, tl3, tl4 = st.columns([3,2,2,2])
+        tl1, tl2, tl3, tl4, tl5 = st.columns([2.5,2,2,2,2.5])
         with tl1:
             tl_search = st.text_input("🔍 Search ticker", placeholder="e.g. FORTIS, NYKAA...", key="tl_s")
         with tl2:
@@ -745,11 +754,14 @@ with t6:
             tl_exit = st.selectbox("Exit Reason", ["All","TP (Take Profit)","SL (Stop Loss)","TIME (Expired)"], key="tl_exit")
         with tl4:
             tl_regime = st.selectbox("Regime", ["All","Bull","Bear","Sideways"], key="tl_reg")
+        with tl5:
+            tl_cap = st.selectbox("Market Cap Size", ["All", "Large Cap", "Mid Cap", "Small Cap"], key="tl_mk_cap")
 
         # Filter trades
         filtered_trades = []
         for tr in all_trades:
-            if tl_search and tl_search.upper() not in tr.get("ticker","").upper():
+            t = tr.get("ticker","")
+            if tl_search and tl_search.upper() not in t.upper():
                 continue
             if tl_result == "Winners Only" and not tr.get("won", False):
                 continue
@@ -761,6 +773,13 @@ with t6:
                     continue
             if tl_regime != "All" and tr.get("regime","") != tl_regime:
                 continue
+            if tl_cap != "All":
+                mc = pick_mcap_map.get(t, None)
+                if mc is None: continue # Skip if Market Cap unknown
+                if tl_cap == "Large Cap" and mc <= 20000: continue
+                if tl_cap == "Mid Cap" and (mc < 5000 or mc > 20000): continue
+                if tl_cap == "Small Cap" and mc >= 5000: continue
+            
             filtered_trades.append(tr)
 
         # Stats for filtered

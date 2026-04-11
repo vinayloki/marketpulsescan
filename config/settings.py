@@ -29,7 +29,7 @@ NSE_EQUITY_MIRROR_URL = (
 NSE_SYMBOLS_CACHE = OUTPUT_DIR / "nse_symbols.json"
 
 # ─── Download Settings ───────────────────────────────────────────────
-DOWNLOAD_PERIOD       = "13mo"   # yfinance period string
+DOWNLOAD_PERIOD       = "5y"     # yfinance period string (5 years for 260w backtest)
 DOWNLOAD_INTERVAL     = "1d"     # daily candles
 BATCH_SIZE            = 50       # tickers per yfinance batch
 BATCH_DELAY_SECONDS   = 2        # polite delay between batches
@@ -91,7 +91,7 @@ SCANNER_LOG   = OUTPUT_DIR / "scanner.log"
 # ═════════════════════════════════════════════════════════════════════
 
 # Walk-forward window — how many historical weeks to simulate
-BACKTEST_WEEKS          = 52       # 1 full year of Mondays
+BACKTEST_WEEKS          = 260      # 5 full years of Mondays
 
 # Exit levels (configurable — change to test different setups)
 TAKE_PROFIT_PCT         = 4.0      # +4% → TP hit → WIN
