@@ -1,749 +1,28 @@
 {
   "generated": "11 Apr 2026",
-  "generated_ts": "2026-04-11_0027",
+  "generated_ts": "2026-04-11_0059",
   "engine_version": "2.0",
-  "total_opportunities": 100,
+  "total_opportunities": 31,
   "opportunities": [
     {
-      "ticker": "ADANIENSOL",
+      "ticker": "INOXINDIA",
       "rank": 1,
-      "score": 77,
+      "score": 50,
       "signals": [
         "52W_BREAKOUT",
-        "EMA_MOMENTUM",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 1160.4,
-        "pct_from_52w_high": 0.22,
-        "volume_ratio": 3.27,
-        "price": 1157.9,
-        "pct_change_1d": 7.34,
-        "above_sma10": true,
-        "rsi_14": 69.8,
-        "ema_9": 1039.68,
-        "ema_21": 1011.47,
-        "ema_50": 995.75,
-        "return_1m": 14.24
+        "high_52w": 1325.0,
+        "pct_from_52w_high": 1.5,
+        "volume_ratio": 4.52,
+        "price": 1305.1,
+        "pct_change_1d": 6.63,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "ADANIENSOL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ATHERENERG",
-      "rank": 2,
-      "score": 72,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "high_52w": 833.35,
-        "pct_from_52w_high": 1.57,
-        "volume_ratio": 2.43,
-        "price": 820.25,
-        "rsi_14": 65.1,
-        "ema_9": 776.61,
-        "ema_21": 755.36,
-        "ema_50": 725.12,
-        "return_1m": 20.32
-      },
-      "fundamental": {
-        "name": "ATHERENERG",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "RUBICON",
-      "rank": 3,
-      "score": 71,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 864.0,
-        "pct_from_52w_high": 0.9,
-        "volume_ratio": 2.72,
-        "price": 856.2,
-        "pct_change_1d": 7.23,
-        "above_sma10": true,
-        "rsi_14": 70.4,
-        "ema_9": 795.3,
-        "ema_21": 782.39,
-        "ema_50": 759.71,
-        "return_1m": 11.12
-      },
-      "fundamental": {
-        "name": "RUBICON",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ABB",
-      "rank": 4,
-      "score": 67,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "high_52w": 6642.0,
-        "pct_from_52w_high": 0.42,
-        "volume_ratio": 1.9,
-        "price": 6614.0,
-        "rsi_14": 65.9,
-        "ema_9": 6318.38,
-        "ema_21": 6206.17,
-        "ema_50": 5962.74,
-        "return_1m": 10.56
-      },
-      "fundamental": {
-        "name": "ABB",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "STLTECH",
-      "rank": 5,
-      "score": 67,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "high_52w": 220.56,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.56,
-        "price": 220.56,
-        "rsi_14": 68.0,
-        "ema_9": 194.19,
-        "ema_21": 185.15,
-        "ema_50": 165.53,
-        "return_1m": 26.58
-      },
-      "fundamental": {
-        "name": "STERLITE TECHNOLOGIES LTD",
-        "sector": "Technology",
-        "ind": "Communication Equipment",
-        "mcap_cr": 11286.6,
-        "pe": 3303.1,
-        "eps": 0.07,
-        "52h": 235.4,
-        "52l": 58.86,
-        "bv": 42.09,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "MEGASTAR",
-      "rank": 6,
-      "score": 66,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.22,
-        "price": 273.3,
-        "pct_change_1d": 0.44,
-        "above_sma10": true,
-        "rsi_14": 69.1,
-        "ema_9": 264.9,
-        "ema_21": 254.77,
-        "ema_50": 244.32,
-        "return_1m": 21.87
-      },
-      "fundamental": {
-        "name": "MEGASTAR",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "UFBL",
-      "rank": 7,
-      "score": 65,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "high_52w": 284.5,
-        "pct_from_52w_high": 1.18,
-        "volume_ratio": 1.96,
-        "price": 281.15,
-        "rsi_14": 68.1,
-        "ema_9": 243.13,
-        "ema_21": 233.27,
-        "ema_50": 227.61,
-        "return_1m": 22.26
-      },
-      "fundamental": {
-        "name": "UFBL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "APEX",
-      "rank": 8,
-      "score": 63,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 5.3,
-        "price": 407.6,
-        "pct_change_1d": 0.37,
-        "above_sma10": true,
-        "rsi_14": 58.2,
-        "ema_9": 388.19,
-        "ema_21": 379.01,
-        "ema_50": 362.88,
-        "return_1m": 17.97
-      },
-      "fundamental": {
-        "name": "APEX FROZEN FOODS LIMITED",
-        "sector": "Consumer Defensive",
-        "ind": "Farm Products",
-        "mcap_cr": 1360.2,
-        "pe": 41.2,
-        "eps": 10.56,
-        "52h": 487.95,
-        "52l": 198.0,
-        "bv": 162.98,
-        "dy": 52.0
-      }
-    },
-    {
-      "ticker": "SAKAR",
-      "rank": 9,
-      "score": 62,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "high_52w": 583.95,
-        "pct_from_52w_high": 1.99,
-        "volume_ratio": 1.79,
-        "price": 572.35,
-        "rsi_14": 64.3,
-        "ema_9": 534.01,
-        "ema_21": 524.16,
-        "ema_50": 495.86,
-        "return_1m": 9.35
-      },
-      "fundamental": {
-        "name": "SAKAR HEALTHCARE LIMITED",
-        "sector": "Healthcare",
-        "ind": "Drug Manufacturers - Specialty & Generic",
-        "mcap_cr": 1293.8,
-        "pe": 51.8,
-        "eps": 11.39,
-        "52h": 598.0,
-        "52l": 239.01,
-        "bv": 136.29,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "POWERINDIA",
-      "rank": 10,
-      "score": 60,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "high_52w": 27500.0,
-        "pct_from_52w_high": 0.67,
-        "volume_ratio": 2.12,
-        "price": 27315.0,
-        "rsi_14": 67.9,
-        "ema_9": 25581.77,
-        "ema_21": 25016.9,
-        "ema_50": 23595.17,
-        "return_1m": 8.57
-      },
-      "fundamental": {
-        "name": "HITACHI ENERGY INDIA LTD",
-        "sector": "Industrials",
-        "ind": "Electrical Equipment & Parts",
-        "mcap_cr": 126790.7,
-        "pe": 148.7,
-        "eps": 191.21,
-        "52h": 28510.0,
-        "52l": 11519.05,
-        "bv": 1028.23,
-        "dy": 2.0
-      }
-    },
-    {
-      "ticker": "SAATVIKGL",
-      "rank": 11,
-      "score": 60,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 8.06,
-        "price": 461.6,
-        "pct_change_1d": 9.79,
-        "above_sma10": true,
-        "rsi_14": 74.1,
-        "ema_9": 414.67,
-        "ema_21": 394.87,
-        "ema_50": 389.65,
-        "return_1m": 33.43
-      },
-      "fundamental": {
-        "name": "SAATVIKGL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "BAJAJCON",
-      "rank": 12,
-      "score": 59,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 5.02,
-        "price": 392.85,
-        "pct_change_1d": 0.87,
-        "above_sma10": true,
-        "rsi_14": 62.6,
-        "ema_9": 375.66,
-        "ema_21": 367.54,
-        "ema_50": 353.17,
-        "return_1m": 5.88
-      },
-      "fundamental": {
-        "name": "BAJAJ CONSUMER CARE LTD",
-        "sector": "Consumer Defensive",
-        "ind": "Household & Personal Products",
-        "mcap_cr": 5646.0,
-        "pe": 37.0,
-        "eps": 11.67,
-        "52h": 444.7,
-        "52l": 161.4,
-        "bv": 47.14,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NARMADA",
-      "rank": 13,
-      "score": 58,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 4.32,
-        "price": 34.22,
-        "pct_change_1d": 2.64,
-        "above_sma10": true,
-        "rsi_14": 61.9,
-        "ema_9": 32.77,
-        "ema_21": 32.31,
-        "ema_50": 31.07,
-        "return_1m": 10.42
-      },
-      "fundamental": {
-        "name": "NARMADA AGROBASE LIMITED",
-        "sector": "Basic Materials",
-        "ind": "Agricultural Inputs",
-        "mcap_cr": 136.6,
-        "pe": 32.1,
-        "eps": 1.11,
-        "52h": 36.99,
-        "52l": 14.82,
-        "bv": 15.23,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ICICIAMC",
-      "rank": 14,
-      "score": 51,
-      "signals": [
-        "52W_BREAKOUT",
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "high_52w": 3275.0,
-        "pct_from_52w_high": 0.73,
-        "volume_ratio": 1.58,
-        "price": 3251.1,
-        "rsi_14": 65.7,
-        "ema_9": 3001.06,
-        "ema_21": 2956.43,
-        "ema_50": 2923.6,
-        "return_1m": 11.84
-      },
-      "fundamental": {
-        "name": "ICICIAMC",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GICRE",
-      "rank": 15,
-      "score": 51,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 5.85,
-        "price": 389.05,
-        "pct_change_1d": 0.34,
-        "above_sma10": true,
-        "rsi_14": 60.4,
-        "ema_9": 379.57,
-        "ema_21": 374.9,
-        "ema_50": 374.58,
-        "return_1m": 6.18
-      },
-      "fundamental": {
-        "name": "GICRE",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "LUMAXTECH",
-      "rank": 16,
-      "score": 48,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 2.5,
-        "price": 1725.6,
-        "pct_change_1d": 2.0,
-        "above_sma10": true,
-        "rsi_14": 59.8,
-        "ema_9": 1640.51,
-        "ema_21": 1603.25,
-        "ema_50": 1570.52,
-        "return_1m": 16.86
-      },
-      "fundamental": {
-        "name": "LUMAX AUTO TECH LTD",
-        "sector": "Consumer Cyclical",
-        "ind": "Auto Parts",
-        "mcap_cr": 12427.2,
-        "pe": 49.8,
-        "eps": 36.58,
-        "52h": 1848.0,
-        "52l": 505.8,
-        "bv": 154.84,
-        "dy": 32.0
-      }
-    },
-    {
-      "ticker": "GROWW",
-      "rank": 17,
-      "score": 45,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 2.85,
-        "price": 186.66,
-        "pct_change_1d": 3.12,
-        "above_sma10": true,
-        "rsi_14": 68.6,
-        "ema_9": 170.59,
-        "ema_21": 165.64,
-        "ema_50": 163.28,
-        "return_1m": 25.09
-      },
-      "fundamental": {
-        "name": "GROWW",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ACMESOLAR",
-      "rank": 18,
-      "score": 44,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.7,
-        "ema_9": 268.92,
-        "ema_21": 257.8,
-        "ema_50": 245.52,
-        "price": 273.1,
-        "return_1m": 24.44
-      },
-      "fundamental": {
-        "name": "ACMESOLAR",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ELECTCAST",
-      "rank": 19,
-      "score": 44,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.3,
-        "ema_9": 79.37,
-        "ema_21": 76.16,
-        "ema_50": 74.36,
-        "price": 84.09,
-        "return_1m": 37.63
-      },
-      "fundamental": {
-        "name": "ELECTROSTEEL CASTINGS LTD",
-        "sector": "Industrials",
-        "ind": "Building Products & Equipment",
-        "mcap_cr": 5115.4,
-        "pe": 16.3,
-        "eps": 5.08,
-        "52h": 138.75,
-        "52l": 60.15,
-        "bv": 95.61,
-        "dy": 166.0
-      }
-    },
-    {
-      "ticker": "MAWANASUG",
-      "rank": 20,
-      "score": 44,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 62.5,
-        "ema_9": 93.2,
-        "ema_21": 87.97,
-        "ema_50": 84.36,
-        "price": 94.97,
-        "return_1m": 22.35
-      },
-      "fundamental": {
-        "name": "MAWANASUG",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "EMMVEE",
-      "rank": 21,
-      "score": 43,
-      "signals": [
-        "EMA_MOMENTUM",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 2.63,
-        "price": 224.71,
-        "pct_change_1d": 0.56,
-        "above_sma10": true,
-        "rsi_14": 55.7,
-        "ema_9": 223.24,
-        "ema_21": 218.88,
-        "ema_50": 212.7,
-        "return_1m": 16.15
-      },
-      "fundamental": {
-        "name": "EMMVEE",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "DEEPINDS",
-      "rank": 22,
-      "score": 43,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 60.4,
-        "ema_9": 437.74,
-        "ema_21": 413.01,
-        "ema_50": 399.55,
-        "price": 441.2,
-        "return_1m": 26.93
-      },
-      "fundamental": {
-        "name": "DEEPINDS",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "JNKINDIA",
-      "rank": 23,
-      "score": 43,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.3,
-        "ema_9": 251.42,
-        "ema_21": 243.22,
-        "ema_50": 239.74,
-        "price": 264.97,
-        "return_1m": 18.13
-      },
-      "fundamental": {
-        "name": "JNKINDIA",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NOCIL",
-      "rank": 24,
-      "score": 43,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 62.9,
-        "ema_9": 160.9,
-        "ema_21": 154.56,
-        "ema_50": 150.22,
-        "price": 165.05,
-        "return_1m": 25.5
-      },
-      "fundamental": {
-        "name": "NOCIL",
+        "name": "INOXINDIA",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -757,22 +36,20 @@
     },
     {
       "ticker": "SHRIPISTON",
-      "rank": 25,
-      "score": 42,
+      "rank": 2,
+      "score": 45,
       "signals": [
-        "EMA_MOMENTUM",
+        "52W_BREAKOUT",
+        "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 3.61,
-        "price": 3223.7,
-        "pct_change_1d": 2.96,
-        "above_sma10": true,
-        "rsi_14": 59.9,
-        "ema_9": 3059.23,
-        "ema_21": 3028.57,
-        "ema_50": 3003.75,
-        "return_1m": 14.68
+        "high_52w": 3653.0,
+        "pct_from_52w_high": 1.23,
+        "volume_ratio": 3.62,
+        "price": 3608.2,
+        "pct_change_1d": 11.93,
+        "above_sma10": true
       },
       "fundamental": {
         "name": "SHRIPISTON",
@@ -788,26 +65,24 @@
       }
     },
     {
-      "ticker": "SUVEN",
-      "rank": 26,
+      "ticker": "ADANIENSOL",
+      "rank": 3,
       "score": 42,
       "signals": [
-        "EMA_MOMENTUM",
+        "52W_BREAKOUT",
+        "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 3.15,
-        "price": 177.98,
-        "pct_change_1d": 5.28,
-        "above_sma10": true,
-        "rsi_14": 74.1,
-        "ema_9": 158.6,
-        "ema_21": 149.52,
-        "ema_50": 149.28,
-        "return_1m": 30.98
+        "high_52w": 1160.4,
+        "pct_from_52w_high": 0.22,
+        "volume_ratio": 3.27,
+        "price": 1157.9,
+        "pct_change_1d": 7.34,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "SUVEN",
+        "name": "ADANIENSOL",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -820,22 +95,49 @@
       }
     },
     {
-      "ticker": "AVADHSUGAR",
-      "rank": 27,
-      "score": 42,
+      "ticker": "LUMAXTECH",
+      "rank": 4,
+      "score": 34,
       "signals": [
-        "EMA_MOMENTUM"
+        "52W_BREAKOUT",
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 61.8,
-        "ema_9": 470.15,
-        "ema_21": 444.96,
-        "ema_50": 409.56,
-        "price": 470.95,
-        "return_1m": 17.75
+        "high_52w": 1848.0,
+        "pct_from_52w_high": 1.34,
+        "volume_ratio": 2.5,
+        "price": 1823.3,
+        "pct_change_1d": 5.66,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "AVADHSUGAR",
+        "name": "LUMAX AUTO TECH LTD",
+        "sector": "Consumer Cyclical",
+        "ind": "Auto Parts",
+        "mcap_cr": 12427.2,
+        "pe": 47.2,
+        "eps": 38.65,
+        "52h": 1848.0,
+        "52l": 505.8,
+        "bv": 154.84,
+        "dy": 32.0
+      }
+    },
+    {
+      "ticker": "EBGNG",
+      "rank": 5,
+      "score": 30,
+      "signals": [
+        "52W_BREAKOUT"
+      ],
+      "indicators": {
+        "high_52w": 409.7,
+        "pct_from_52w_high": 0.28,
+        "volume_ratio": 2.48,
+        "price": 408.55
+      },
+      "fundamental": {
+        "name": "EBGNG",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -848,526 +150,46 @@
       }
     },
     {
-      "ticker": "JINDALSAW",
-      "rank": 28,
-      "score": 42,
+      "ticker": "POWERINDIA",
+      "rank": 6,
+      "score": 29,
       "signals": [
-        "EMA_MOMENTUM"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "rsi_14": 59.9,
-        "ema_9": 194.03,
-        "ema_21": 190.15,
-        "ema_50": 185.42,
-        "price": 202.31,
-        "return_1m": 24.44
+        "high_52w": 28510.0,
+        "pct_from_52w_high": 0.3,
+        "volume_ratio": 2.12,
+        "price": 28425.0
       },
       "fundamental": {
-        "name": "JINDALSAW",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ZYDUSWELL",
-      "rank": 29,
-      "score": 42,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 64.4,
-        "ema_9": 468.09,
-        "ema_21": 443.96,
-        "ema_50": 428.82,
-        "price": 489.5,
-        "return_1m": 31.06
-      },
-      "fundamental": {
-        "name": "ZYDUSWELL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ARVIND",
-      "rank": 30,
-      "score": 41,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 62.5,
-        "ema_9": 368.73,
-        "ema_21": 360.53,
-        "ema_50": 351.14,
-        "price": 382.75,
-        "return_1m": 15.49
-      },
-      "fundamental": {
-        "name": "ARVIND",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "DALMIASUG",
-      "rank": 31,
-      "score": 41,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.6,
-        "ema_9": 362.63,
-        "ema_21": 341.79,
-        "ema_50": 320.21,
-        "price": 365.95,
-        "return_1m": 15.81
-      },
-      "fundamental": {
-        "name": "DALMIASUG",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GPIL",
-      "rank": 32,
-      "score": 41,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.7,
-        "ema_9": 277.5,
-        "ema_21": 269.97,
-        "ema_50": 263.54,
-        "price": 285.15,
-        "return_1m": 14.66
-      },
-      "fundamental": {
-        "name": "GPIL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "RPSGVENT",
-      "rank": 33,
-      "score": 41,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 64.9,
-        "ema_9": 937.05,
-        "ema_21": 822.92,
-        "ema_50": 757.01,
-        "price": 966.7,
-        "return_1m": 59.13
-      },
-      "fundamental": {
-        "name": "RPSG VENTURES LIMITED",
-        "sector": "Technology",
-        "ind": "Information Technology Services",
-        "mcap_cr": 3187.0,
-        "pe": null,
-        "eps": -28.32,
-        "52h": 1179.0,
-        "52l": 551.9,
-        "bv": 800.69,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "UTTAMSUGAR",
-      "rank": 34,
-      "score": 41,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 59.2,
-        "ema_9": 241.27,
-        "ema_21": 229.24,
-        "ema_50": 222.59,
-        "price": 242.0,
-        "return_1m": 22.9
-      },
-      "fundamental": {
-        "name": "UTTAMSUGAR",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "AERONEU",
-      "rank": 35,
-      "score": 40,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 62.3,
-        "ema_9": 77.12,
-        "ema_21": 74.09,
-        "ema_50": 72.71,
-        "price": 79.2,
-        "return_1m": 13.96
-      },
-      "fundamental": {
-        "name": "AERONEU",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "DWARKESH",
-      "rank": 36,
-      "score": 40,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.4,
-        "ema_9": 44.16,
-        "ema_21": 41.88,
-        "ema_50": 39.59,
-        "price": 44.64,
-        "return_1m": 13.18
-      },
-      "fundamental": {
-        "name": "DWARKESH",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "KOTYARK",
-      "rank": 37,
-      "score": 40,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 58.2,
-        "ema_9": 377.49,
-        "ema_21": 356.81,
-        "ema_50": 311.98,
-        "price": 366.5,
-        "return_1m": 30.5
-      },
-      "fundamental": {
-        "name": "KOTYARK INDUSTRIES LTD",
-        "sector": "Basic Materials",
-        "ind": "Specialty Chemicals",
-        "mcap_cr": 388.3,
-        "pe": 147.0,
-        "eps": 2.57,
-        "52h": 459.6,
-        "52l": 191.2,
-        "bv": 145.08,
-        "dy": 27.0
-      }
-    },
-    {
-      "ticker": "NAHARSPING",
-      "rank": 38,
-      "score": 40,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 65.3,
-        "ema_9": 220.73,
-        "ema_21": 211.21,
-        "ema_50": 202.09,
-        "price": 230.15,
-        "return_1m": 21.54
-      },
-      "fundamental": {
-        "name": "NAHARSPING",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SOUTHWEST",
-      "rank": 39,
-      "score": 40,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 64.4,
-        "ema_9": 217.7,
-        "ema_21": 209.03,
-        "ema_50": 200.21,
-        "price": 229.76,
-        "return_1m": 16.49
-      },
-      "fundamental": {
-        "name": "SOUTH WEST PINNACLE LTD",
-        "sector": "Energy",
-        "ind": "Oil & Gas Equipment & Services",
-        "mcap_cr": 688.7,
-        "pe": 22.7,
-        "eps": 10.06,
-        "52h": 242.0,
-        "52l": 108.3,
-        "bv": 60.8,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "XPROINDIA",
-      "rank": 40,
-      "score": 40,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 60.7,
-        "ema_9": 1016.51,
-        "ema_21": 980.94,
-        "ema_50": 961.47,
-        "price": 1031.8,
-        "return_1m": 14.75
-      },
-      "fundamental": {
-        "name": "XPROINDIA",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "AEROFLEX",
-      "rank": 41,
-      "score": 39,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.5,
-        "ema_9": 254.34,
-        "ema_21": 243.67,
-        "ema_50": 225.62,
-        "price": 274.46,
-        "return_1m": 27.25
-      },
-      "fundamental": {
-        "name": "AEROFLEX",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "CENTRUM",
-      "rank": 42,
-      "score": 39,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 57.8,
-        "ema_9": 27.68,
-        "ema_21": 26.45,
-        "ema_50": 26.0,
-        "price": 28.39,
-        "return_1m": 31.74
-      },
-      "fundamental": {
-        "name": "CENTRUM",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "KESORAMIND",
-      "rank": 43,
-      "score": 39,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.1,
-        "ema_9": 9.72,
-        "ema_21": 9.12,
-        "ema_50": 8.99,
-        "price": 10.93,
-        "return_1m": 32.16
-      },
-      "fundamental": {
-        "name": "KESORAM INDUSTRIES LTD",
-        "sector": "Basic Materials",
-        "ind": "Building Materials",
-        "mcap_cr": 322.8,
-        "pe": null,
-        "eps": -4.56,
-        "52h": 13.94,
-        "52l": 2.84,
-        "bv": 11.11,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "KTKBANK",
-      "rank": 44,
-      "score": 39,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 65.6,
-        "ema_9": 232.94,
-        "ema_21": 226.08,
-        "ema_50": 215.5,
-        "price": 243.69,
-        "return_1m": 18.41
-      },
-      "fundamental": {
-        "name": "KTKBANK",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "QPOWER",
-      "rank": 45,
-      "score": 39,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.4,
-        "ema_9": 883.77,
-        "ema_21": 854.61,
-        "ema_50": 823.89,
-        "price": 969.85,
-        "return_1m": 21.86
-      },
-      "fundamental": {
-        "name": "QUALITY POWER ELEC EQUP L",
+        "name": "HITACHI ENERGY INDIA LTD",
         "sector": "Industrials",
         "ind": "Electrical Equipment & Parts",
-        "mcap_cr": 7450.9,
-        "pe": 69.9,
-        "eps": 13.77,
-        "52h": 1082.0,
-        "52l": 276.3,
-        "bv": 60.66,
-        "dy": 10.0
+        "mcap_cr": 126790.7,
+        "pe": 148.7,
+        "eps": 191.21,
+        "52h": 28510.0,
+        "52l": 11519.05,
+        "bv": 1028.23,
+        "dy": 2.0
       }
     },
     {
-      "ticker": "RENUKA",
-      "rank": 46,
-      "score": 39,
+      "ticker": "LENSKART",
+      "rank": 7,
+      "score": 27,
       "signals": [
-        "EMA_MOMENTUM"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "rsi_14": 62.5,
-        "ema_9": 27.25,
-        "ema_21": 26.18,
-        "ema_50": 25.53,
-        "price": 27.53,
-        "return_1m": 11.05
+        "high_52w": 550.0,
+        "pct_from_52w_high": 0.45,
+        "volume_ratio": 1.86,
+        "price": 547.55
       },
       "fundamental": {
-        "name": "RENUKA",
+        "name": "LENSKART",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -1380,1114 +202,20 @@
       }
     },
     {
-      "ticker": "SAMBHV",
-      "rank": 47,
-      "score": 39,
+      "ticker": "ATHERENERG",
+      "rank": 8,
+      "score": 26,
       "signals": [
-        "EMA_MOMENTUM"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "rsi_14": 66.5,
-        "ema_9": 105.21,
-        "ema_21": 99.94,
-        "ema_50": 97.45,
-        "price": 111.99,
-        "return_1m": 25.1
+        "high_52w": 875.45,
+        "pct_from_52w_high": 1.42,
+        "volume_ratio": 2.43,
+        "price": 863.05
       },
       "fundamental": {
-        "name": "SAMBHV",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SKYGOLD",
-      "rank": 48,
-      "score": 39,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 63.6,
-        "ema_9": 358.03,
-        "ema_21": 348.85,
-        "ema_50": 343.34,
-        "price": 379.7,
-        "return_1m": 15.74
-      },
-      "fundamental": {
-        "name": "SKYGOLD",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "WAAREEENER",
-      "rank": 49,
-      "score": 39,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.2,
-        "ema_9": 3113.04,
-        "ema_21": 3032.59,
-        "ema_50": 2961.48,
-        "price": 3232.3,
-        "return_1m": 24.37
-      },
-      "fundamental": {
-        "name": "WAAREEENER",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ARIES",
-      "rank": 50,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 59.7,
-        "ema_9": 355.35,
-        "ema_21": 346.96,
-        "ema_50": 340.41,
-        "price": 365.7,
-        "return_1m": 13.17
-      },
-      "fundamental": {
-        "name": "ARIES",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GANECOS",
-      "rank": 51,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 67.5,
-        "ema_9": 1000.33,
-        "ema_21": 912.68,
-        "ema_50": 853.51,
-        "price": 1052.15,
-        "return_1m": 49.17
-      },
-      "fundamental": {
-        "name": "GANESHA ECOSPHERE LIMITED",
-        "sector": "Consumer Cyclical",
-        "ind": "Textile Manufacturing",
-        "mcap_cr": 2800.6,
-        "pe": 70.0,
-        "eps": 14.94,
-        "52h": 1742.3,
-        "52l": 653.55,
-        "bv": 706.96,
-        "dy": 43.0
-      }
-    },
-    {
-      "ticker": "GRANULES",
-      "rank": 52,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 60.3,
-        "ema_9": 627.73,
-        "ema_21": 610.79,
-        "ema_50": 594.78,
-        "price": 635.5,
-        "return_1m": 13.62
-      },
-      "fundamental": {
-        "name": "GRANULES",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GUJAPOLLO",
-      "rank": 53,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 59.1,
-        "ema_9": 427.37,
-        "ema_21": 416.2,
-        "ema_50": 408.53,
-        "price": 434.7,
-        "return_1m": 14.68
-      },
-      "fundamental": {
-        "name": "GUJAPOLLO",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SHILCTECH",
-      "rank": 54,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.6,
-        "ema_9": 4074.28,
-        "ema_21": 3950.44,
-        "ema_50": 3867.05,
-        "price": 4408.6,
-        "return_1m": 19.96
-      },
-      "fundamental": {
-        "name": "SHILCTECH",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "UTLSOLAR",
-      "rank": 55,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.9,
-        "ema_9": 213.64,
-        "ema_21": 205.26,
-        "ema_50": 202.51,
-        "price": 221.44,
-        "return_1m": 20.73
-      },
-      "fundamental": {
-        "name": "UTLSOLAR",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "VENUSREM",
-      "rank": 56,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 67.0,
-        "ema_9": 914.03,
-        "ema_21": 871.33,
-        "ema_50": 814.87,
-        "price": 976.95,
-        "return_1m": 29.22
-      },
-      "fundamental": {
-        "name": "VENUS REMEDIES LIMITED",
-        "sector": "Healthcare",
-        "ind": "Drug Manufacturers - Specialty & Generic",
-        "mcap_cr": 1330.4,
-        "pe": 17.4,
-        "eps": 57.05,
-        "52h": 1025.75,
-        "52l": 294.15,
-        "bv": 444.62,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "WSTCSTPAPR",
-      "rank": 57,
-      "score": 38,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 59.8,
-        "ema_9": 436.81,
-        "ema_21": 426.21,
-        "ema_50": 420.13,
-        "price": 448.9,
-        "return_1m": 17.73
-      },
-      "fundamental": {
-        "name": "WSTCSTPAPR",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "AXISCADES",
-      "rank": 58,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 68.1,
-        "ema_9": 1601.44,
-        "ema_21": 1519.39,
-        "ema_50": 1442.92,
-        "price": 1712.8,
-        "return_1m": 20.07
-      },
-      "fundamental": {
-        "name": "AXISCADES",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "BSE",
-      "rank": 59,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.4,
-        "ema_9": 2996.07,
-        "ema_21": 2909.29,
-        "ema_50": 2846.2,
-        "price": 3257.4,
-        "return_1m": 17.64
-      },
-      "fundamental": {
-        "name": "BSE",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "DBOL",
-      "rank": 60,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.9,
-        "ema_9": 112.91,
-        "ema_21": 107.49,
-        "ema_50": 100.75,
-        "price": 118.52,
-        "return_1m": 19.67
-      },
-      "fundamental": {
-        "name": "DHAMPUR BIO ORGANICS LTD",
-        "sector": "Consumer Defensive",
-        "ind": "Farm Products",
-        "mcap_cr": 790.1,
-        "pe": 33.7,
-        "eps": 3.56,
-        "52h": 126.6,
-        "52l": 66.0,
-        "bv": 144.93,
-        "dy": 105.0
-      }
-    },
-    {
-      "ticker": "EPL",
-      "rank": 61,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.3,
-        "ema_9": 215.13,
-        "ema_21": 207.65,
-        "ema_50": 206.0,
-        "price": 229.64,
-        "return_1m": 19.01
-      },
-      "fundamental": {
-        "name": "EPL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GMDCLTD",
-      "rank": 62,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.3,
-        "ema_9": 587.53,
-        "ema_21": 575.0,
-        "ema_50": 567.7,
-        "price": 604.35,
-        "return_1m": 14.02
-      },
-      "fundamental": {
-        "name": "GMDCLTD",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GOKULAGRO",
-      "rank": 63,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 68.3,
-        "ema_9": 192.7,
-        "ema_21": 184.5,
-        "ema_50": 177.61,
-        "price": 199.88,
-        "return_1m": 24.34
-      },
-      "fundamental": {
-        "name": "GOKULAGRO",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GRPLTD",
-      "rank": 64,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.1,
-        "ema_9": 1918.61,
-        "ema_21": 1860.48,
-        "ema_50": 1821.55,
-        "price": 1947.4,
-        "return_1m": 9.88
-      },
-      "fundamental": {
-        "name": "GRPLTD",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "GUJALKALI",
-      "rank": 65,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 67.6,
-        "ema_9": 584.39,
-        "ema_21": 548.11,
-        "ema_50": 515.35,
-        "price": 618.1,
-        "return_1m": 43.84
-      },
-      "fundamental": {
-        "name": "GUJARAT ALKALIES & CHEM",
-        "sector": "Basic Materials",
-        "ind": "Chemicals",
-        "mcap_cr": 4540.7,
-        "pe": null,
-        "eps": -1.17,
-        "52h": 684.35,
-        "52l": 409.15,
-        "bv": 760.22,
-        "dy": 256.0
-      }
-    },
-    {
-      "ticker": "INDOTHAI",
-      "rank": 66,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 62.8,
-        "ema_9": 286.65,
-        "ema_21": 277.14,
-        "ema_50": 275.27,
-        "price": 290.1,
-        "return_1m": 11.45
-      },
-      "fundamental": {
-        "name": "INDOTHAI",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NATIONALUM",
-      "rank": 67,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.4,
-        "ema_9": 397.99,
-        "ema_21": 387.51,
-        "ema_50": 369.74,
-        "price": 412.35,
-        "return_1m": 6.25
-      },
-      "fundamental": {
-        "name": "NATIONAL ALUMINIUM CO LTD",
-        "sector": "Basic Materials",
-        "ind": "Aluminum",
-        "mcap_cr": 76672.8,
-        "pe": 12.5,
-        "eps": 33.44,
-        "52h": 431.5,
-        "52l": 142.69,
-        "bv": 108.06,
-        "dy": 364.0
-      }
-    },
-    {
-      "ticker": "SEAMECLTD",
-      "rank": 68,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 64.9,
-        "ema_9": 1470.95,
-        "ema_21": 1418.11,
-        "ema_50": 1331.24,
-        "price": 1511.2,
-        "return_1m": 13.93
-      },
-      "fundamental": {
-        "name": "SEAMEC LIMITED",
-        "sector": "Industrials",
-        "ind": "Marine Shipping",
-        "mcap_cr": 3891.4,
-        "pe": 20.3,
-        "eps": 75.11,
-        "52h": 1575.1,
-        "52l": 752.55,
-        "bv": 422.75,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SMSPHARMA",
-      "rank": 69,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 60.9,
-        "ema_9": 394.94,
-        "ema_21": 387.03,
-        "ema_50": 368.7,
-        "price": 415.0,
-        "return_1m": 8.16
-      },
-      "fundamental": {
-        "name": "SMSPHARMA",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "TRAVELFOOD",
-      "rank": 70,
-      "score": 37,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 63.2,
-        "ema_9": 1253.38,
-        "ema_21": 1217.0,
-        "ema_50": 1196.73,
-        "price": 1277.9,
-        "return_1m": 9.65
-      },
-      "fundamental": {
-        "name": "TRAVELFOOD",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "AETHER",
-      "rank": 71,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 57.2,
-        "ema_9": 1115.4,
-        "ema_21": 1086.92,
-        "ema_50": 1033.12,
-        "price": 1133.8,
-        "return_1m": 14.91
-      },
-      "fundamental": {
-        "name": "AETHER",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "APARINDS",
-      "rank": 72,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 62.9,
-        "ema_9": 10194.39,
-        "ema_21": 10001.27,
-        "ema_50": 9661.03,
-        "price": 10767.0,
-        "return_1m": 6.16
-      },
-      "fundamental": {
-        "name": "APARINDS",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ARROWGREEN",
-      "rank": 73,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 69.0,
-        "ema_9": 497.51,
-        "ema_21": 454.38,
-        "ema_50": 443.39,
-        "price": 536.1,
-        "return_1m": 44.91
-      },
-      "fundamental": {
-        "name": "ARROW GREENTECH LIMITED",
-        "sector": "Consumer Cyclical",
-        "ind": "Packaging & Containers",
-        "mcap_cr": 862.7,
-        "pe": 16.7,
-        "eps": 34.04,
-        "52h": 817.95,
-        "52l": 341.95,
-        "bv": 140.14,
-        "dy": 75.0
-      }
-    },
-    {
-      "ticker": "BELRISE",
-      "rank": 74,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 62.7,
-        "ema_9": 192.66,
-        "ema_21": 189.38,
-        "ema_50": 184.33,
-        "price": 202.23,
-        "return_1m": 4.71
-      },
-      "fundamental": {
-        "name": "BELRISE",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "BLISSGVS",
-      "rank": 75,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 68.5,
-        "ema_9": 235.83,
-        "ema_21": 224.58,
-        "ema_50": 210.13,
-        "price": 254.07,
-        "return_1m": 24.39
-      },
-      "fundamental": {
-        "name": "BLISS GVS PHARMA LTD",
-        "sector": "Healthcare",
-        "ind": "Drug Manufacturers - Specialty & Generic",
-        "mcap_cr": 2741.4,
-        "pe": 25.4,
-        "eps": 10.19,
-        "52h": 264.9,
-        "52l": 109.03,
-        "bv": 107.21,
-        "dy": 39.0
-      }
-    },
-    {
-      "ticker": "HFCL",
-      "rank": 76,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.4,
-        "ema_9": 73.66,
-        "ema_21": 71.99,
-        "ema_50": 70.58,
-        "price": 79.61,
-        "return_1m": 16.39
-      },
-      "fundamental": {
-        "name": "HFCL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "KRISHANA",
-      "rank": 77,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 68.9,
-        "ema_9": 545.2,
-        "ema_21": 518.29,
-        "ema_50": 506.44,
-        "price": 584.35,
-        "return_1m": 22.45
-      },
-      "fundamental": {
-        "name": "KRISHANA PHOSCHEM LIMITED",
-        "sector": "Basic Materials",
-        "ind": "Agricultural Inputs",
-        "mcap_cr": 3537.8,
-        "pe": 27.2,
-        "eps": 21.04,
-        "52h": 619.0,
-        "52l": 235.0,
-        "bv": 71.83,
-        "dy": 9.0
-      }
-    },
-    {
-      "ticker": "KRN",
-      "rank": 78,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.5,
-        "ema_9": 912.65,
-        "ema_21": 894.59,
-        "ema_50": 853.04,
-        "price": 964.2,
-        "return_1m": 4.94
-      },
-      "fundamental": {
-        "name": "KRN",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NINSYS",
-      "rank": 79,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 69.1,
-        "ema_9": 390.66,
-        "ema_21": 359.18,
-        "ema_50": 348.84,
-        "price": 417.05,
-        "return_1m": 42.1
-      },
-      "fundamental": {
-        "name": "NINTEC SYSTEMS LIMITED",
-        "sector": "Technology",
-        "ind": "Information Technology Services",
-        "mcap_cr": 772.5,
-        "pe": 25.2,
-        "eps": 16.47,
-        "52h": 526.9,
-        "52l": 281.05,
-        "bv": 41.8,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "PFOCUS",
-      "rank": 80,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 58.0,
-        "ema_9": 325.4,
-        "ema_21": 306.86,
-        "ema_50": 280.21,
-        "price": 319.1,
-        "return_1m": 15.12
-      },
-      "fundamental": {
-        "name": "PRIME FOCUS LIMITED",
-        "sector": "Communication Services",
-        "ind": "Entertainment",
-        "mcap_cr": 25956.9,
-        "pe": null,
-        "eps": -4.5,
-        "52h": 359.0,
-        "52l": 89.05,
-        "bv": 51.79,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "REGAAL",
-      "rank": 81,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 61.6,
-        "ema_9": 71.51,
-        "ema_21": 70.18,
-        "ema_50": 69.47,
-        "price": 78.72,
-        "return_1m": 25.75
-      },
-      "fundamental": {
-        "name": "REGAAL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SGFIN",
-      "rank": 82,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 65.9,
-        "ema_9": 445.41,
-        "ema_21": 425.45,
-        "ema_50": 407.81,
-        "price": 461.15,
-        "return_1m": 13.93
-      },
-      "fundamental": {
-        "name": "SGFIN",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SPLPETRO",
-      "rank": 83,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 60.5,
-        "ema_9": 725.82,
-        "ema_21": 702.61,
-        "ema_50": 672.52,
-        "price": 739.75,
-        "return_1m": 7.44
-      },
-      "fundamental": {
-        "name": "SPLPETRO",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "THANGAMAYL",
-      "rank": 84,
-      "score": 36,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 66.4,
-        "ema_9": 3764.65,
-        "ema_21": 3643.85,
-        "ema_50": 3564.68,
-        "price": 4086.5,
-        "return_1m": 14.46
-      },
-      "fundamental": {
-        "name": "THANGAMAYIL JEWELLERY LTD",
-        "sector": "Consumer Cyclical",
-        "ind": "Luxury Goods",
-        "mcap_cr": 12881.4,
-        "pe": 53.6,
-        "eps": 77.23,
-        "52h": 4181.9,
-        "52l": 1750.1,
-        "bv": 375.46,
-        "dy": 31.0
-      }
-    },
-    {
-      "ticker": "AUROPHARMA",
-      "rank": 85,
-      "score": 35,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 64.2,
-        "ema_9": 1324.98,
-        "ema_21": 1297.2,
-        "ema_50": 1253.43,
-        "price": 1340.4,
-        "return_1m": 7.46
-      },
-      "fundamental": {
-        "name": "AUROPHARMA",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "BUILDPRO",
-      "rank": 86,
-      "score": 35,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 58.8,
-        "ema_9": 1054.02,
-        "ema_21": 1008.88,
-        "ema_50": 945.39,
-        "price": 1071.8,
-        "return_1m": 8.12
-      },
-      "fundamental": {
-        "name": "BUILDPRO",
+        "name": "ATHERENERG",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2501,18 +229,16 @@
     },
     {
       "ticker": "DEEDEV",
-      "rank": 87,
-      "score": 35,
+      "rank": 9,
+      "score": 26,
       "signals": [
-        "EMA_MOMENTUM"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "rsi_14": 60.9,
-        "ema_9": 300.38,
-        "ema_21": 288.15,
-        "ema_50": 266.71,
-        "price": 312.3,
-        "return_1m": 4.17
+        "high_52w": 343.5,
+        "pct_from_52w_high": 0.0,
+        "volume_ratio": 1.71,
+        "price": 343.5
       },
       "fundamental": {
         "name": "DEE DEVELOPMENT ENG LTD",
@@ -2528,22 +254,20 @@
       }
     },
     {
-      "ticker": "ENTERO",
-      "rank": 88,
-      "score": 35,
+      "ticker": "ANANDRATHI",
+      "rank": 10,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "rsi_14": 56.4,
-        "ema_9": 1189.4,
-        "ema_21": 1158.17,
-        "ema_50": 1126.9,
-        "price": 1180.9,
-        "return_1m": 14.7
+        "high_52w": 3603.7,
+        "pct_from_52w_high": 0.7,
+        "volume_ratio": 2.33,
+        "price": 3578.5
       },
       "fundamental": {
-        "name": "ENTERO",
+        "name": "ANANDRATHI",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2556,22 +280,20 @@
       }
     },
     {
-      "ticker": "GAEL",
-      "rank": 89,
-      "score": 35,
+      "ticker": "ANDHRSUGAR",
+      "rank": 11,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 68.3,
-        "ema_9": 143.1,
-        "ema_21": 139.0,
-        "ema_50": 136.04,
-        "price": 152.79,
-        "return_1m": 17.08
+        "volume_ratio": 8.0,
+        "price": 80.42,
+        "pct_change_1d": 7.79,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "GAEL",
+        "name": "ANDHRSUGAR",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2584,22 +306,20 @@
       }
     },
     {
-      "ticker": "ISGEC",
-      "rank": 90,
-      "score": 35,
+      "ticker": "ARENTERP",
+      "rank": 12,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 63.4,
-        "ema_9": 916.12,
-        "ema_21": 902.48,
-        "ema_50": 879.74,
-        "price": 952.95,
-        "return_1m": 6.13
+        "volume_ratio": 6.35,
+        "price": 40.6,
+        "pct_change_1d": 2.84,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "ISGEC",
+        "name": "ARENTERP",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2612,22 +332,20 @@
       }
     },
     {
-      "ticker": "KNAGRI",
-      "rank": 91,
-      "score": 35,
+      "ticker": "ARIHANTSUP",
+      "rank": 13,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 69.9,
-        "ema_9": 196.85,
-        "ema_21": 187.43,
-        "ema_50": 184.05,
-        "price": 220.47,
-        "return_1m": 23.75
+        "volume_ratio": 7.1,
+        "price": 262.14,
+        "pct_change_1d": 15.08,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "KNAGRI",
+        "name": "ARIHANTSUP",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2640,50 +358,306 @@
       }
     },
     {
-      "ticker": "LUXIND",
-      "rank": 92,
-      "score": 35,
+      "ticker": "ARTNIRMAN",
+      "rank": 14,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 69.6,
-        "ema_9": 1088.86,
-        "ema_21": 1001.3,
-        "ema_50": 978.32,
-        "price": 1232.3,
-        "return_1m": 41.87
+        "volume_ratio": 10.07,
+        "price": 49.33,
+        "pct_change_1d": 20.0,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "LUX INDUSTRIES LIMITED",
-        "sector": "Consumer Cyclical",
-        "ind": "Apparel Manufacturing",
-        "mcap_cr": 4050.7,
-        "pe": 37.6,
-        "eps": 35.86,
-        "52h": 1645.8,
-        "52l": 824.05,
-        "bv": 590.67,
+        "name": "ART NIRMAN LIMITED",
+        "sector": "Real Estate",
+        "ind": "Real Estate - Development",
+        "mcap_cr": 123.1,
+        "pe": 96.7,
+        "eps": 0.51,
+        "52h": 72.5,
+        "52l": 29.39,
+        "bv": 14.75,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "ARVEE",
+      "rank": 15,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 7.35,
+        "price": 175.79,
+        "pct_change_1d": 3.85,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "ARVEE",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "ASTEC",
+      "rank": 16,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 7.61,
+        "price": 658.95,
+        "pct_change_1d": 17.67,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "ASTEC",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "ATLASCYCLE",
+      "rank": 17,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 6.51,
+        "price": 103.06,
+        "pct_change_1d": 19.99,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "ATLASCYCLE",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "AVANTIFEED",
+      "rank": 18,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 9.67,
+        "price": 1459.1,
+        "pct_change_1d": 13.46,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "AVANTI FEEDS LIMITED",
+        "sector": "Consumer Defensive",
+        "ind": "Packaged Foods",
+        "mcap_cr": 19879.6,
+        "pe": 25.8,
+        "eps": 56.46,
+        "52h": 1489.0,
+        "52l": 614.25,
+        "bv": 220.94,
+        "dy": 70.0
+      }
+    },
+    {
+      "ticker": "COHANCE",
+      "rank": 19,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 15.08,
+        "price": 377.9,
+        "pct_change_1d": 19.27,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "COHANCE",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "CREST",
+      "rank": 20,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 8.11,
+        "price": 348.1,
+        "pct_change_1d": 2.87,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "CREST",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "HIRECT",
+      "rank": 21,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 10.33,
+        "price": 840.4,
+        "pct_change_1d": 19.0,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "HIRECT",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "HMAAGRO",
+      "rank": 22,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 9.25,
+        "price": 23.75,
+        "pct_change_1d": 8.15,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "HMAAGRO",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "INFOBEAN",
+      "rank": 23,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 7.96,
+        "price": 185.12,
+        "pct_change_1d": 17.55,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "INFOBEANS TECHNO. LTD.",
+        "sector": "Technology",
+        "ind": "Software - Application",
+        "mcap_cr": 1794.9,
+        "pe": 23.8,
+        "eps": 7.78,
+        "52h": 257.5,
+        "52l": 70.6,
+        "bv": 37.77,
         "dy": 16.0
       }
     },
     {
-      "ticker": "MAHSEAMLES",
-      "rank": 93,
-      "score": 35,
+      "ticker": "ITDC",
+      "rank": 24,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 66.1,
-        "ema_9": 590.6,
-        "ema_21": 574.23,
-        "ema_50": 560.04,
-        "price": 608.6,
-        "return_1m": 12.26
+        "volume_ratio": 14.56,
+        "price": 610.4,
+        "pct_change_1d": 15.31,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "MAHSEAMLES",
+        "name": "INDIA TOUR. DEV. CO. LTD.",
+        "sector": "Consumer Cyclical",
+        "ind": "Lodging",
+        "mcap_cr": 5235.4,
+        "pe": 65.9,
+        "eps": 9.26,
+        "52h": 712.8,
+        "52l": 368.0,
+        "bv": 39.47,
+        "dy": 55.0
+      }
+    },
+    {
+      "ticker": "MEGASTAR",
+      "rank": 25,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 6.22,
+        "price": 283.75,
+        "pct_change_1d": 3.82,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "MEGASTAR",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2696,22 +670,20 @@
       }
     },
     {
-      "ticker": "MONEYBOXX",
-      "rank": 94,
-      "score": 35,
+      "ticker": "NAHARPOLY",
+      "rank": 26,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 63.7,
-        "ema_9": 66.88,
-        "ema_21": 65.04,
-        "ema_50": 63.92,
-        "price": 74.02,
-        "return_1m": 9.97
+        "volume_ratio": 6.17,
+        "price": 267.2,
+        "pct_change_1d": 10.01,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "MONEYBOXX",
+        "name": "NAHARPOLY",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2724,22 +696,20 @@
       }
     },
     {
-      "ticker": "RANASUG",
-      "rank": 95,
-      "score": 35,
+      "ticker": "NIACL",
+      "rank": 27,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 64.6,
-        "ema_9": 12.31,
-        "ema_21": 11.92,
-        "ema_50": 11.77,
-        "price": 12.89,
-        "return_1m": 8.32
+        "volume_ratio": 17.29,
+        "price": 155.71,
+        "pct_change_1d": 19.83,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "RANASUG",
+        "name": "NIACL",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -2752,142 +722,106 @@
       }
     },
     {
-      "ticker": "SPAL",
-      "rank": 96,
-      "score": 35,
+      "ticker": "PRITI",
+      "rank": 28,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 66.1,
-        "ema_9": 740.31,
-        "ema_21": 722.79,
-        "ema_50": 713.41,
-        "price": 782.9,
-        "return_1m": 18.15
+        "volume_ratio": 8.4,
+        "price": 51.81,
+        "pct_change_1d": 9.91,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "SPAL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
+        "name": "PRITI INTERNATIONAL LTD",
+        "sector": "Consumer Cyclical",
+        "ind": "Furnishings, Fixtures & Appliances",
+        "mcap_cr": 69.2,
+        "pe": 43.9,
+        "eps": 1.18,
+        "52h": 107.09,
+        "52l": 31.5,
+        "bv": 55.47,
         "dy": null
       }
     },
     {
-      "ticker": "SYRMA",
-      "rank": 97,
-      "score": 35,
+      "ticker": "ROSSTECH",
+      "rank": 29,
+      "score": 25,
       "signals": [
-        "EMA_MOMENTUM"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "rsi_14": 60.5,
-        "ema_9": 813.67,
-        "ema_21": 798.35,
-        "ema_50": 789.29,
-        "price": 847.4,
-        "return_1m": 16.23
+        "volume_ratio": 11.01,
+        "price": 916.4,
+        "pct_change_1d": 14.8,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "SYRMA",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "THERMAX",
-      "rank": 98,
-      "score": 35,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 67.5,
-        "ema_9": 3312.19,
-        "ema_21": 3243.45,
-        "ema_50": 3149.53,
-        "price": 3535.1,
-        "return_1m": 15.36
-      },
-      "fundamental": {
-        "name": "THERMAX",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "VIDYAWIRES",
-      "rank": 99,
-      "score": 35,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 69.9,
-        "ema_9": 54.94,
-        "ema_21": 53.47,
-        "ema_50": 51.94,
-        "price": 61.68,
-        "return_1m": 22.7
-      },
-      "fundamental": {
-        "name": "VIDYAWIRES",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ATLANTAELE",
-      "rank": 100,
-      "score": 34,
-      "signals": [
-        "EMA_MOMENTUM"
-      ],
-      "indicators": {
-        "rsi_14": 70.5,
-        "ema_9": 1211.46,
-        "ema_21": 1134.51,
-        "ema_50": 1027.27,
-        "price": 1277.6,
-        "return_1m": 39.33
-      },
-      "fundamental": {
-        "name": "ATLANTA ELECTRICALS LTD",
+        "name": "ROSSELL TECHSYS LIMITED",
         "sector": "Industrials",
-        "ind": "Electrical Equipment & Parts",
-        "mcap_cr": 10076.5,
-        "pe": 77.7,
-        "eps": 16.86,
-        "52h": 1350.8,
-        "52l": 707.6,
-        "bv": 48.88,
+        "ind": "Aerospace & Defense",
+        "mcap_cr": 3467.7,
+        "pe": 163.9,
+        "eps": 5.59,
+        "52h": 957.9,
+        "52l": 283.55,
+        "bv": 37.49,
+        "dy": 3.0
+      }
+    },
+    {
+      "ticker": "SAATVIKGL",
+      "rank": 30,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 8.06,
+        "price": 461.6,
+        "pct_change_1d": 9.79,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "SAATVIKGL",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "WIPL",
+      "rank": 31,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 7.14,
+        "price": 155.22,
+        "pct_change_1d": 0.5,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "WIPL",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
         "dy": null
       }
     }
