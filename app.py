@@ -664,13 +664,25 @@ with t5:
 
 
 # ══════════════════════════════════════════════════════════════════
-# TAB 6 — BACKTEST LAB
+# TAB 6 — BACKTEST LAB  (with full trade log)
 # ══════════════════════════════════════════════════════════════════
 with t6:
+    # Load real trade-level data
+    @st.cache_data(ttl=3600)
+    def load_backtest_trades():
+        try:
+            with open(os.path.join(SCAN_DIR, "backtest_results.json"), encoding="utf-8") as f:
+                d = json.load(f)
+            return d.get("mode_b",{}).get("trades",[])
+        except:
+            return []
+
+    all_trades = load_backtest_trades()
+
     real_wr    = mb.get("win_rate_pct",52.6)
     real_aw    = mb.get("avg_win_pct",3.43)
     real_al    = abs(mb.get("avg_loss_pct",-4.84))
-    real_trades = mb.get("total_trades",156)
+    real_trades_n = mb.get("total_trades",156)
     real_exp   = mb.get("expectancy_pct",-0.49)
     real_pf    = mb.get("profit_factor",0.847)
     real_dd    = mb.get("max_drawdown_pct",18.06)
@@ -681,12 +693,12 @@ with t6:
     regime_bk  = mb.get("regime_breakdown",{})
 
     st.markdown("""
-    <div class="info-box">🧪 <b>Backtest Laboratory</b> — Real 52-week historical results (156 trades) + interactive parameter simulator.
-    Understand what's working, what's not, and how to fix it.</div>
+    <div class="info-box">🧪 <b>Backtest Laboratory</b> — Real 52-week historical results with <b>every trade visible</b>.
+    See exactly which companies were traded, when, and whether they won or lost. Click any ticker to open TradingView.</div>
     """, unsafe_allow_html=True)
 
-    # ── Real Results ──
-    st.markdown('<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin:8px 0 14px">📊 Real Backtest Results — 52 Weeks · 156 Trades</div>', unsafe_allow_html=True)
+    # ── Summary Metrics ──
+    st.markdown(f'<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin:8px 0 14px">📊 Real Backtest Results — 52 Weeks · {real_trades_n} Trades</div>', unsafe_allow_html=True)
 
     mc1,mc2,mc3,mc4 = st.columns(4)
     wrc = "#22c55e" if real_wr>=60 else ("#f59e0b" if real_wr>=50 else "#ef4444")
@@ -708,13 +720,143 @@ with t6:
     ex1,ex2,ex3 = st.columns(3)
     with ex1:
         tp_n = exits.get("TP",0)
-        st.markdown(f'<div class="mc" style="border-top:3px solid #22c55e"><div class="mc-val pos">{tp_n}</div><div class="mc-lbl">✅ Take Profit Hit</div><div class="mc-sub">{tp_n/real_trades*100:.0f}% of trades</div></div>',unsafe_allow_html=True)
+        st.markdown(f'<div class="mc" style="border-top:3px solid #22c55e"><div class="mc-val pos">{tp_n}</div><div class="mc-lbl">✅ Take Profit Hit</div><div class="mc-sub">{tp_n/real_trades_n*100:.0f}% of trades</div></div>',unsafe_allow_html=True)
     with ex2:
         sl_n = exits.get("SL",0)
-        st.markdown(f'<div class="mc" style="border-top:3px solid #ef4444"><div class="mc-val neg">{sl_n}</div><div class="mc-lbl">🛑 Stop Loss Hit</div><div class="mc-sub">{sl_n/real_trades*100:.0f}% of trades</div></div>',unsafe_allow_html=True)
+        st.markdown(f'<div class="mc" style="border-top:3px solid #ef4444"><div class="mc-val neg">{sl_n}</div><div class="mc-lbl">🛑 Stop Loss Hit</div><div class="mc-sub">{sl_n/real_trades_n*100:.0f}% of trades</div></div>',unsafe_allow_html=True)
     with ex3:
         ti_n = exits.get("TIME",0)
-        st.markdown(f'<div class="mc" style="border-top:3px solid #f59e0b"><div class="mc-val warn">{ti_n}</div><div class="mc-lbl">⏰ Time Exit (5d)</div><div class="mc-sub">{ti_n/real_trades*100:.0f}% of trades</div></div>',unsafe_allow_html=True)
+        st.markdown(f'<div class="mc" style="border-top:3px solid #f59e0b"><div class="mc-val warn">{ti_n}</div><div class="mc-lbl">⏰ Time Exit (5d)</div><div class="mc-sub">{ti_n/real_trades_n*100:.0f}% of trades</div></div>',unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════
+    # FULL TRADE LOG — Every single trade with company name
+    # ══════════════════════════════════════════════════════════════
+    st.markdown("---")
+    st.markdown(f'<div style="font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:6px">📋 Complete Trade Log — All {len(all_trades)} Trades</div>', unsafe_allow_html=True)
+    st.markdown('<div style="color:#64748b;font-size:13px;margin-bottom:12px">Every trade the engine executed over 52 weeks. Click any ticker to open its TradingView chart.</div>', unsafe_allow_html=True)
+
+    if all_trades:
+        # Filters for trade log
+        tl1, tl2, tl3, tl4 = st.columns([3,2,2,2])
+        with tl1:
+            tl_search = st.text_input("🔍 Search ticker", placeholder="e.g. FORTIS, NYKAA...", key="tl_s")
+        with tl2:
+            tl_result = st.selectbox("Result", ["All","Winners Only","Losers Only"], key="tl_res")
+        with tl3:
+            tl_exit = st.selectbox("Exit Reason", ["All","TP (Take Profit)","SL (Stop Loss)","TIME (Expired)"], key="tl_exit")
+        with tl4:
+            tl_regime = st.selectbox("Regime", ["All","Bull","Bear","Sideways"], key="tl_reg")
+
+        # Filter trades
+        filtered_trades = []
+        for tr in all_trades:
+            if tl_search and tl_search.upper() not in tr.get("ticker","").upper():
+                continue
+            if tl_result == "Winners Only" and not tr.get("won", False):
+                continue
+            if tl_result == "Losers Only" and tr.get("won", True):
+                continue
+            if tl_exit != "All":
+                ex_code = tl_exit.split("(")[0].strip()
+                if tr.get("exit_reason","") != ex_code:
+                    continue
+            if tl_regime != "All" and tr.get("regime","") != tl_regime:
+                continue
+            filtered_trades.append(tr)
+
+        # Stats for filtered
+        f_wins = sum(1 for t in filtered_trades if t.get("won"))
+        f_losses = len(filtered_trades) - f_wins
+        f_pnl = sum(t.get("pnl",0) for t in filtered_trades)
+        f_wr = f_wins/len(filtered_trades)*100 if filtered_trades else 0
+
+        st.markdown(f"""
+        <div style="display:flex;gap:24px;padding:10px 14px;background:#0d1728;border:1px solid #1e2a3a;border-radius:8px;margin-bottom:12px;flex-wrap:wrap">
+          <span style="font-size:13px;color:#64748b">Showing <b style="color:#38bdf8">{len(filtered_trades)}</b> trades</span>
+          <span style="font-size:13px;color:#64748b">Wins: <b class="pos">{f_wins}</b></span>
+          <span style="font-size:13px;color:#64748b">Losses: <b class="neg">{f_losses}</b></span>
+          <span style="font-size:13px;color:#64748b">Win Rate: <b style="color:{'#22c55e' if f_wr>=55 else '#ef4444'}">{f_wr:.1f}%</b></span>
+          <span style="font-size:13px;color:#64748b">Total P&L: <b style="color:{'#22c55e' if f_pnl>=0 else '#ef4444'}">₹{f_pnl:+,.0f}</b></span>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Build trade log table
+        exit_icons = {"TP":"✅","SL":"🛑","TIME":"⏰"}
+        result_icons = {True: '<span class="pos">✅ WIN</span>', False: '<span class="neg">❌ LOSS</span>'}
+        tl_header = "<tr><th>#</th><th>Ticker</th><th>Entry Date</th><th>Entry ₹</th><th>Exit Date</th><th>Exit ₹</th><th>Days</th><th>Return %</th><th>P&L ₹</th><th>Exit</th><th>Result</th><th>Regime</th><th>Score</th><th>Chart</th></tr>"
+        tl_rows = ""
+        for i, tr in enumerate(filtered_trades, 1):
+            t = tr.get("ticker","")
+            ret = tr.get("return_pct",0)
+            pnl = tr.get("pnl",0)
+            won = tr.get("won",False)
+            exit_r = tr.get("exit_reason","")
+            ret_color = "pos" if ret >= 0 else "neg"
+            pnl_color = "pos" if pnl >= 0 else "neg"
+
+            # Regime badge
+            reg = tr.get("regime","")
+            reg_icon = "🟢" if reg == "Bull" else ("🔴" if reg == "Bear" else "🟡")
+
+            tl_rows += f"""<tr>
+              <td style="color:#475569">{i}</td>
+              <td><a href="{tv(t)}" target="_blank" class="tv-link">{t}</a></td>
+              <td style="color:#94a3b8;font-size:12px">{tr.get("entry_date","")}</td>
+              <td style="color:#f1f5f9;font-weight:600">₹{tr.get("entry_price",0):,.2f}</td>
+              <td style="color:#94a3b8;font-size:12px">{tr.get("exit_date","")}</td>
+              <td style="color:#f1f5f9;font-weight:600">₹{tr.get("exit_price",0):,.2f}</td>
+              <td style="color:#94a3b8">{tr.get("holding_days","")}</td>
+              <td><span class="{ret_color}">{ret:+.2f}%</span></td>
+              <td><span class="{pnl_color}">₹{pnl:+,.0f}</span></td>
+              <td>{exit_icons.get(exit_r,"❓")} {exit_r}</td>
+              <td>{result_icons.get(won, "–")}</td>
+              <td>{reg_icon} {reg}</td>
+              <td style="color:#a78bfa;font-weight:700">{tr.get("score","–")}</td>
+              <td><a href="{tv(t)}" target="_blank" class="chart-btn">📊 Chart ↗</a></td>
+            </tr>"""
+
+        st.markdown(f"""
+        <div style="overflow-x:auto;max-height:700px;border:1px solid #1e2a3a;border-radius:12px">
+        <table class="tv-table">
+          <thead>{tl_header}</thead>
+          <tbody>{tl_rows}</tbody>
+        </table>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Top Winners & Worst Losers summary
+        st.markdown("---")
+        tw_col, tl_col = st.columns(2)
+        sorted_by_pnl = sorted(all_trades, key=lambda x: x.get("pnl",0), reverse=True)
+
+        with tw_col:
+            st.markdown('<div style="font-size:14px;font-weight:700;color:#22c55e;margin-bottom:10px">🏆 Top 10 Winners (by P&L)</div>', unsafe_allow_html=True)
+            for tr in sorted_by_pnl[:10]:
+                t = tr.get("ticker","")
+                st.markdown(f"""<div class="mv-row">
+                  <div>{tv_link(t)} <span style="font-size:11px;color:#475569">· {tr.get("entry_date","")}</span></div>
+                  <div style="text-align:right">
+                    <span class="pos">+{tr.get("return_pct",0):.2f}%</span>
+                    <span style="color:#22c55e;font-size:12px;margin-left:8px">₹{tr.get("pnl",0):+,.0f}</span>
+                    {chart_btn(t)}
+                  </div>
+                </div>""", unsafe_allow_html=True)
+
+        with tl_col:
+            st.markdown('<div style="font-size:14px;font-weight:700;color:#ef4444;margin-bottom:10px">💀 Top 10 Losers (by P&L)</div>', unsafe_allow_html=True)
+            for tr in sorted_by_pnl[-10:]:
+                t = tr.get("ticker","")
+                st.markdown(f"""<div class="mv-row">
+                  <div>{tv_link(t)} <span style="font-size:11px;color:#475569">· {tr.get("entry_date","")}</span></div>
+                  <div style="text-align:right">
+                    <span class="neg">{tr.get("return_pct",0):+.2f}%</span>
+                    <span style="color:#ef4444;font-size:12px;margin-left:8px">₹{tr.get("pnl",0):+,.0f}</span>
+                    {chart_btn(t)}
+                  </div>
+                </div>""", unsafe_allow_html=True)
+
+    else:
+        st.info("No trade data found. Run `python backtest.py` to generate trade-level results.")
 
     # Monthly table
     if monthly:
@@ -736,14 +878,21 @@ with t6:
             ec2 = "#22c55e" if rv_exp>=0 else "#ef4444"
             st.markdown(f'<div class="card" style="padding:12px 16px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><b style="color:#f1f5f9">{ri2} {rn} Market</b><span style="color:#64748b;font-size:12px">{rv_tr} trades</span><div style="display:flex;gap:20px"><span style="font-size:13px">WR: <b style="color:{wrc}">{rv_wr:.1f}%</b></span><span style="font-size:13px">Expectancy: <b style="color:{ec2}">{rv_exp:+.2f}%</b></span><span style="font-size:13px">P&L: <b style="color:{ec2}">₹{rv_pnl:+,.0f}</b></span></div></div></div>',unsafe_allow_html=True)
 
-    # ── Simulator ──
+    # ══════════════════════════════════════════════════════════════
+    # SIMULATOR — with real company names from trade universe
+    # ══════════════════════════════════════════════════════════════
     st.markdown("---")
     st.markdown("""
     <div class="card" style="border-color:#7c3aed33">
       <div style="font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:4px">🎛️ Strategy Parameter Simulator</div>
-      <div style="color:#64748b;font-size:13px">Change TP/SL and see how the strategy would have performed using calibrated real backtest win rates.</div>
+      <div style="color:#64748b;font-size:13px">Adjust TP/SL and simulate with real company names from the NSE universe. Each simulated trade shows the ticker it was assigned to.</div>
     </div>
     """,unsafe_allow_html=True)
+
+    # Collect real tickers for sampling
+    sim_ticker_pool = list(set(tr.get("ticker","") for tr in all_trades)) or [p.get("ticker","") for p in picks[:100]]
+    if not sim_ticker_pool:
+        sim_ticker_pool = ["RELIANCE","TCS","INFY","HDFCBANK","ICICIBANK","KOTAKBANK","BHARTIARTL","ITC","LT","SBIN"]
 
     # Presets
     st.markdown('<div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Quick Presets</div>',unsafe_allow_html=True)
@@ -776,33 +925,51 @@ with t6:
 
     run_btn = st.button("▶ Run Simulation", type="primary", use_container_width=False, key="runsim")
     if run_btn:
-        prog = st.progress(0,"Running...")
+        prog = st.progress(0,"Running simulation...")
         base_wr = 0.526
         rr_adj = (rr - 1.78) * 0.03
         adj_wr = min(0.75, max(0.30, base_wr + rr_adj))
         equity = float(cap_sim)
         eq_curve = [equity]
-        trade_log = []
+        sim_trade_log = []  # Now stores dicts with ticker info
         weekly_rets = []
+
         for wk in range(sim_w):
             prog.progress((wk+1)/sim_w, f"Week {wk+1}/{sim_w}...")
             wk_eq = equity; wk_pnl = 0.0; trade_size = equity/pool
-            for _ in range(pool):
+            # Pick random tickers for this week
+            week_tickers = random.choices(sim_ticker_pool, k=pool)
+            for j in range(pool):
+                ticker_sim = week_tickers[j]
                 if random.random() < adj_wr:
                     g = random.gauss(tp_pct, tp_pct*0.15)/100
-                    wk_pnl += trade_size*g; trade_log.append(("WIN",g*100))
+                    pnl_sim = trade_size * g
+                    wk_pnl += pnl_sim
+                    sim_trade_log.append({
+                        "week": wk+1, "ticker": ticker_sim, "result": "WIN",
+                        "return_pct": g*100, "pnl": pnl_sim, "exit": "TP",
+                        "alloc": trade_size
+                    })
                 else:
                     lm = random.choice([1.0,1.0,1.2,1.5,2.0])
                     l = -sl_pct*lm/100; l = max(l,-sl_pct*2.5/100)
-                    wk_pnl += trade_size*l; trade_log.append(("LOSS",l*100))
+                    pnl_sim = trade_size * l
+                    wk_pnl += pnl_sim
+                    exit_type = "SL" if lm <= 1.2 else "TIME"
+                    sim_trade_log.append({
+                        "week": wk+1, "ticker": ticker_sim, "result": "LOSS",
+                        "return_pct": l*100, "pnl": pnl_sim, "exit": exit_type,
+                        "alloc": trade_size
+                    })
             equity += wk_pnl; equity = max(equity,0)
             eq_curve.append(equity)
             weekly_rets.append(wk_pnl/wk_eq*100 if wk_eq>0 else 0)
         prog.empty()
 
-        wins_r = [t[1] for t in trade_log if t[0]=="WIN"]
-        loss_r = [t[1] for t in trade_log if t[0]=="LOSS"]
-        s_wr = len(wins_r)/len(trade_log)*100 if trade_log else 0
+        # Calculate stats
+        wins_r = [t["return_pct"] for t in sim_trade_log if t["result"]=="WIN"]
+        loss_r = [t["return_pct"] for t in sim_trade_log if t["result"]=="LOSS"]
+        s_wr = len(wins_r)/len(sim_trade_log)*100 if sim_trade_log else 0
         s_aw = sum(wins_r)/len(wins_r) if wins_r else 0
         s_al = sum(loss_r)/len(loss_r) if loss_r else 0
         s_exp = (s_wr/100*s_aw)+((1-s_wr/100)*s_al)
@@ -829,9 +996,93 @@ with t6:
         with r3: st.markdown(metric_box("Expectancy",f'<span style="color:{sec}">{s_exp:+.2f}%</span>',"Target: >0%",sec),unsafe_allow_html=True)
         with r4: st.markdown(metric_box("Sharpe Ratio",f'<span style="color:{ssc}">{s_sh:.2f}</span>',"Target: >0.5",ssc),unsafe_allow_html=True)
 
+        # Equity curve
         eq_df = pd.DataFrame({"Week":range(len(eq_curve)),"Equity (₹)":eq_curve})
         st.markdown('<div style="font-size:14px;font-weight:700;color:#f1f5f9;margin:12px 0 6px">📈 Simulated Equity Curve</div>',unsafe_allow_html=True)
         st.line_chart(eq_df.set_index("Week"), color=["#1a56db"])
+
+        # ── SIMULATED TRADE LOG — every trade with company name ──
+        st.markdown(f'<div style="font-size:15px;font-weight:700;color:#f1f5f9;margin:16px 0 6px">📋 Simulated Trade Log — All {len(sim_trade_log)} Trades</div>', unsafe_allow_html=True)
+        st.markdown('<div style="color:#64748b;font-size:13px;margin-bottom:10px">Every simulated trade using real NSE tickers. Click any ticker for TradingView chart.</div>', unsafe_allow_html=True)
+
+        # Sim trade log filters
+        stl1, stl2 = st.columns([3,2])
+        with stl1:
+            stl_search = st.text_input("🔍 Search simulated ticker", placeholder="OMAXE, FORTIS...", key="stl_s")
+        with stl2:
+            stl_filter = st.selectbox("Show", ["All Trades","Winners Only","Losers Only"], key="stl_f")
+
+        display_trades = sim_trade_log
+        if stl_search:
+            display_trades = [t for t in display_trades if stl_search.upper() in t["ticker"].upper()]
+        if stl_filter == "Winners Only":
+            display_trades = [t for t in display_trades if t["result"]=="WIN"]
+        elif stl_filter == "Losers Only":
+            display_trades = [t for t in display_trades if t["result"]=="LOSS"]
+
+        # Summary for filtered sim trades
+        sim_f_wins = sum(1 for t in display_trades if t["result"]=="WIN")
+        sim_f_pnl = sum(t["pnl"] for t in display_trades)
+        st.markdown(f'<div style="padding:8px 14px;background:#0d1728;border:1px solid #1e2a3a;border-radius:8px;font-size:12px;color:#64748b;margin-bottom:10px">Showing <b style="color:#38bdf8">{len(display_trades)}</b> trades · Wins: <b class="pos">{sim_f_wins}</b> · Losses: <b class="neg">{len(display_trades)-sim_f_wins}</b> · P&L: <b style="color:{"#22c55e" if sim_f_pnl>=0 else "#ef4444"}">₹{sim_f_pnl:+,.0f}</b></div>', unsafe_allow_html=True)
+
+        sim_th = "<tr><th>#</th><th>Week</th><th>Ticker</th><th>Allocation ₹</th><th>Return %</th><th>P&L ₹</th><th>Exit</th><th>Result</th><th>Chart</th></tr>"
+        sim_rows = ""
+        for i, tr in enumerate(display_trades[:500], 1):
+            rc2 = "pos" if tr["result"]=="WIN" else "neg"
+            ex_icon2 = {"TP":"✅","SL":"🛑","TIME":"⏰"}.get(tr["exit"],"❓")
+            res_html = f'<span class="pos">✅ WIN</span>' if tr["result"]=="WIN" else f'<span class="neg">❌ LOSS</span>'
+            sim_rows += f"""<tr>
+              <td style="color:#475569">{i}</td>
+              <td style="color:#94a3b8">W{tr["week"]}</td>
+              <td><a href="{tv(tr['ticker'])}" target="_blank" class="tv-link">{tr["ticker"]}</a></td>
+              <td style="color:#94a3b8">₹{tr["alloc"]:,.0f}</td>
+              <td><span class="{rc2}">{tr["return_pct"]:+.2f}%</span></td>
+              <td><span class="{rc2}">₹{tr["pnl"]:+,.0f}</span></td>
+              <td>{ex_icon2} {tr["exit"]}</td>
+              <td>{res_html}</td>
+              <td><a href="{tv(tr['ticker'])}" target="_blank" class="chart-btn">📊 ↗</a></td>
+            </tr>"""
+
+        st.markdown(f"""
+        <div style="overflow-x:auto;max-height:600px;border:1px solid #1e2a3a;border-radius:12px">
+        <table class="tv-table"><thead>{sim_th}</thead><tbody>{sim_rows}</tbody></table>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if len(display_trades) > 500:
+            st.caption(f"Showing first 500 of {len(display_trades)} trades.")
+
+        # Per-ticker performance summary
+        st.markdown("---")
+        st.markdown('<div style="font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:8px">📊 Per-Company Performance Summary</div>', unsafe_allow_html=True)
+        ticker_stats = {}
+        for tr in sim_trade_log:
+            tk = tr["ticker"]
+            if tk not in ticker_stats:
+                ticker_stats[tk] = {"trades":0,"wins":0,"pnl":0.0}
+            ticker_stats[tk]["trades"] += 1
+            ticker_stats[tk]["pnl"] += tr["pnl"]
+            if tr["result"]=="WIN":
+                ticker_stats[tk]["wins"] += 1
+
+        ts_sorted = sorted(ticker_stats.items(), key=lambda x: x[1]["pnl"], reverse=True)
+
+        ts_th = "<tr><th>Ticker</th><th>Trades</th><th>Wins</th><th>Win Rate</th><th>Total P&L</th><th>Chart</th></tr>"
+        ts_rows = ""
+        for tk, st_d in ts_sorted:
+            wr_tk = st_d["wins"]/st_d["trades"]*100 if st_d["trades"]>0 else 0
+            pnl_c = "pos" if st_d["pnl"]>=0 else "neg"
+            wr_c = "pos" if wr_tk >= 55 else ("warn" if wr_tk >= 45 else "neg")
+            ts_rows += f"""<tr>
+              <td><a href="{tv(tk)}" target="_blank" class="tv-link">{tk}</a></td>
+              <td style="color:#94a3b8">{st_d["trades"]}</td>
+              <td class="pos">{st_d["wins"]}</td>
+              <td><span class="{wr_c}">{wr_tk:.0f}%</span></td>
+              <td><span class="{pnl_c}">₹{st_d["pnl"]:+,.0f}</span></td>
+              <td><a href="{tv(tk)}" target="_blank" class="chart-btn">📊 ↗</a></td>
+            </tr>"""
+
+        st.markdown(f'<div style="overflow-x:auto;max-height:400px;border:1px solid #1e2a3a;border-radius:12px"><table class="tv-table"><thead>{ts_th}</thead><tbody>{ts_rows}</tbody></table></div>', unsafe_allow_html=True)
 
     # ── About & Guide ──
     st.markdown("---")
