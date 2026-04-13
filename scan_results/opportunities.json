@@ -1,24 +1,54 @@
 {
   "generated": "13 Apr 2026",
-  "generated_ts": "2026-04-13_0006",
+  "generated_ts": "2026-04-13_1204",
   "engine_version": "2.0",
-  "total_opportunities": 31,
+  "total_opportunities": 23,
   "opportunities": [
     {
-      "ticker": "INOXINDIA",
+      "ticker": "HARDWYN",
       "rank": 1,
-      "score": 50,
+      "score": 59,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 1325.0,
-        "pct_from_52w_high": 1.5,
-        "volume_ratio": 4.52,
-        "price": 1305.1,
-        "pct_change_1d": 6.63,
+        "high_52w": 21.15,
+        "pct_from_52w_high": 1.04,
+        "volume_ratio": 5.97,
+        "price": 20.93,
+        "pct_change_1d": 0.1,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "HARDWYN",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "INOXINDIA",
+      "rank": 2,
+      "score": 58,
+      "signals": [
+        "52W_BREAKOUT",
+        "HIGH_VOLUME",
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "high_52w": 1425.0,
+        "pct_from_52w_high": 0.94,
+        "volume_ratio": 5.77,
+        "price": 1411.6,
+        "pct_change_1d": 8.16,
         "above_sma10": true
       },
       "fundamental": {
@@ -35,54 +65,54 @@
       }
     },
     {
-      "ticker": "SHRIPISTON",
-      "rank": 2,
-      "score": 45,
-      "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 3653.0,
-        "pct_from_52w_high": 1.23,
-        "volume_ratio": 3.62,
-        "price": 3608.2,
-        "pct_change_1d": 11.93,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "SHRIPISTON",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ADANIENSOL",
+      "ticker": "SALSTEEL",
       "rank": 3,
-      "score": 42,
+      "score": 58,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 1160.4,
-        "pct_from_52w_high": 0.22,
-        "volume_ratio": 3.27,
-        "price": 1157.9,
-        "pct_change_1d": 7.34,
+        "high_52w": 49.7,
+        "pct_from_52w_high": 0.52,
+        "volume_ratio": 5.83,
+        "price": 49.44,
+        "pct_change_1d": 9.4,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "ADANIENSOL",
+        "name": "S.A.L. STEEL LTD.",
+        "sector": "Basic Materials",
+        "ind": "Steel",
+        "mcap_cr": 715.7,
+        "pe": null,
+        "eps": -0.63,
+        "52h": 49.7,
+        "52l": 14.37,
+        "bv": 3.87,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "KRN",
+      "rank": 4,
+      "score": 48,
+      "signals": [
+        "52W_BREAKOUT",
+        "HIGH_VOLUME",
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "high_52w": 1069.0,
+        "pct_from_52w_high": 1.77,
+        "volume_ratio": 4.16,
+        "price": 1050.05,
+        "pct_change_1d": 8.33,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "KRN",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -95,23 +125,49 @@
       }
     },
     {
-      "ticker": "LUMAXTECH",
-      "rank": 4,
-      "score": 34,
+      "ticker": "WELCORP",
+      "rank": 5,
+      "score": 37,
       "signals": [
         "52W_BREAKOUT",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 1848.0,
-        "pct_from_52w_high": 1.34,
-        "volume_ratio": 2.5,
-        "price": 1823.3,
-        "pct_change_1d": 5.66,
+        "high_52w": 1017.0,
+        "pct_from_52w_high": 1.13,
+        "volume_ratio": 2.72,
+        "price": 1005.5,
+        "pct_change_1d": 4.54,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "LUMAXTECH",
+        "name": "WELCORP",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "SONACOMS",
+      "rank": 6,
+      "score": 28,
+      "signals": [
+        "52W_BREAKOUT"
+      ],
+      "indicators": {
+        "high_52w": 571.35,
+        "pct_from_52w_high": 0.36,
+        "volume_ratio": 2.08,
+        "price": 569.3
+      },
+      "fundamental": {
+        "name": "SONACOMS",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -125,16 +181,16 @@
     },
     {
       "ticker": "EBGNG",
-      "rank": 5,
-      "score": 30,
+      "rank": 7,
+      "score": 26,
       "signals": [
         "52W_BREAKOUT"
       ],
       "indicators": {
-        "high_52w": 409.7,
-        "pct_from_52w_high": 0.28,
-        "volume_ratio": 2.48,
-        "price": 408.55
+        "high_52w": 425.3,
+        "pct_from_52w_high": 1.69,
+        "volume_ratio": 2.42,
+        "price": 418.1
       },
       "fundamental": {
         "name": "EBGNG",
@@ -150,280 +206,20 @@
       }
     },
     {
-      "ticker": "POWERINDIA",
-      "rank": 6,
-      "score": 29,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 28510.0,
-        "pct_from_52w_high": 0.3,
-        "volume_ratio": 2.12,
-        "price": 28425.0
-      },
-      "fundamental": {
-        "name": "POWERINDIA",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "LENSKART",
-      "rank": 7,
-      "score": 27,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 550.0,
-        "pct_from_52w_high": 0.45,
-        "volume_ratio": 1.86,
-        "price": 547.55
-      },
-      "fundamental": {
-        "name": "LENSKART",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ATHERENERG",
+      "ticker": "STEELCAS",
       "rank": 8,
       "score": 26,
       "signals": [
         "52W_BREAKOUT"
       ],
       "indicators": {
-        "high_52w": 875.45,
-        "pct_from_52w_high": 1.42,
-        "volume_ratio": 2.43,
-        "price": 863.05
+        "high_52w": 296.0,
+        "pct_from_52w_high": 0.86,
+        "volume_ratio": 2.44,
+        "price": 293.46
       },
       "fundamental": {
-        "name": "ATHERENERG",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "DEEDEV",
-      "rank": 9,
-      "score": 26,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 343.5,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.71,
-        "price": 343.5
-      },
-      "fundamental": {
-        "name": "DEEDEV",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ANANDRATHI",
-      "rank": 10,
-      "score": 25,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 3603.7,
-        "pct_from_52w_high": 0.7,
-        "volume_ratio": 2.33,
-        "price": 3578.5
-      },
-      "fundamental": {
-        "name": "ANANDRATHI",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ANDHRSUGAR",
-      "rank": 11,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 8.0,
-        "price": 80.42,
-        "pct_change_1d": 7.79,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ANDHRSUGAR",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ARENTERP",
-      "rank": 12,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.35,
-        "price": 40.6,
-        "pct_change_1d": 2.84,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ARENTERP",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ARIHANTSUP",
-      "rank": 13,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.1,
-        "price": 262.14,
-        "pct_change_1d": 15.08,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ARIHANTSUP",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ARTNIRMAN",
-      "rank": 14,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 10.07,
-        "price": 49.33,
-        "pct_change_1d": 20.0,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ARTNIRMAN",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ARVEE",
-      "rank": 15,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.35,
-        "price": 175.79,
-        "pct_change_1d": 3.85,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ARVEE",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ASTEC",
-      "rank": 16,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.61,
-        "price": 658.95,
-        "pct_change_1d": 17.67,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ASTEC",
+        "name": "STEELCAS",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -437,19 +233,227 @@
     },
     {
       "ticker": "ATLASCYCLE",
+      "rank": 9,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 16.61,
+        "price": 119.45,
+        "pct_change_1d": 15.9,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "ATLAS CYCLE (HARYANA) LTD",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": 77.7,
+        "pe": null,
+        "eps": null,
+        "52h": 164.37,
+        "52l": 76.15,
+        "bv": 589.77,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "ATULAUTO",
+      "rank": 10,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 16.57,
+        "price": 485.05,
+        "pct_change_1d": 11.36,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "ATULAUTO",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "BIRLACABLE",
+      "rank": 11,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 7.9,
+        "price": 146.35,
+        "pct_change_1d": 12.01,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "BIRLACABLE",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "DMCC",
+      "rank": 12,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 8.76,
+        "price": 268.68,
+        "pct_change_1d": 20.0,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "DMCC",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "DPWIRES",
+      "rank": 13,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 11.54,
+        "price": 197.12,
+        "pct_change_1d": 7.46,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "D P WIRES LIMITED",
+        "sector": "Industrials",
+        "ind": "Metal Fabrication",
+        "mcap_cr": 305.5,
+        "pe": 25.0,
+        "eps": 7.89,
+        "52h": 306.95,
+        "52l": 125.02,
+        "bv": 163.06,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "EIEL",
+      "rank": 14,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 10.19,
+        "price": 199.17,
+        "pct_change_1d": 15.03,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "EIEL",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "JKIPL",
+      "rank": 15,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 6.1,
+        "price": 65.67,
+        "pct_change_1d": 19.7,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "JKIPL",
+        "sector": null,
+        "ind": null,
+        "mcap_cr": null,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "KECL",
+      "rank": 16,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 7.29,
+        "price": 115.36,
+        "pct_change_1d": 10.69,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "KIRLOSKAR ELECTRIC CO LTD",
+        "sector": "Industrials",
+        "ind": "Specialty Industrial Machinery",
+        "mcap_cr": 767.3,
+        "pe": 72.1,
+        "eps": 1.6,
+        "52h": 151.92,
+        "52l": 75.47,
+        "bv": 18.81,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "NATHBIOGEN",
       "rank": 17,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 6.51,
-        "price": 103.06,
-        "pct_change_1d": 19.99,
+        "volume_ratio": 7.59,
+        "price": 172.94,
+        "pct_change_1d": 13.08,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "ATLASCYCLE",
+        "name": "NATHBIOGEN",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -462,20 +466,20 @@
       }
     },
     {
-      "ticker": "AVANTIFEED",
+      "ticker": "PURVA",
       "rank": 18,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 9.67,
-        "price": 1459.1,
-        "pct_change_1d": 13.46,
+        "volume_ratio": 14.35,
+        "price": 215.99,
+        "pct_change_1d": 10.62,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "AVANTIFEED",
+        "name": "PURVA",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -488,20 +492,20 @@
       }
     },
     {
-      "ticker": "COHANCE",
+      "ticker": "RETAIL",
       "rank": 19,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 15.08,
-        "price": 377.9,
-        "pct_change_1d": 19.27,
+        "volume_ratio": 8.77,
+        "price": 22.67,
+        "pct_change_1d": 3.14,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "COHANCE",
+        "name": "RETAIL",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -514,20 +518,20 @@
       }
     },
     {
-      "ticker": "CREST",
+      "ticker": "SARDAEN",
       "rank": 20,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 8.11,
-        "price": 348.1,
-        "pct_change_1d": 2.87,
+        "volume_ratio": 6.94,
+        "price": 579.0,
+        "pct_change_1d": 4.4,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "CREST",
+        "name": "SARDAEN",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -540,20 +544,20 @@
       }
     },
     {
-      "ticker": "HIRECT",
+      "ticker": "SECMARK",
       "rank": 21,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 10.33,
-        "price": 840.4,
-        "pct_change_1d": 19.0,
+        "volume_ratio": 8.56,
+        "price": 134.43,
+        "pct_change_1d": 2.76,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "HIRECT",
+        "name": "SECMARK",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -566,20 +570,20 @@
       }
     },
     {
-      "ticker": "HMAAGRO",
+      "ticker": "TATACHEM",
       "rank": 22,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 9.25,
-        "price": 23.75,
-        "pct_change_1d": 8.15,
+        "volume_ratio": 7.31,
+        "price": 717.6,
+        "pct_change_1d": 4.02,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "HMAAGRO",
+        "name": "TATACHEM",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
@@ -592,228 +596,20 @@
       }
     },
     {
-      "ticker": "INFOBEAN",
+      "ticker": "TATAINVEST",
       "rank": 23,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 7.96,
-        "price": 185.12,
-        "pct_change_1d": 17.55,
+        "volume_ratio": 10.26,
+        "price": 713.2,
+        "pct_change_1d": 7.14,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "INFOBEAN",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ITDC",
-      "rank": 24,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 14.56,
-        "price": 610.4,
-        "pct_change_1d": 15.31,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ITDC",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "MEGASTAR",
-      "rank": 25,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.22,
-        "price": 283.75,
-        "pct_change_1d": 3.82,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "MEGASTAR",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NAHARPOLY",
-      "rank": 26,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.17,
-        "price": 267.2,
-        "pct_change_1d": 10.01,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "NAHARPOLY",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NIACL",
-      "rank": 27,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 17.29,
-        "price": 155.71,
-        "pct_change_1d": 19.83,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "NIACL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "PRITI",
-      "rank": 28,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 8.4,
-        "price": 51.81,
-        "pct_change_1d": 9.91,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "PRITI",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ROSSTECH",
-      "rank": 29,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 11.01,
-        "price": 916.4,
-        "pct_change_1d": 14.8,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ROSSTECH",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SAATVIKGL",
-      "rank": 30,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 8.06,
-        "price": 461.6,
-        "pct_change_1d": 9.79,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "SAATVIKGL",
-        "sector": null,
-        "ind": null,
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "WIPL",
-      "rank": 31,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.14,
-        "price": 155.22,
-        "pct_change_1d": 0.5,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "WIPL",
+        "name": "TATAINVEST",
         "sector": null,
         "ind": null,
         "mcap_cr": null,
