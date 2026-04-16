@@ -1,0 +1,63 @@
+name: Weekly Backtest (Mode A + B)
+
+on:
+  schedule:
+    # Monday 5:00 AM IST = Sunday 23:30 UTC (before Indian market opens Monday)
+    - cron: '30 23 * * 0'
+  workflow_dispatch:   # manual trigger anytime
+
+# Prevent two backtest runs from pushing at the same time
+concurrency:
+  group: weekly-backtest
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  weekly-backtest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-actions.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-actions.txt
+
+      - name: Run Walk-Forward Backtest (Mode A + B)
+        run: python backtest.py --mode AB
+        env:
+          # Force fresh OHLCV download on Monday — never use stale cache
+          FORCE_DOWNLOAD: "true"
+
+      - name: Generate Performance Report
+        run: python performance.py
+
+      - name: Commit Backtest Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add scan_results/backtest_results.json scan_results/performance_report.json
+          git diff --staged --quiet \
+            && echo "ℹ️  No backtest changes — nothing to commit." \
+            || git commit -m "🔬 Weekly Backtest: $(date -u +'%Y-%m-%d') | $(python -c "import json; d=json.load(open('scan_results/performance_report.json')); a=d.get('mode_b',{}).get('win_rate_pct',0); b=d.get('mode_b',{}).get('expectancy_pct',0); print(f'WR={a}% E={b:+.2f}%')" 2>/dev/null || echo 'results pending')"
+          git push origin HEAD:main

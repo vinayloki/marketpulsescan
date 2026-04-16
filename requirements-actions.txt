@@ -1,0 +1,10 @@
+# ── GitHub Actions dependencies only ──────────────────────────────────
+# streamlit is intentionally EXCLUDED — it's a local dev tool and
+# adds ~60s to every Actions pip install for no benefit.
+# ──────────────────────────────────────────────────────────────────────
+pandas>=2.0
+numpy>=1.26
+requests>=2.31
+yfinance>=0.2.40
+feedparser>=6.0
+pyarrow>=14.0
