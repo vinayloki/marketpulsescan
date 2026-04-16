@@ -62,11 +62,24 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # Pull FIRST to incorporate any concurrent remote changes before committing
-          # Use --autostash because the scanner scripts modified local files
-          git pull --rebase --autostash origin main
+
+          # Stage only the scan_results we care about first
+          git add scan_results/
+
+          # Stash staged + unstaged + untracked (cache/, logs, etc.) so the
+          # rebase has a clean working tree — this is the only 100% reliable approach
+          git stash push --include-untracked -m "ci: pre-pull stash"
+
+          # Pull any concurrent pushes that landed while the scan was running
+          git pull --rebase origin main
+
+          # Restore everything the scanner wrote
+          git stash pop
+
+          # Re-stage scan_results and commit if anything actually changed
           git add scan_results/
           git diff --staged --quiet \
             && echo "ℹ️  No data changes — nothing to commit." \
             || git commit -m "📊 Daily Market Update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+
           git push origin HEAD:main
