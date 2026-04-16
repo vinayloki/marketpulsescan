@@ -55,7 +55,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git add scan_results/backtest_results.json scan_results/performance_report.json
           git diff --staged --quiet \
             && echo "ℹ️  No backtest changes — nothing to commit." \

@@ -63,7 +63,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           # Pull FIRST to incorporate any concurrent remote changes before committing
-          git pull --rebase origin main
+          # Use --autostash because the scanner scripts modified local files
+          git pull --rebase --autostash origin main
           git add scan_results/
           git diff --staged --quiet \
             && echo "ℹ️  No data changes — nothing to commit." \
