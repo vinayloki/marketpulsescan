@@ -31,8 +31,8 @@ NSE_SYMBOLS_CACHE = OUTPUT_DIR / "nse_symbols.json"
 # ─── Download Settings ───────────────────────────────────────────────
 DOWNLOAD_PERIOD       = "5y"     # yfinance period string (5 years for 260w backtest)
 DOWNLOAD_INTERVAL     = "1d"     # daily candles
-BATCH_SIZE            = 50       # tickers per yfinance batch
-BATCH_DELAY_SECONDS   = 2        # polite delay between batches
+BATCH_SIZE            = 15       # tickers per yfinance batch
+BATCH_DELAY_SECONDS   = 6        # polite delay between batches
 MIN_DATA_POINTS       = 30       # drop ticker if fewer rows than this
 
 # ─── Performance Timeframes ─────────────────────────────────────────
@@ -79,7 +79,7 @@ MAX_OPPORTUNITIES   = 100             # top N in opportunities.json
 
 # ─── Fundamentals ────────────────────────────────────────────────────
 FUNDAMENTALS_TOP_N      = 100    # fetch fundamentals for top N movers
-FUNDAMENTALS_WORKERS    = 10     # parallel threads for yfinance .info
+FUNDAMENTALS_WORKERS    = 1      # parallel threads for yfinance .info (disabled)
 
 # ─── Logging ─────────────────────────────────────────────────────────
 LOG_FORMAT    = "%(asctime)s │ %(levelname)-7s │ %(message)s"

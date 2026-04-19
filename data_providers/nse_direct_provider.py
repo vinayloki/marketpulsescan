@@ -194,42 +194,49 @@ class NSEDirectProvider(BaseDataProvider):
                 f"— {len(batch)} stocks..."
             )
 
-            try:
-                raw = yf.download(
-                    tickers=batch,
-                    period=period,
-                    interval=interval,
-                    group_by="ticker",
-                    auto_adjust=True,
-                    threads=True,
-                    progress=False,
-                )
-
-                if raw.empty:
-                    continue
-
-                # yfinance returns multi-level when >1 ticker, flat when =1
-                if len(batch) == 1:
-                    sym = batch[0].replace(".NS", "")
-                    raw.columns = pd.MultiIndex.from_tuples(
-                        [(col, sym) for col in raw.columns]
+            # Retry logic: 3 attempts with 10s backoff for rate limits
+            for attempt in range(3):
+                try:
+                    raw = yf.download(
+                        tickers=batch,
+                        period=period,
+                        interval=interval,
+                        group_by="ticker",
+                        auto_adjust=True,
+                        threads=False,   # Disable threads to avoid Yahoo rate limits
+                        progress=False,
                     )
-                else:
-                    # Swap levels: (ticker, field) → (field, ticker)
-                    raw = raw.swaplevel(axis=1)
-                    # Strip .NS from ticker level
-                    raw.columns = pd.MultiIndex.from_tuples(
-                        [(field, sym.replace(".NS", ""))
-                         for field, sym in raw.columns]
+
+                    if raw.empty:
+                        break  # Nothing returned, just proceed to next batch
+
+                    # yfinance returns multi-level when >1 ticker, flat when =1
+                    if len(batch) == 1:
+                        sym = batch[0].replace(".NS", "")
+                        raw.columns = pd.MultiIndex.from_tuples(
+                            [(col, sym) for col in raw.columns]
+                        )
+                    else:
+                        # Swap levels: (ticker, field) → (field, ticker)
+                        raw = raw.swaplevel(axis=1)
+                        # Strip .NS from ticker level
+                        raw.columns = pd.MultiIndex.from_tuples(
+                            [(field, sym.replace(".NS", ""))
+                             for field, sym in raw.columns]
+                        )
+                    raw.sort_index(axis=1, inplace=True)
+
+                    all_data = raw if all_data.empty else all_data.join(
+                        raw, how="outer"
                     )
-                raw.sort_index(axis=1, inplace=True)
+                    break  # Success, exit retry loop
 
-                all_data = raw if all_data.empty else all_data.join(
-                    raw, how="outer"
-                )
-
-            except Exception as e:
-                log.warning(f"   ⚠️  Batch {batch_num} failed: {e}")
+                except Exception as e:
+                    if attempt < 2:
+                        log.warning(f"   ⚠️  Batch {batch_num} failed: {e}. Retrying in 10s...")
+                        time.sleep(10)
+                    else:
+                        log.warning(f"   ❌ Batch {batch_num} failed after 3 attempts: {e}")
 
             if batch_num < total_batches:
                 time.sleep(BATCH_DELAY_SECONDS)
