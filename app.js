@@ -29,6 +29,23 @@ const CANONICAL_SECTORS = [
   'Textiles & Apparel', 'Agri & Food Processing', 'Others',
 ];
 
+/**
+ * Populate a <select id="..."> with canonical sector options.
+ * Clears all existing options except the first ("All Sectors" placeholder).
+ */
+function buildSectorDropdown(selectId) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  // Remove all options beyond the placeholder
+  while (sel.options.length > 1) sel.remove(1);
+  CANONICAL_SECTORS.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
 // Prediction tab filter state
 let _predFilter = '', _predSignal = '', _predConf = 50, _predRegime = '', _predMcap = '', _predState = '', _predPage = 0;
 const PRED_PAGE = 80;
@@ -370,15 +387,8 @@ function buildTopMovers() {
   document.getElementById('moversBadge').textContent = movers.length;
   window._moversData = movers;
 
-  // Populate sector dropdown
-  const sectors = new Set();
-  movers.forEach(s => { const f = fundamentals[s.t]; if (f?.sector) sectors.add(f.sector); });
-  const selSector = document.getElementById('tmSector');
-  [...sectors].sort().forEach(sec => {
-    const opt = document.createElement('option');
-    opt.value = sec; opt.textContent = sec;
-    selSector.appendChild(opt);
-  });
+  // Populate sector dropdown from canonical list (not from data)
+  buildSectorDropdown('tmSector');
 
   renderTopMovers();
 }
@@ -600,15 +610,8 @@ function buildNews() {
 function buildOpportunities() {
   document.getElementById('oppBadge').textContent = opportunitiesData.length;
 
-  // Populate sector filter
-  const sectors = new Set();
-  opportunitiesData.forEach(o => { if (o.fundamental?.sector) sectors.add(o.fundamental.sector); });
-  const selSec = document.getElementById('oppSector');
-  [...sectors].sort().forEach(sec => {
-    const opt = document.createElement('option');
-    opt.value = sec; opt.textContent = sec;
-    selSec.appendChild(opt);
-  });
+  // Populate sector filter from canonical list
+  buildSectorDropdown('oppSector');
 
   // Set initial score filter from the select
   _oppMinScore = parseInt(document.getElementById('oppMinScore').value) || 50;
