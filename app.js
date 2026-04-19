@@ -29,6 +29,23 @@ const CANONICAL_SECTORS = [
   'Textiles & Apparel', 'Agri & Food Processing', 'Others',
 ];
 
+/* ── External link helpers ──────────────────────────────────────────────── */
+const TV_BASE = 'https://in.tradingview.com/chart/?symbol=NSE:';
+const SC_BASE = 'https://www.screener.in/company/';
+/** Inline ticker+screener links for table td-ticker cells */
+function tickerLinks(sym, tvStyle='', scStyle='') {
+  return `<a href="${TV_BASE}${sym}" target="_blank" rel="noopener" ${tvStyle}>${sym}</a>`
+       + `<a href="${SC_BASE}${sym}/" target="_blank" rel="noopener" title="Screener.in" `
+       + `style="margin-left:6px;font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(16,245,168,0.1);color:var(--primary);border:1px solid rgba(16,245,168,0.2);text-decoration:none;vertical-align:middle${scStyle?';'+scStyle:''}" `
+       + `>SC</a>`;
+}
+/** Footer button pair: Chart + Screener */
+function chartAndScreenerBtns(sym, chartCls='opp-chart-link') {
+  return `<a class="${chartCls}" href="${TV_BASE}${sym}" target="_blank" rel="noopener">📊 Chart ↗</a>`
+       + `<a class="${chartCls}" href="${SC_BASE}${sym}/" target="_blank" rel="noopener" `
+       + `style="background:rgba(16,245,168,0.08);color:var(--primary);border-color:rgba(16,245,168,0.2)">🔍 Screener ↗</a>`;
+}
+
 /**
  * Populate a <select id="..."> with canonical sector options.
  * Clears all existing options except the first ("All Sectors" placeholder).
@@ -459,7 +476,7 @@ function renderTopMovers() {
       <div class="mc-top">
         <div class="mc-rank">#${(_tmPage * TM_PAGE) + i + 1}</div>
         <div class="mc-info">
-          <div class="mc-name"><a href="https://in.tradingview.com/chart/?symbol=NSE:${s.t}" target="_blank" rel="noopener">${s.t}</a></div>
+          <div class="mc-name">${tickerLinks(s.t)}</div>
           <div class="mc-sub">
             ${f.sector ? `<span class="mc-sector-pill">${f.sector}</span>` : ''}
             <span>${mcapStr}</span>
@@ -482,7 +499,7 @@ function renderTopMovers() {
       <div class="mc-tf-header">${TFS.map(tf => `<div class="mc-tf-h">${tf}</div>`).join('')}</div>
       <div class="mc-tfs">${tfCells}</div>
       <div class="mc-footer">
-        <a class="mc-chart-link" href="https://in.tradingview.com/chart/?symbol=NSE:${s.t}" target="_blank" rel="noopener">📊 Chart ↗</a>
+        ${chartAndScreenerBtns(s.t, 'mc-chart-link')}
         ${f['52l'] && f['52h'] ? `<span class="mc-52w">52W: ₹${f['52l']} — ₹${f['52h']}</span>` : ''}
       </div>
     </div>`;
@@ -556,7 +573,7 @@ function fsRender() {
       return `<td class="${v >= 0 ? 'pos' : 'neg'} ${w}">${v >= 0 ? '▲' : '▼'} ${abs.toFixed(2)}%</td>`;
     }).join('');
     return `<tr>
-      <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${s.t}" target="_blank" rel="noopener">${s.t}</a></td>
+      <td class="td-ticker">${tickerLinks(s.t)}</td>
       <td class="td-price">₹${s.c.toFixed(2)}</td>
       <td class="td-date">${s.d}</td>
       ${cells}
@@ -732,7 +749,7 @@ function buildOppCard(opp) {
       <div class="opp-meta">
         <div class="opp-rank">#${opp.rank} · ${price}</div>
         <div class="opp-name">
-          <a href="https://in.tradingview.com/chart/?symbol=NSE:${opp.ticker}" target="_blank" rel="noopener">${opp.ticker}</a>
+          ${tickerLinks(opp.ticker)}
         </div>
         <div class="opp-sector">${displayName !== opp.ticker ? displayName : (f.sector || '')}</div>
       </div>
@@ -741,7 +758,7 @@ function buildOppCard(opp) {
     <div class="opp-indicators">${indItems}</div>
     ${funds ? `<div class="opp-funds">${funds}</div>` : ''}
     <div class="opp-footer">
-      <a class="opp-chart-link" href="https://in.tradingview.com/chart/?symbol=NSE:${opp.ticker}" target="_blank" rel="noopener">📊 Chart ↗</a>
+      ${chartAndScreenerBtns(opp.ticker)}
       ${f['52h'] && f['52l'] ? `<span style="font-size:10px;color:rgba(255,255,255,0.2);margin-left:auto;">52W: ₹${f['52l']} – ₹${f['52h']}</span>` : ''}
     </div>
   </div>`;
@@ -905,7 +922,7 @@ function renderAIPicksTable() {
     const rrColor = (p.risk_reward||0) >= 1.5 ? 'var(--emerald)' : 'var(--amber)';
     const regimeCls = p.regime === 'Bull' ? 'regime-bull' : p.regime === 'Bear' ? 'regime-bear' : 'regime-side';
     return `<tr>
-      <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${p.ticker}" target="_blank" rel="noopener">${p.ticker}</a></td>
+      <td class="td-ticker">${tickerLinks(p.ticker)}</td>
       <td style="text-align:left;max-width:160px">
         <div style="font-size:11px;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${displayName}</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.25)">${p.sector||p.cap_label}</div>
@@ -974,7 +991,7 @@ function buildAIPickCard(pick, isDemo = false) {
     <div class="ai-pick-header">
       <div class="ai-rec-badge ${rec}">${rec.toUpperCase()}</div>
       <div class="ai-pick-meta">
-        <div class="ai-pick-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${pick.ticker}" target="_blank" rel="noopener" style="color:#fff">${pick.ticker}</a></div>
+        <div class="ai-pick-ticker">${tickerLinks(pick.ticker, 'style="color:#fff"')}</div>
         <div class="ai-pick-name">${(pick.name && pick.name !== pick.ticker) ? pick.name : (pick.sector||pick.cap_label||'')}</div>
       </div>
       <div class="ai-pick-price" style="color:${recColor}">₹${pick.price}</div>
@@ -998,7 +1015,7 @@ function buildAIPickCard(pick, isDemo = false) {
     <div class="ai-pick-section-title">Risk Indicators</div>
     ${risks}
     <div class="ai-pick-footer">
-      <a class="ai-chart-link" href="https://in.tradingview.com/chart/?symbol=NSE:${pick.ticker}" target="_blank" rel="noopener">📊 Chart ↗</a>
+      ${chartAndScreenerBtns(pick.ticker, 'ai-chart-link')}
       ${isDemo ? '<span class="ai-pick-demo-tag">Demo</span>' : ''}
     </div>
   </div>`;
@@ -1393,7 +1410,7 @@ function slFilterLog() {
                     : '<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(16,245,168,0.08);color:var(--primary);font-weight:700">S</span>';
     return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
       <td style="padding:8px 10px;text-align:left;font-family:var(--mono);color:rgba(255,255,255,0.5)">${t.week}</td>
-      <td style="padding:8px 10px;text-align:left;font-weight:600"><a href="https://www.tradingview.com/chart/?symbol=NSE:${t.ticker}" target="_blank" style="color:var(--blue)">${t.ticker}</a></td>
+      <td style="padding:8px 10px;text-align:left;font-weight:600">${tickerLinks(t.ticker, 'style="color:var(--blue)"')}</td>
       <td style="padding:8px 10px;text-align:center">${mcapBadge}</td>
       <td style="padding:8px 10px;text-align:left"><span style="background:rgba(63,185,80,0.12);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">${t.signal}</span></td>
       <td style="padding:8px 10px;text-align:center;font-size:11px;${exitCol}">${exitIcon}</td>
@@ -1934,7 +1951,7 @@ function renderPredictionTable() {
       : `<span style="font-size:9px;color:rgba(255,255,255,0.18)">—</span>`;
 
     return `<tr>
-      <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${p.ticker}" target="_blank" rel="noopener">${p.ticker}</a></td>
+      <td class="td-ticker">${tickerLinks(p.ticker)}</td>
       <td style="text-align:center">${mcapBadge}</td>
       <td style="text-align:center"><span class="pred-sig-badge ${p.prediction}">${p.prediction}</span></td>
       <td style="text-align:center">${stateBadge}</td>
@@ -2016,7 +2033,7 @@ function renderWeeklyLog(logEntries) {
     const retCls = (r.return_pct || 0) >= 0 ? 'pos' : 'neg';
     return `<tr>
       <td class="td-date">${r.week}</td>
-      <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${r.ticker}" target="_blank">${r.ticker}</a></td>
+      <td class="td-ticker">${tickerLinks(r.ticker)}</td>
       <td style="text-align:center"><span class="pred-sig-badge ${r.predicted}">${r.predicted}</span></td>
       <td style="text-align:center"><span class="pred-sig-badge ${r.actual}">${r.actual}</span></td>
       <td class="${retCls}" style="text-align:right;font-family:var(--mono);font-size:11px">${retStr}</td>
