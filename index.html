@@ -839,6 +839,12 @@
           <option value="75">Score ≥ 75 (Top)</option>
         </select>
         <select class="opp-select" id="oppSector" onchange="onOppFilter()"><option value="">All Sectors</option></select>
+        <select class="opp-select" id="oppMcap" onchange="onOppFilter()">
+          <option value="">All Market Caps</option>
+          <option value="L">🔵 Large Cap</option>
+          <option value="M">🟡 Mid Cap</option>
+          <option value="S">🟢 Small Cap</option>
+        </select>
         <span class="opp-count" id="oppCount"></span>
       </div>
       <div class="opp-grid" id="oppGrid"></div>

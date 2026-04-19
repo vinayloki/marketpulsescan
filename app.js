@@ -20,7 +20,7 @@ let predAccuracyData  = null;  // prediction_accuracy.json -> accuracy metrics
 let currentTf      = '1M';
 
 // Prediction tab filter state
-let _predFilter = '', _predSignal = '', _predConf = 50, _predRegime = '', _predPage = 0;
+let _predFilter = '', _predSignal = '', _predConf = 50, _predRegime = '', _predMcap = '', _predPage = 0;
 const PRED_PAGE = 80;
 
 // Full Scan table state
@@ -32,7 +32,10 @@ let _tmSearch = '', _tmSector = '', _tmPe = '', _tmMcap = '', _tmPage = 0;
 const TM_PAGE = 40;
 
 // Opportunity filter state
-let _oppSearch = '', _oppSignal = '', _oppMinScore = 50, _oppSector = '';
+let _oppSearch = '', _oppSignal = '', _oppMinScore = 50, _oppSector = '', _oppMcap = '';
+
+// Strategy Lab filter state
+let _slMcapFilter = '';
 
 const TFS = ['1W','2W','1M','3M','6M','12M'];
 
@@ -171,6 +174,10 @@ async function loadEverything() {
     console.warn('Scan data fetch failed:', err.message);
     document.getElementById('errorScreen').style.display = 'flex';
   } finally {
+    // Build ticker→mcap lookup map from fullScanData (m field: L/M/S)
+    window._tickerMcap = {};
+    fullScanData.forEach(s => { if (s.t && s.m) window._tickerMcap[s.t] = s.m; });
+
     // Always reveal the dashboard so static tabs are accessible
     buildDashboard();
     document.getElementById('loadScreen').style.display = 'none';
@@ -506,6 +513,9 @@ function renderOpportunities() {
   // Sector filter
   if (_oppSector) data = data.filter(o => o.fundamental?.sector === _oppSector);
 
+  // Market Cap filter (cross-reference with ticker→mcap map)
+  if (_oppMcap) data = data.filter(o => ((window._tickerMcap || {})[o.ticker] || 'S') === _oppMcap);
+
   document.getElementById('oppCount').textContent = `${data.length} opportunities`;
 
   const grid = document.getElementById('oppGrid');
@@ -623,6 +633,7 @@ function onOppSearch() {
 function onOppFilter() {
   _oppMinScore = parseInt(document.getElementById('oppMinScore').value) || 0;
   _oppSector   = document.getElementById('oppSector').value;
+  _oppMcap     = document.getElementById('oppMcap').value;
   renderOpportunities();
 }
 function onOppChip(btn) {
@@ -892,54 +903,115 @@ function buildBacktestTab() {
 
       <!-- Investor Expectation -->
       <div style="background:rgba(61,232,245,0.04);border:1px solid rgba(61,232,245,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
-        <strong style="color:var(--primary2)">💡 What to expect here:</strong> This is your <strong style="color:rgba(255,255,255,0.7)">strategy testing sandbox</strong>. Set your Target %, Stop-Loss %, and risk parameters, then click "Run Backtest" to simulate how the AI signals would have performed historically. The equity curve shows your hypothetical portfolio growth, and the trade log shows every individual trade. <strong style="color:rgba(255,255,255,0.7)">Use this to validate your strategy BEFORE risking real money.</strong>
+        <strong style="color:var(--primary2)">💡 What to expect here:</strong>
+        This is your <strong style="color:rgba(255,255,255,0.7)">strategy testing sandbox</strong>.
+        Set your risk parameters, click "Run Backtest", and see how a mechanical strategy using
+        today's AI signals would have performed over the last N weeks.
+        <strong style="color:rgba(255,255,255,0.7)">Always test a strategy here before risking real money.</strong>
+        A good strategy shows positive final return AND a Max Drawdown below 20%.
+      </div>
+
+      <!-- ═══ HOW TO READ THIS ═══ -->
+      <div style="background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.12);border-radius:14px;padding:22px 26px;margin-bottom:24px">
+        <div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:14px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="this.parentElement.querySelector('.sl-guide-body').style.display=this.parentElement.querySelector('.sl-guide-body').style.display==='none'?'block':'none'">
+          📖 How to Read This — Click to expand/collapse
+        </div>
+        <div class="sl-guide-body" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7">
+
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px">
+              <div style="color:#fff;font-weight:700;margin-bottom:6px">⚙️ Strategy Parameters</div>
+              <div><strong style="color:var(--primary)">Target Exit %</strong> — If a stock goes UP by this much, we sell and take profit. E.g. 4% means "book profit at +4%".</div>
+              <div style="margin-top:6px"><strong style="color:var(--red)">Stop-Loss %</strong> — If the stock falls by this much, we exit to limit the loss. E.g. 2% means "cut at -2%".</div>
+              <div style="margin-top:6px"><strong style="color:var(--amber)">Max Hold (weeks)</strong> — If neither Target nor Stop is hit, we close the trade after this many weeks (time-stop).</div>
+              <div style="margin-top:6px"><strong style="color:var(--blue)">Min AI Score</strong> — Only trade stocks where the AI confidence score is above this threshold. Higher = fewer but higher-quality trades.</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px">
+              <div style="color:#fff;font-weight:700;margin-bottom:6px">💰 Capital & Pool</div>
+              <div><strong style="color:var(--primary)">Capital (₹)</strong> — Your starting portfolio amount. The backtest will track how this grows or falls.</div>
+              <div style="margin-top:6px"><strong style="color:var(--primary)">Backtest Weeks</strong> — How many past weeks to simulate. 52 weeks = 1 full year. More weeks = more reliable stats.</div>
+              <div style="margin-top:6px"><strong style="color:var(--primary)">Stocks in Pool</strong> — Each week, pick the top N stocks from the BUY signals. Capital is split equally across these.</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px">
+              <div style="color:#fff;font-weight:700;margin-bottom:6px">📊 Result Metrics</div>
+              <div><strong style="color:var(--green)">Win Rate</strong> — What % of trades made a profit. Above 50% is good. Above 60% is excellent.</div>
+              <div style="margin-top:6px"><strong style="color:var(--green)">Avg Win</strong> — Average return on winning trades. Should be ≥ Target %.</div>
+              <div style="margin-top:6px"><strong style="color:var(--red)">Avg Loss</strong> — Average loss on losing trades. Should be close to your Stop-Loss %.</div>
+              <div style="margin-top:6px"><strong style="color:var(--red)">Max Drawdown</strong> — The worst peak-to-valley drop your portfolio experienced. Below -20% is risky.</div>
+              <div style="margin-top:6px"><strong style="color:var(--primary)">Total Return</strong> — Your overall % gain/loss after all trades over the full period.</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px">
+              <div style="color:#fff;font-weight:700;margin-bottom:6px">📈 Equity Curve</div>
+              <div>The <strong style="color:var(--primary)">green curve</strong> shows your portfolio value over time. You want this to trend up with few deep dips.</div>
+              <div style="margin-top:6px">A <strong style="color:var(--red)">sharp dip</strong> followed by recovery is a drawdown — acceptable if it recovers. A dip that never recovers is a red flag.</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px">
+              <div style="color:#fff;font-weight:700;margin-bottom:6px">📋 Trade Log Symbols</div>
+              <div><strong style="color:var(--green)">✅ Target Hit</strong> — Trade exited at your profit target. This is the ideal outcome.</div>
+              <div style="margin-top:6px"><strong style="color:var(--red)">🛑 Stop Hit</strong> — Stop-loss triggered. Loss capped at your Stop %.</div>
+              <div style="margin-top:6px"><strong style="color:var(--amber)">⏱ Timeout</strong> — Neither target nor stop hit within Max Hold weeks. Trade closed at market price.</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:14px">
+              <div style="color:#fff;font-weight:700;margin-bottom:6px">🏷️ Signal Tags (in Forecast tab)</div>
+              <div><strong style="color:var(--purple)">🗜 SQUEEZE</strong> — Bollinger Band Squeeze: volatility is compressed. Often precedes a sharp breakout. High conviction setup.</div>
+              <div style="margin-top:6px"><strong style="color:var(--blue)">📉 QUIET</strong> — Volume contraction. Institutional accumulation pattern. Smart money buying quietly.</div>
+              <div style="margin-top:6px"><strong style="color:var(--primary)">🏆 LEADER</strong> — Sector Leader: this stock is outperforming the broader market by >5% on a 1-month basis. Strong relative strength.</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ⚙️ Strategy Parameters -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:24px">
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:8px">
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;display:flex;align-items:center;gap:8px">
           ⚙️ Strategy Parameters
         </div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,0.3);margin-bottom:18px">Adjust sliders below. Hover over any label for an explanation. Then click Run Backtest.</div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;margin-bottom:20px">
           <div class="sl-param">
-            <label>Target Exit (%)</label>
+            <label title="If stock rises this much, we take profit and exit">🎯 Target Exit (%) <span style="color:var(--primary)">→ sell at profit</span></label>
             <div class="sl-row"><input type="range" id="slTarget" min="1" max="15" value="4" step="0.5" oninput="slUpdate()"><span id="slTargetVal">4%</span></div>
           </div>
           <div class="sl-param">
-            <label>Stop-Loss (%)</label>
+            <label title="If stock drops this much, we cut the loss and exit">🛑 Stop-Loss (%) <span style="color:var(--red)">→ exit at loss</span></label>
             <div class="sl-row"><input type="range" id="slStop" min="0.5" max="10" value="2" step="0.5" oninput="slUpdate()"><span id="slStopVal">2%</span></div>
           </div>
           <div class="sl-param">
-            <label>Max Hold (weeks)</label>
+            <label title="Close the trade after this many weeks regardless of outcome">⏱ Max Hold (weeks) <span style="color:var(--amber)">→ time limit</span></label>
             <div class="sl-row"><input type="range" id="slHold" min="1" max="8" value="2" step="1" oninput="slUpdate()"><span id="slHoldVal">2w</span></div>
           </div>
           <div class="sl-param">
-            <label>Min AI Score</label>
+            <label title="Only enter stocks where AI confidence is above this number">🤖 Min AI Score <span style="color:var(--blue)">→ quality filter</span></label>
             <div class="sl-row"><input type="range" id="slScore" min="0" max="100" value="60" step="5" oninput="slUpdate()"><span id="slScoreVal">60</span></div>
           </div>
           <div class="sl-param">
-            <label>Capital (₹)</label>
+            <label title="Your starting portfolio value in Indian Rupees">💰 Capital (₹) <span style="color:rgba(255,255,255,0.3)">→ starting portfolio</span></label>
             <div class="sl-row"><input type="range" id="slCapital" min="10000" max="1000000" value="100000" step="10000" oninput="slUpdate()"><span id="slCapitalVal">₹100K</span></div>
           </div>
           <div class="sl-param">
-            <label>Backtest Weeks</label>
+            <label title="How many past weeks to simulate. 52 = 1 full year.">📅 Backtest Weeks <span style="color:rgba(255,255,255,0.3)">→ history depth</span></label>
             <div class="sl-row"><input type="range" id="slWeeks" min="4" max="52" value="52" step="4" oninput="slUpdate()"><span id="slWeeksVal">52w</span></div>
           </div>
           <div class="sl-param">
-            <label>Stocks in Pool</label>
+            <label title="Each week, pick and trade this many top-ranked BUY stocks">📦 Stocks in Pool <span style="color:rgba(255,255,255,0.3)">→ diversification</span></label>
             <div class="sl-row"><input type="range" id="slPool" min="1" max="50" value="10" step="1" oninput="slUpdate()"><span id="slPoolVal">10</span></div>
           </div>
         </div>
 
         <!-- Quick Presets -->
         <div style="margin-bottom:18px">
-          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">Quick Presets:</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">Quick Presets — click to apply a ready-made strategy:</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="chip" onclick="slPreset(2.5,1.5,2,65,100000,52,10)">Conservative (2–3%)</button>
-            <button class="chip" onclick="slPreset(5,2,3,55,100000,52,10)">Aggressive (5%)</button>
-            <button class="chip" onclick="slPreset(1.5,0.75,1,70,100000,52,15)">Tight Scalp (1.5%)</button>
-            <button class="chip" onclick="slPreset(4,2,2,60,100000,52,10)">Your Goal (3–5%)</button>
+            <button class="chip" onclick="slPreset(2.5,1.5,2,65,100000,52,10)" title="Lower targets, tighter stops — fewer but safer trades">Conservative (2–3%)</button>
+            <button class="chip" onclick="slPreset(5,2,3,55,100000,52,10)" title="Higher target, wider net — more trades, more volatility">Aggressive (5%)</button>
+            <button class="chip" onclick="slPreset(1.5,0.75,1,70,100000,52,15)" title="Very quick in-and-out with tight risk — many small winners">Tight Scalp (1.5%)</button>
+            <button class="chip" onclick="slPreset(4,2,2,60,100000,52,10)" title="Balanced 4% target, 2% stop — R:R of 2 — the default swing trade">Balanced Swing (4%)</button>
           </div>
         </div>
 
@@ -950,15 +1022,17 @@ function buildBacktestTab() {
           <button onclick="resetStrategy()" style="padding:10px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer;font-family:var(--font)">
             Reset
           </button>
+          <span style="font-size:11px;color:rgba(255,255,255,0.25)">Results appear below after running</span>
         </div>
       </div>
 
       <!-- 📈 Equity Curve -->
       <div id="slEquitySection" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:24px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <div style="font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">📈 Equity Curve</div>
           <div id="slEquityRange" style="font-size:13px;font-family:var(--mono);color:var(--primary)"></div>
         </div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,0.3);margin-bottom:14px">Shows how ₹ grew or fell week by week. A rising line = profitable strategy. Deep dips = drawdown risk.</div>
         <canvas id="slCanvas" width="800" height="200" style="width:100%;height:200px;border-radius:8px;background:rgba(255,255,255,0.02)"></canvas>
       </div>
 
@@ -967,14 +1041,37 @@ function buildBacktestTab() {
 
       <!-- 📋 Weekly Trade Log -->
       <div id="slLogSection" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:24px">
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px">📋 Weekly Trade Log <span id="slLogCount" style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.35)"></span></div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;display:flex;align-items:center;gap:8px">
+          📋 Weekly Trade Log
+          <span id="slLogCount" style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.35)"></span>
+        </div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,0.3);margin-bottom:12px">Every simulated trade: stock picked, signal used, how it exited (✅ Target / 🛑 Stop / ⏱ Timeout), and running capital.</div>
+
+        <!-- Trade log filters -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+          <select id="slLogOutcome" onchange="slFilterLog()" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:rgba(255,255,255,0.6);font-family:var(--font);font-size:12px">
+            <option value="">All Outcomes</option>
+            <option value="TARGET">✅ Target Hit</option>
+            <option value="STOP">🛑 Stop Hit</option>
+            <option value="TIMEOUT">⏱ Timeout</option>
+          </select>
+          <select id="slLogMcap" onchange="slFilterLog()" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:rgba(255,255,255,0.6);font-family:var(--font);font-size:12px">
+            <option value="">All Market Caps</option>
+            <option value="L">🔵 Large Cap</option>
+            <option value="M">🟡 Mid Cap</option>
+            <option value="S">🟢 Small Cap</option>
+          </select>
+          <span style="font-size:11px;color:rgba(255,255,255,0.25)">Filter trade log rows</span>
+        </div>
+
         <div class="table-wrap">
           <table id="slLogTable" style="width:100%;border-collapse:collapse;font-size:12px">
             <thead><tr>
               <th style="text-align:left">Week</th>
-              <th style="text-align:left">Signal</th>
               <th style="text-align:left">Stock</th>
-              <th style="text-align:center">Exit</th>
+              <th style="text-align:center">MCap</th>
+              <th style="text-align:left">Signal</th>
+              <th style="text-align:center" title="How the trade exited">Exit</th>
               <th style="text-align:right">Return</th>
               <th style="text-align:right">Capital</th>
             </tr></thead>
@@ -987,7 +1084,7 @@ function buildBacktestTab() {
     </div>
 
     <style>
-      .sl-param label{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px;display:block}
+      .sl-param label{font-size:11.5px;color:rgba(255,255,255,0.4);margin-bottom:6px;display:block;cursor:help}
       .sl-row{display:flex;align-items:center;gap:10px}
       .sl-row input[type="range"]{flex:1;accent-color:var(--blue);cursor:pointer;height:4px}
       .sl-row span{font-family:var(--mono);font-size:13px;color:var(--primary);min-width:55px;text-align:right}
@@ -1134,19 +1231,50 @@ function runStrategyBacktest() {
     sc('₹' + Math.round(capital).toLocaleString(), 'Final Capital', 'var(--primary)'),
   ].join('');
 
-  // Trade Log (last 20)
+  // Trade Log — store all trades globally so filters can re-render
+  window._slTrades = trades;
   const logSection = document.getElementById('slLogSection');
   logSection.style.display = 'block';
-  document.getElementById('slLogCount').textContent = `(last ${Math.min(20, trades.length)} of ${trades.length} trades)`;
+  slFilterLog();
+}
+
+// ── Strategy Lab: Trade Log Filters ────────────────────────────────────
+function slFilterLog() {
+  const trades = window._slTrades || [];
+  const outcomeEl = document.getElementById('slLogOutcome');
+  const mcapEl    = document.getElementById('slLogMcap');
+  const outcome   = outcomeEl ? outcomeEl.value : '';
+  const mcapF     = mcapEl ? mcapEl.value : '';
+  const mcapMap   = window._tickerMcap || {};
+
+  let filtered = trades;
+  if (outcome) filtered = filtered.filter(t => {
+    if (outcome === 'TARGET') return t.exit === 'Target';
+    if (outcome === 'STOP')   return t.exit === 'Stop';
+    if (outcome === 'TIMEOUT') return t.exit === 'Timeout';
+    return true;
+  });
+  if (mcapF) filtered = filtered.filter(t => (mcapMap[t.ticker] || 'S') === mcapF);
+
+  const show = filtered.slice(-50).reverse();
+  const countEl = document.getElementById('slLogCount');
+  if (countEl) countEl.textContent = `(${show.length} shown of ${trades.length} total)`;
+
   const tbody = document.getElementById('slLogBody');
-  tbody.innerHTML = trades.slice(-20).reverse().map(t => {
-    const retCls = t.returnPct >= 0 ? 'color:var(--green)' : 'color:var(--red)';
+  if (!tbody) return;
+  tbody.innerHTML = show.map(t => {
+    const retCls  = t.returnPct >= 0 ? 'color:var(--green)' : 'color:var(--red)';
     const exitIcon = t.exit === 'Target' ? '✅ Target' : t.exit === 'Stop' ? '🛑 Stop' : '⏱ Timeout';
-    const exitCol = t.exit === 'Target' ? 'color:var(--green)' : t.exit === 'Stop' ? 'color:var(--red)' : 'color:var(--amber)';
+    const exitCol  = t.exit === 'Target' ? 'color:var(--green)' : t.exit === 'Stop' ? 'color:var(--red)' : 'color:var(--amber)';
+    const mcap     = mcapMap[t.ticker];
+    const mcapBadge = mcap === 'L' ? '<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(61,142,244,0.12);color:var(--blue);font-weight:700">L</span>'
+                    : mcap === 'M' ? '<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(245,166,35,0.12);color:var(--amber);font-weight:700">M</span>'
+                    : '<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(16,245,168,0.08);color:var(--primary);font-weight:700">S</span>';
     return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
       <td style="padding:8px 10px;text-align:left;font-family:var(--mono);color:rgba(255,255,255,0.5)">${t.week}</td>
-      <td style="padding:8px 10px;text-align:left"><span style="background:rgba(63,185,80,0.12);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">${t.signal}</span></td>
       <td style="padding:8px 10px;text-align:left;font-weight:600"><a href="https://www.tradingview.com/chart/?symbol=NSE:${t.ticker}" target="_blank" style="color:var(--blue)">${t.ticker}</a></td>
+      <td style="padding:8px 10px;text-align:center">${mcapBadge}</td>
+      <td style="padding:8px 10px;text-align:left"><span style="background:rgba(63,185,80,0.12);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">${t.signal}</span></td>
       <td style="padding:8px 10px;text-align:center;font-size:11px;${exitCol}">${exitIcon}</td>
       <td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-weight:600;${retCls}">${t.returnPct >= 0 ? '+' : ''}${t.returnPct.toFixed(2)}%</td>
       <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:rgba(255,255,255,0.6)">₹${t.capital.toLocaleString()}</td>
@@ -1374,6 +1502,12 @@ function buildPredictionTab() {
             <option value="Sideways">Sideways</option>
             <option value="Bear">Bear</option>
           </select>
+          <select class="opp-select" id="predMcap" onchange="onPredMcapFilter()">
+            <option value="">All Market Caps</option>
+            <option value="L">🔵 Large Cap</option>
+            <option value="M">🟡 Mid Cap</option>
+            <option value="S">🟢 Small Cap</option>
+          </select>
           <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.4)">
             <span>Confidence ≥</span>
             <input type="range" id="predConfSlider" min="0" max="95" value="50"
@@ -1387,6 +1521,7 @@ function buildPredictionTab() {
           <table id="predTable">
             <thead><tr>
               <th style="text-align:left">Ticker</th>
+              <th>MCap</th>
               <th>Signal</th>
               <th>Confidence</th>
               <th>Entry ₹</th>
@@ -1593,10 +1728,12 @@ function renderConfusionMatrix(cm) {
 // ── Prediction Table ──────────────────────────────────────────────────────────
 function renderPredictionTable() {
   let data = window._predData || [];
+  const mcapMap = window._tickerMcap || {};
 
   if (_predFilter)  data = data.filter(p => p.ticker?.includes(_predFilter));
   if (_predSignal)  data = data.filter(p => p.prediction === _predSignal);
   if (_predConf > 0) data = data.filter(p => (p.confidence || 0) >= _predConf);
+  if (_predMcap)    data = data.filter(p => (mcapMap[p.ticker] || 'S') === _predMcap);
 
   const total = data.length;
   const countEl = document.getElementById('predCount');
@@ -1627,8 +1764,15 @@ function renderPredictionTable() {
     if (p.vol_contraction === 1) tags.push('<span title="Volume Contraction — quiet accumulation pattern" style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(61,142,244,0.12);color:var(--blue);font-weight:700">📉 QUIET</span>');
     if (p.sector_rs_pct != null && p.sector_rs_pct > 5) tags.push('<span title="Outperforming broader market by ' + p.sector_rs_pct.toFixed(1) + '%" style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(16,245,168,0.1);color:var(--primary);font-weight:700">🏆 LEADER</span>');
 
+    // Market Cap badge
+    const mcap = (window._tickerMcap || {})[p.ticker];
+    const mcapBadge = mcap === 'L' ? '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(61,142,244,0.12);color:var(--blue);font-weight:700">L</span>'
+                    : mcap === 'M' ? '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(245,166,35,0.12);color:var(--amber);font-weight:700">M</span>'
+                    : '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(16,245,168,0.08);color:var(--primary);font-weight:700">S</span>';
+
     return `<tr>
       <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${p.ticker}" target="_blank" rel="noopener">${p.ticker}</a></td>
+      <td style="text-align:center">${mcapBadge}</td>
       <td style="text-align:center"><span class="pred-sig-badge ${p.prediction}">${p.prediction}</span></td>
       <td style="text-align:center">
         <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
@@ -1672,6 +1816,8 @@ function renderPredictionTable() {
 function predGo(p) { _predPage = p; renderPredictionTable(); window.scrollTo({ top: 400, behavior: 'smooth' }); }
 function onPredSearch() { _predFilter = document.getElementById('predSearch').value.toUpperCase().trim(); _predPage = 0; renderPredictionTable(); }
 function onPredFilter() { _predRegime = document.getElementById('predRegime').value; _predPage = 0; renderPredictionTable(); }
+function onPredMcapFilter() { _predMcap = document.getElementById('predMcap').value; _predPage = 0; renderPredictionTable(); }
+function onOppMcapFilter() { _oppMcap = document.getElementById('oppMcap').value; buildOpportunities(); }
 function onPredConf(v) {
   _predConf = parseInt(v); _predPage = 0;
   const el = document.getElementById('predConfVal');
