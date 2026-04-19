@@ -750,6 +750,16 @@
     .bold-md { font-weight: 700; }
     .td-ticker a { font-weight: 700; color: var(--blue); text-decoration: none; }
     .td-ticker a:hover { color: var(--primary); }
+
+    /* ── Sector Heatmap ───────────────────────────────── */
+    .sector-pulse-wrapper { width: 100%; }
+    .sector-heatmap { width: 100%; border-collapse: separate; border-spacing: 2px; font-size: 11px; }
+    .sector-heatmap th { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.3); text-align: center; padding: 5px 6px; white-space: nowrap; }
+    .sector-label-col { text-align: left !important; min-width: 180px; padding: 6px 10px !important; font-weight: 500; color: rgba(255,255,255,0.5); white-space: nowrap; }
+    .sector-label { text-align: left; font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); padding: 5px 10px; white-space: nowrap; }
+    .heatmap-cell { text-align: center; padding: 6px 8px; border-radius: 4px; font-family: var(--mono); font-size: 11px; cursor: default; transition: opacity .15s, filter .15s; min-width: 56px; }
+    .heatmap-cell:hover { opacity: .85; filter: brightness(1.2); }
+    .sector-heatmap tbody tr:hover .sector-label { color: rgba(255,255,255,0.85); }
   </style>
 </head>
 <body>
@@ -847,6 +857,10 @@
         </select>
         <span class="opp-count" id="oppCount"></span>
       </div>
+      <!-- Sector Rank Strip: today's best sectors above the opportunity grid -->
+      <div id="sectorRankStrip" style="display:none;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <!-- Populated by renderSectorRankStrip() -->
+      </div>
       <div class="opp-grid" id="oppGrid"></div>
     </div>
 
@@ -857,8 +871,20 @@
         <span class="sh-sub">All 2000+ NSE stocks ranked by momentum · Enriched with fundamentals · Filter by sector, P/E, market cap</span>
       </div>
       <div style="background:rgba(61,142,244,0.04);border:1px solid rgba(61,142,244,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
-        <strong style="color:var(--blue)">💡 What to expect here:</strong> Browse the full NSE universe — every stock ranked by recent performance. Use filters (sector, P/E, market cap) to narrow down candidates. Cards show momentum across 6 timeframes (1W→12M) plus fundamentals like P/E, Market Cap, and Dividend Yield. <strong style="color:rgba(255,255,255,0.7)">This is your discovery screen — find stocks, then check them in Trade Setups or AI Signals.</strong>
+        <strong style="color:var(--blue)">💡 What to expect here:</strong> Browse the full NSE universe — every stock ranked by recent performance. Use filters (sector, P/E, market cap) to narrow down candidates. Cards show momentum across 6 timeframes (1W→ 12M) plus fundamentals like P/E, Market Cap, and Dividend Yield. <strong style="color:rgba(255,255,255,0.7)">This is your discovery screen — find stocks, then check them in Trade Setups or AI Signals.</strong>
       </div>
+
+      <!-- Sector Pulse Heatmap: 10-day rolling sector performance -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span style="font-size:14px;font-weight:700;color:#fff">📊 Sector Pulse</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.3)">Last 10 trading days · Equal-weighted avg return per sector · Hover cells for details</span>
+        </div>
+        <div id="sectorPulseContainer">
+          <div style="font-size:12px;color:rgba(255,255,255,0.25);padding:14px 0">Loading sector data…</div>
+        </div>
+      </div>
+
       <div class="tm-controls">
         <input class="tm-input" id="tmSearch" type="text" placeholder="🔍 Search ticker..." oninput="onTmSearch()">
         <select class="tm-select" id="tmSector" onchange="onTmSector()">

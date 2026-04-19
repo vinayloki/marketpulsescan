@@ -64,6 +64,25 @@ jobs:
         continue-on-error: true   # non-fatal — predictions augment but don't replace scanner data
         timeout-minutes: 15
 
+      - name: Validate Sector Labels
+        continue-on-error: true   # informational only — does not block the scan
+        run: |
+          python -c "
+import json, sys
+from config.sector_map import CANONICAL_SECTORS
+try:
+    with open('scan_results/fundamentals.json') as f:
+        data = json.load(f)
+    stocks = data.get('stocks', [])
+    invalid = [s.get('s','?') + ':' + str(s.get('sector','')) for s in stocks if s.get('sector') not in CANONICAL_SECTORS]
+    if invalid:
+        print(f'WARNING: {len(invalid)} stocks with non-canonical sectors: {set(s.split(\":\")[1] for s in invalid)}')
+    else:
+        print(f'OK: All {len(stocks)} sector labels are canonical.')
+except Exception as e:
+    print(f'Sector validation skipped: {e}')
+"
+
       - name: Commit and Push Results
         run: |
           git config --global user.name "github-actions[bot]"

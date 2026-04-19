@@ -22,6 +22,7 @@ from config.settings import (
     MULTI_SIGNAL_BONUS,
     OUTPUT_DIR,
 )
+from config.sector_map import normalize_sector
 from engine.opportunity_model import Opportunity, ScanResult
 
 log = logging.getLogger("marketpulse.engine")
@@ -99,7 +100,7 @@ class ScoringEngine:
             # Clean fundamental dict for output
             fund_clean = {
                 "name":    fund.get("name") or ticker,
-                "sector":  fund.get("sector"),
+                "sector":  normalize_sector(fund.get("sector")),
                 "ind":     fund.get("ind"),
                 "mcap_cr": fund.get("mcap"),
                 "pe":      fund.get("pe"),

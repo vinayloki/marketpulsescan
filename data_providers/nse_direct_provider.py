@@ -31,6 +31,7 @@ from config.settings import (
     NSE_EQUITY_MIRROR_URL,
     NSE_SYMBOLS_CACHE,
 )
+from config.sector_map import normalize_sector
 from data_providers.base_provider import BaseDataProvider
 
 log = logging.getLogger("marketpulse.provider")
@@ -300,7 +301,7 @@ class NSEDirectProvider(BaseDataProvider):
             return {
                 "s":      symbol,
                 "name":   info.get("shortName") or info.get("longName") or symbol,
-                "sector": info.get("sector"),
+                "sector": normalize_sector(info.get("sector")),
                 "ind":    info.get("industry"),
                 "mcap":   round(mcap / 1e7, 1) if mcap else None,  # → ₹ Cr
                 "pe":     round(info["trailingPE"], 1)

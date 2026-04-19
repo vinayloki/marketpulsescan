@@ -362,6 +362,109 @@ def run_opportunity_engine(ohlcv: pd.DataFrame, fundamentals: dict[str, dict]):
 
 
 # ═══════════════════════════════════════════════════════════════════════
+#  STEP 7: Daily Sector Performance Heatmap
+# ═══════════════════════════════════════════════════════════════════════
+
+def compute_sector_daily_performance(
+    ohlcv: pd.DataFrame,
+    fundamentals: dict[str, dict],
+    n_days: int = 10,
+) -> None:
+    """
+    For each of the last N trading days, compute the equal-weighted average
+    daily return per canonical sector. Writes sector_daily_performance.json.
+
+    Args:
+        ohlcv:        Full MultiIndex OHLCV DataFrame (field, ticker)
+        fundamentals: {ticker: {"sector": canonical_sector, ...}}
+        n_days:       Number of past trading days to include (default 10)
+    """
+    log.info("📊 Computing sector daily performance heatmap...")
+
+    try:
+        from config.sector_map import normalize_sector
+
+        # ── Build ticker → sector map from fundamentals ────────────────
+        sector_map: dict[str, str] = {}
+        for ticker, fund in fundamentals.items():
+            raw = fund.get("sector") or fund.get("s", "")
+            # Already normalized at data-provider level, but normalize again
+            # defensively in case some entry passed through a different path
+            sector_map[ticker] = normalize_sector(raw) if raw else "Others"
+
+        if not sector_map:
+            log.warning("   ⚠️ No sector map available — skipping sector heatmap")
+            return
+
+        # ── Extract Close prices ───────────────────────────────────────
+        if "Close" not in ohlcv.columns.get_level_values(0):
+            log.warning("   ⚠️ No Close field in OHLCV — skipping sector heatmap")
+            return
+
+        close = ohlcv["Close"]
+        # Daily % returns (fill_method=None avoids pandas FutureWarning)
+        daily_ret = close.pct_change(fill_method=None) * 100  # shape: (days, tickers)
+
+        # Last n_days+1 rows (we need +1 for pct_change to produce n_days)
+        last_slice = daily_ret.iloc[-(n_days + 1):]
+        # Drop the first row (it's NaN from pct_change)
+        last_slice = last_slice.dropna(how="all").iloc[-n_days:]
+
+        days_result: dict[str, list[dict]] = {}
+
+        for date_idx in range(len(last_slice)):
+            date_str = str(last_slice.index[date_idx].date())
+            day_ret  = last_slice.iloc[date_idx].dropna()
+
+            # Group by sector
+            sector_buckets: dict[str, list[float]] = {}
+            for ticker, ret_val in day_ret.items():
+                sector = sector_map.get(ticker, "Others")
+                sector_buckets.setdefault(sector, []).append(float(ret_val))
+
+            # Compute average per sector (min 3 stocks to be meaningful)
+            ranked = sorted(
+                [
+                    {
+                        "sector":       s,
+                        "avg_return":   round(sum(v) / len(v), 2),
+                        "stocks_count": len(v),
+                    }
+                    for s, v in sector_buckets.items()
+                    if len(v) >= 3
+                ],
+                key=lambda x: x["avg_return"],
+                reverse=True,
+            )
+            for i, item in enumerate(ranked):
+                item["rank"] = i + 1
+
+            days_result[date_str] = ranked
+
+        # ── Write JSON ─────────────────────────────────────────────────
+        sectors_tracked = len(set(sector_map.values()))
+        output = {
+            "generated":       datetime.now().strftime("%d %b %Y"),
+            "run_at":          datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "days_tracked":    len(days_result),
+            "sectors_tracked": sectors_tracked,
+            "days":            days_result,
+        }
+
+        out_path = OUTPUT_DIR / "sector_daily_performance.json"
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(output, f, separators=(",", ":"), ensure_ascii=False)
+
+        log.info(
+            f"   ✅ sector_daily_performance.json — "
+            f"{len(days_result)} days × {sectors_tracked} sectors"
+        )
+
+    except Exception as exc:
+        log.warning(f"   ⚠️ Sector heatmap failed (non-fatal): {exc}")
+
+
+# ═══════════════════════════════════════════════════════════════════════
 #  MAIN ENTRY POINT
 # ═══════════════════════════════════════════════════════════════════════
 
@@ -393,8 +496,11 @@ def main():
     # Step 5: Fundamentals for top movers
     fundamentals = fetch_fundamentals(performance)
 
-    # Step 6: Opportunity Engine (new)
+    # Step 6: Opportunity Engine
     run_opportunity_engine(ohlcv, fundamentals)
+
+    # Step 7: Sector daily performance heatmap (non-fatal)
+    compute_sector_daily_performance(ohlcv, fundamentals)
 
     elapsed = time.time() - start
     log.info(f"⏱️  Total time: {elapsed:.1f}s")

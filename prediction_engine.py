@@ -110,6 +110,77 @@ def fallback_from_ai_picks(regime: str) -> list[dict]:
         return []
 
 
+# ── Stock State Classifier (SQUEEZE / QUIET / LEADER / NEUTRAL) ───────────────
+
+def classify_stock_state(feat_row: "pd.Series") -> tuple[str, str]:
+    """
+    Classify a stock into one of four states using the already-computed
+    feature row from build_feature_matrix().
+
+    Priority order: SQUEEZE > QUIET > LEADER > NEUTRAL
+    (A squeezed stock that is also a leader is still SQUEEZE — the setup is
+    about the coming breakout, not past outperformance.)
+
+    Args:
+        feat_row: A row from the features DataFrame with fields:
+                  bb_squeeze, atr_pct, vol_contraction, vol_ratio,
+                  sector_rs_pct, rsi_14, ema_aligned
+
+    Returns:
+        (state, reason) — state is one of SQUEEZE/QUIET/LEADER/NEUTRAL
+    """
+    bb_sq   = feat_row.get("bb_squeeze", 0)
+    atr_pct = feat_row.get("atr_pct", 3.0)
+    vol_con = feat_row.get("vol_contraction", 0)
+    vol_rat = feat_row.get("vol_ratio", 1.0)
+    rs_pct  = feat_row.get("sector_rs_pct", 0.0)
+    rsi     = feat_row.get("rsi_14", 50.0)
+    ema_al  = feat_row.get("ema_aligned", 0)
+
+    # Safe-convert — features can be NaN
+    def _f(v, default=0.0):
+        try:
+            f = float(v)
+            return default if (f != f) else f  # NaN check
+        except Exception:
+            return default
+
+    bb_sq   = int(_f(bb_sq))
+    atr_pct = _f(atr_pct, 3.0)
+    vol_con = int(_f(vol_con))
+    vol_rat = _f(vol_rat, 1.0)
+    rs_pct  = _f(rs_pct, 0.0)
+    rsi     = _f(rsi, 50.0)
+    ema_al  = int(_f(ema_al))
+
+    # ── SQUEEZE: BB compressed + low volatility (coiled setup) ───────────────
+    if bb_sq == 1 and atr_pct < 2.5:
+        reason = (
+            f"BB compressed (ATR {atr_pct:.1f}%) · "
+            f"RSI {rsi:.0f} · Awaiting breakout"
+        )
+        return "SQUEEZE", reason
+
+    # ── QUIET: Volume drying up + low ATR (accumulation/distribution) ────────
+    if vol_con == 1 and atr_pct < 1.8:
+        vol_desc = f"Vol ratio {vol_rat:.2f}x 20w avg"
+        reason = (
+            f"Low ATR {atr_pct:.1f}% · {vol_desc} · "
+            f"Possible quiet accumulation"
+        )
+        return "QUIET", reason
+
+    # ── LEADER: Outpacing market + RSI momentum + price above EMAs ───────────
+    if rs_pct > 5.0 and rsi > 55 and ema_al == 1:
+        reason = (
+            f"Outpacing market +{rs_pct:.1f}% · "
+            f"RSI {rsi:.0f} · Above 50-EMA"
+        )
+        return "LEADER", reason
+
+    return "NEUTRAL", ""
+
+
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def main():
@@ -237,6 +308,11 @@ def main():
             tp_pct   = round(sl_pct * 2.0, 2)
             rr       = 2.0
 
+        # ── State classification (SQUEEZE / QUIET / LEADER / NEUTRAL) ─────────
+        state, state_reason = "NEUTRAL", ""
+        if ticker in features_df.index:
+            state, state_reason = classify_stock_state(features_df.loc[ticker])
+
         rec = {
             "ticker":              ticker,
             "prediction":          pred,
@@ -249,6 +325,9 @@ def main():
             "sl_price":            sl_price,
             "tp_price":            tp_price,
             "rr":                  rr,
+            # State classification (P4)
+            "state":               state,
+            "state_reason":        state_reason,
             # Professional signal features (P3)
             "bb_squeeze":     int(features_df.loc[ticker, "bb_squeeze"])
                               if ticker in features_df.index and "bb_squeeze" in features_df.columns

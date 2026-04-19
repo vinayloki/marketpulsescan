@@ -17,10 +17,20 @@ let backtestData   = null;   // performance_report.json -> backtest stats
 let regimeData     = null;   // market_regime.json -> current regime
 let predictionsData   = null;  // predictions.json -> next-week signals
 let predAccuracyData  = null;  // prediction_accuracy.json -> accuracy metrics
+let sectorPulseData   = null;  // sector_daily_performance.json
 let currentTf      = '1M';
 
+// Canonical sector list (mirrors config/sector_map.py — 15 labels)
+const CANONICAL_SECTORS = [
+  'IT & Technology', 'Banking & Finance', 'Pharma & Healthcare',
+  'FMCG & Consumer', 'Auto & Auto Ancillaries', 'Capital Goods & Engineering',
+  'Metals & Mining', 'Oil, Gas & Energy', 'Real Estate',
+  'Chemicals & Specialty', 'Infrastructure', 'Telecom & Media',
+  'Textiles & Apparel', 'Agri & Food Processing', 'Others',
+];
+
 // Prediction tab filter state
-let _predFilter = '', _predSignal = '', _predConf = 50, _predRegime = '', _predMcap = '', _predPage = 0;
+let _predFilter = '', _predSignal = '', _predConf = 50, _predRegime = '', _predMcap = '', _predState = '', _predPage = 0;
 const PRED_PAGE = 80;
 
 // Full Scan table state
@@ -80,7 +90,7 @@ function initTabs() {
 async function loadEverything() {
   try {
     const cb = '?cb=' + new Date().getTime();
-    const [summRes, fullRes, fundRes, newsRes, oppRes, aiRes, btRes, regRes, predRes, predAccRes] = await Promise.allSettled([
+    const [summRes, fullRes, fundRes, newsRes, oppRes, aiRes, btRes, regRes, predRes, predAccRes, sectorRes] = await Promise.allSettled([
       fetch('scan_results/latest_scan_summary.json' + cb),
       fetch('scan_results/full_summary.json' + cb),
       fetch('scan_results/fundamentals.json' + cb),
@@ -91,6 +101,7 @@ async function loadEverything() {
       fetch('scan_results/market_regime.json' + cb),
       fetch('scan_results/predictions.json' + cb),
       fetch('scan_results/prediction_accuracy.json' + cb),
+      fetch('scan_results/sector_daily_performance.json' + cb),
     ]);
 
     // Parse summary
@@ -169,6 +180,12 @@ async function loadEverything() {
       predAccuracyData = await predAccRes.value.json();
       console.log('Prediction accuracy loaded');
     }
+
+    // Parse sector daily performance
+    if (sectorRes && sectorRes.status === 'fulfilled' && sectorRes.value.ok) {
+      sectorPulseData = await sectorRes.value.json();
+      console.log(`Sector pulse loaded: ${sectorPulseData.days_tracked} days`);
+    }
   } catch (err) {
     // Network failure — show inline warning banner; AI Picks still works (static data)
     console.warn('Scan data fetch failed:', err.message);
@@ -213,6 +230,107 @@ function buildDashboard() {
   buildAIPicksTab();
   buildBacktestTab();
   buildPredictionTab();
+  loadSectorPulse();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTOR PULSE — Daily Sector Heatmap + Rank Strip
+═══════════════════════════════════════════════════════════════ */
+function loadSectorPulse() {
+  const container = document.getElementById('sectorPulseContainer');
+  if (!container) return;
+
+  if (!sectorPulseData || !sectorPulseData.days) {
+    container.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.25);padding:14px 0">
+      Sector pulse data not yet available — will populate after next daily scan.
+    </div>`;
+    renderSectorRankStrip(null);
+    return;
+  }
+
+  const days = Object.keys(sectorPulseData.days).sort().reverse().slice(0, 10);
+  const allSectors = [...new Set(
+    days.flatMap(d => sectorPulseData.days[d].map(s => s.sector))
+  )].sort();
+
+  // Build legend
+  const legend = `<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;color:rgba(255,255,255,0.35)">
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;margin-right:4px;vertical-align:middle"></span>Top (+1.5%+)</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.25);margin-right:4px;vertical-align:middle"></span>Positive</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.06);margin-right:4px;vertical-align:middle"></span>Flat</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.25);margin-right:4px;vertical-align:middle"></span>Negative</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;margin-right:4px;vertical-align:middle"></span>Bottom (-1.5%+)</span>
+  </div>`;
+
+  // Format date header: "Mon 18 Apr"
+  const fmtDay = d => {
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' });
+  };
+
+  let html = `<div class="sector-pulse-wrapper">
+    <div style="overflow-x:auto">
+      <table class="sector-heatmap">
+        <thead><tr>
+          <th class="sector-label-col">Sector</th>
+          ${days.map(d => `<th style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.35);white-space:nowrap;padding:6px 8px">${fmtDay(d)}</th>`).join('')}
+        </tr></thead>
+        <tbody>`;
+
+  allSectors.forEach(sector => {
+    html += `<tr><td class="sector-label">${sector}</td>`;
+    days.forEach(day => {
+      const entry = sectorPulseData.days[day]?.find(s => s.sector === sector);
+      const ret   = entry?.avg_return ?? null;
+      let bg = 'rgba(255,255,255,0.04)', color = 'rgba(255,255,255,0.25)', fw = '400';
+      if (ret !== null) {
+        if      (ret >  1.5) { bg = 'rgba(22,163,74,0.55)';    color = '#fff'; fw = '700'; }
+        else if (ret >  0.3) { bg = 'rgba(34,197,94,0.18)';    color = '#4ade80'; fw = '600'; }
+        else if (ret < -1.5) { bg = 'rgba(220,38,38,0.55)';    color = '#fff'; fw = '700'; }
+        else if (ret < -0.3) { bg = 'rgba(239,68,68,0.2)';     color = '#f87171'; fw = '600'; }
+        else                 { bg = 'rgba(255,255,255,0.05)';   color = 'rgba(255,255,255,0.35)'; }
+      }
+      const label  = ret !== null ? `${ret >= 0 ? '+' : ''}${ret.toFixed(1)}%` : '–';
+      const nStocks = entry?.stocks_count ? ` (${entry.stocks_count} stocks)` : '';
+      html += `<td class="heatmap-cell" style="background:${bg};color:${color};font-weight:${fw}"
+        title="${sector} on ${day}: ${label}${nStocks}">${label}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += `</tbody></table></div></div>`;
+  container.innerHTML = legend + html;
+
+  // Also render the rank strip using today (latest day)
+  renderSectorRankStrip(sectorPulseData.days[days[0]] || null);
+}
+
+function renderSectorRankStrip(todaySectors) {
+  const strip = document.getElementById('sectorRankStrip');
+  if (!strip) return;
+
+  if (!todaySectors || todaySectors.length === 0) {
+    strip.style.display = 'none';
+    return;
+  }
+
+  strip.style.display = 'flex';
+  const pills = todaySectors.map((s, i) => {
+    const ret    = s.avg_return;
+    const isTop  = i === 0;
+    const isBot  = i === todaySectors.length - 1;
+    const retStr = `${ret >= 0 ? '+' : ''}${ret.toFixed(1)}%`;
+    const color  = isTop ? '#4ade80' : isBot ? '#f87171' : ret > 0 ? 'var(--green)' : ret < 0 ? 'var(--red)' : 'rgba(255,255,255,0.4)';
+    const bg     = isTop ? 'rgba(22,163,74,0.15)' : isBot ? 'rgba(220,38,38,0.15)' : 'rgba(255,255,255,0.04)';
+    const icon   = isTop ? '🏆 ' : isBot ? '🔻 ' : '';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;
+      background:${bg};border:1px solid rgba(255,255,255,0.07);font-size:11px;
+      color:${color};white-space:nowrap;cursor:default"
+      title="${s.stocks_count} stocks tracked">
+      ${icon}<strong>${s.sector}</strong>&nbsp;${retStr}
+    </span>`;
+  });
+  strip.innerHTML = pills.join('');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1496,6 +1614,13 @@ function buildPredictionTab() {
             <button class="chip" onclick="onPredSignal('SELL')">🔴 SELL</button>
             <button class="chip" onclick="onPredSignal('HOLD')">🟡 HOLD</button>
           </div>
+          <!-- State filter chips -->
+          <div class="opp-chips" id="predStateChips" style="border-left:1px solid rgba(255,255,255,0.08);padding-left:10px">
+            <button class="chip active" onclick="onPredState('')" title="Show all stocks regardless of state">All States</button>
+            <button class="chip" onclick="onPredState('SQUEEZE')" title="Bollinger Bands compressed + low ATR — coiled, awaiting directional breakout" style="--chip-active-bg:rgba(224,123,0,0.8)">🗜 Squeeze</button>
+            <button class="chip" onclick="onPredState('QUIET')" title="Below-avg ATR + volume contraction — quiet accumulation or distribution phase" style="--chip-active-bg:rgba(107,114,128,0.8)">📉 Quiet</button>
+            <button class="chip" onclick="onPredState('LEADER')" title="Outperforming Nifty 50 · RSI > 55 · Above 50-EMA — confirmed relative strength" style="--chip-active-bg:rgba(21,128,61,0.8)">🏆 Leader</button>
+          </div>
           <select class="opp-select" id="predRegime" onchange="onPredFilter()">
             <option value="">All Regimes</option>
             <option value="Bull">Bull</option>
@@ -1523,6 +1648,7 @@ function buildPredictionTab() {
               <th style="text-align:left">Ticker</th>
               <th>MCap</th>
               <th>Signal</th>
+              <th title="SQUEEZE=coiled, QUIET=quiet accumulation, LEADER=outperforming Nifty">State</th>
               <th>Confidence</th>
               <th>Entry ₹</th>
               <th title="Stop-Loss price — set your stop here to limit loss">SL ₹ 🛑</th>
@@ -1734,6 +1860,7 @@ function renderPredictionTable() {
   if (_predSignal)  data = data.filter(p => p.prediction === _predSignal);
   if (_predConf > 0) data = data.filter(p => (p.confidence || 0) >= _predConf);
   if (_predMcap)    data = data.filter(p => (mcapMap[p.ticker] || 'S') === _predMcap);
+  if (_predState)   data = data.filter(p => (p.state || 'NEUTRAL') === _predState);
 
   const total = data.length;
   const countEl = document.getElementById('predCount');
@@ -1770,10 +1897,22 @@ function renderPredictionTable() {
                     : mcap === 'M' ? '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(245,166,35,0.12);color:var(--amber);font-weight:700">M</span>'
                     : '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(16,245,168,0.08);color:var(--primary);font-weight:700">S</span>';
 
+    // State badge
+    const stateVal    = p.state || 'NEUTRAL';
+    const stateReason = p.state_reason || '';
+    const stateBadge  = stateVal === 'SQUEEZE'
+      ? `<span title="${stateReason}" style="font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(224,123,0,0.18);color:#e07b00;font-weight:700;border:1px solid rgba(224,123,0,0.3);cursor:help">🗜 SQUEEZE</span>`
+      : stateVal === 'QUIET'
+      ? `<span title="${stateReason}" style="font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(107,114,128,0.18);color:#9ca3af;font-weight:700;border:1px solid rgba(107,114,128,0.3);cursor:help">📉 QUIET</span>`
+      : stateVal === 'LEADER'
+      ? `<span title="${stateReason}" style="font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(16,245,168,0.12);color:var(--primary);font-weight:700;border:1px solid rgba(16,245,168,0.25);cursor:help">🏆 LEADER</span>`
+      : `<span style="font-size:9px;color:rgba(255,255,255,0.18)">—</span>`;
+
     return `<tr>
       <td class="td-ticker"><a href="https://in.tradingview.com/chart/?symbol=NSE:${p.ticker}" target="_blank" rel="noopener">${p.ticker}</a></td>
       <td style="text-align:center">${mcapBadge}</td>
       <td style="text-align:center"><span class="pred-sig-badge ${p.prediction}">${p.prediction}</span></td>
+      <td style="text-align:center">${stateBadge}</td>
       <td style="text-align:center">
         <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
           <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:${confColor}">${p.confidence || '—'}%</span>
@@ -1817,6 +1956,16 @@ function predGo(p) { _predPage = p; renderPredictionTable(); window.scrollTo({ t
 function onPredSearch() { _predFilter = document.getElementById('predSearch').value.toUpperCase().trim(); _predPage = 0; renderPredictionTable(); }
 function onPredFilter() { _predRegime = document.getElementById('predRegime').value; _predPage = 0; renderPredictionTable(); }
 function onPredMcapFilter() { _predMcap = document.getElementById('predMcap').value; _predPage = 0; renderPredictionTable(); }
+function onPredState(st) {
+  _predState = st; _predPage = 0;
+  document.querySelectorAll('#predStateChips .chip').forEach(c => c.classList.remove('active'));
+  const btn = [...document.querySelectorAll('#predStateChips .chip')].find(c => {
+    if (st === '') return c.textContent.includes('All');
+    return c.textContent.toUpperCase().includes(st);
+  });
+  if (btn) btn.classList.add('active');
+  renderPredictionTable();
+}
 function onOppMcapFilter() { _oppMcap = document.getElementById('oppMcap').value; buildOpportunities(); }
 function onPredConf(v) {
   _predConf = parseInt(v); _predPage = 0;
