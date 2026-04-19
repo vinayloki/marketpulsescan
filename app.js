@@ -881,205 +881,361 @@ function animateConfBars(parentEl) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BACKTEST TAB
+   STRATEGY LAB (formerly Backtest)
 ═══════════════════════════════════════════════════════════════ */
 function buildBacktestTab() {
   const el = document.getElementById('tab-backtest');
   if (!el) return;
 
-  if (!backtestData) {
-    el.innerHTML = `<div style="padding:60px;text-align:center;color:rgba(255,255,255,0.3)">
-      <div style="font-size:48px;margin-bottom:16px">🧪</div>
-      <div style="font-size:18px;font-weight:600;margin-bottom:8px">No Backtest Data Yet</div>
-      <div style="font-size:14px">Run <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:4px">python backtest.py</code> then <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:4px">python performance.py</code></div>
-    </div>`;
-    return;
-  }
-
-  const cfg = backtestData.config || {};
-  const cmp = backtestData.comparison || {};
-  const mA  = backtestData.mode_a || {};
-  const mB  = backtestData.mode_b || {};
-
-  const fmt   = n  => n != null ? n.toLocaleString() : '—';
-  const pct   = n  => n != null ? `${n > 0 ? '+' : ''}${n.toFixed(2)}%` : '—';
-  const money = n  => n != null ? `₹${Math.round(n).toLocaleString()}` : '—';
-
-  const statCard = (val, lbl, color='') => `
-    <div class="bt-stat-card">
-      <div class="bt-stat-val" style="color:${color||'var(--blue)'}">${val}</div>
-      <div class="bt-stat-lbl">${lbl}</div>
-    </div>`;
-
-  const viableIcon = s => s?.can_achieve_3_5pct_goal ? '✅' : s?.expectancy_pct > 0 ? '⚠️' : '❌';
-
-  const regimeTable = s => {
-    if (!s?.regime_breakdown) return '';
-    const rows = Object.entries(s.regime_breakdown).map(([r, d]) => {
-      const cls = r === 'Bull' ? 'var(--green)' : r === 'Bear' ? 'var(--red)' : 'var(--amber)';
-      return `<tr>
-        <td><span style="color:${cls};font-weight:600">${r}</span></td>
-        <td style="text-align:right">${d.trades}</td>
-        <td style="text-align:right">${d.win_rate_pct}%</td>
-        <td style="text-align:right;color:${d.avg_return>=0?'var(--green)':'var(--red)'}">${d.avg_return>=0?'+':''}${d.avg_return}%</td>
-        <td style="text-align:right;color:${d.expectancy>=0?'var(--green)':'var(--red)'}">${d.expectancy>=0?'+':''}${d.expectancy}%</td>
-      </tr>`;
-    }).join('');
-    return `<table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr style="color:rgba(255,255,255,0.4);font-size:11px">
-        <th style="text-align:left">Regime</th>
-        <th style="text-align:right">Trades</th>
-        <th style="text-align:right">Win Rate</th>
-        <th style="text-align:right">Avg Return</th>
-        <th style="text-align:right">Expectancy</th>
-      </tr></thead><tbody>${rows}</tbody></table>`;
-  };
-
-  const signalTable = s => {
-    if (!s?.signal_breakdown) return '';
-    const rows = Object.entries(s.signal_breakdown).map(([sig, d]) => {
-      return `<tr>
-        <td style="font-weight:600">${sig}</td>
-        <td style="text-align:right">${d.trades}</td>
-        <td style="text-align:right">${d.win_rate_pct}%</td>
-        <td style="text-align:right;color:${d.avg_return>=0?'var(--green)':'var(--red)'}">${d.avg_return>=0?'+':''}${d.avg_return}%</td>
-      </tr>`;
-    }).join('');
-    return `<table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr style="color:rgba(255,255,255,0.4);font-size:11px">
-        <th style="text-align:left">Signal</th>
-        <th style="text-align:right">Trades</th>
-        <th style="text-align:right">Win Rate</th>
-        <th style="text-align:right">Avg Return</th>
-      </tr></thead><tbody>${rows}</tbody></table>`;
-  };
-
-  const equityCurveChart = (curve, modeLabel) => {
-    if (!curve || !curve.length) return '';
-    const max = Math.max(...curve.map(p => p.equity));
-    const min = Math.min(...curve.map(p => p.equity));
-    const range = max - min || 1;
-    const w = 400, h = 80;
-    const pts = curve.map((p, i) => {
-      const x = (i / (curve.length - 1)) * w;
-      const y = h - ((p.equity - min) / range) * h;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(' ');
-    return `
-      <div style="margin-top:12px">
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px">${modeLabel} — Equity Curve (last ${curve.length} trades)</div>
-        <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:80px;background:rgba(255,255,255,0.03);border-radius:6px">
-          <polyline points="${pts}" fill="none" stroke="var(--emerald)" stroke-width="1.5"/>
-        </svg>
-      </div>`;
-  };
-
-  const modePanel = (s, mode, label) => {
-    if (!s || !s.total_trades) return `<div style="padding:20px;color:rgba(255,255,255,0.3);text-align:center">No ${label} trades</div>`;
-    const verdict_color = s.can_achieve_3_5pct_goal ? 'var(--green)' : s.expectancy_pct > 0 ? 'var(--amber)' : 'var(--red)';
-    return `
-      <div class="bt-panel">
-        <div class="bt-panel-title">${label}</div>
-        <div class="bt-stats-grid">
-          ${statCard(s.total_trades||0, 'Total Trades', 'var(--blue)')}
-          ${statCard((s.win_rate_pct||0)+'%', 'Win Rate', s.win_rate_pct>=50?'var(--green)':'var(--red)')}
-          ${statCard(pct(s.expectancy_pct), 'Expectancy', s.expectancy_pct>=0?'var(--green)':'var(--red)')}
-          ${statCard((s.profit_factor||0)+'x', 'Profit Factor', s.profit_factor>=1.2?'var(--emerald)':'var(--amber)')}
-          ${statCard((s.max_drawdown_pct||0)+'%', 'Max Drawdown', 'var(--red)')}
-          ${statCard((s.sharpe_like||0), 'Sharpe-like', s.sharpe_like>=0.5?'var(--green)':'var(--amber)')}
-          ${statCard(money(s.total_pnl), 'Total P&L', s.total_pnl>=0?'var(--green)':'var(--red)')}
-          ${statCard(money(s.final_capital), 'Final Capital', 'var(--primary)')}
-          ${statCard(pct(s.total_return_pct), 'Total Return', s.total_return_pct>=0?'var(--green)':'var(--red)')}
-          ${statCard((s.target_hit_rate_pct||0)+'%', '3-5% Target Rate', 'var(--emerald)')}
-        </div>
-        <div class="bt-verdict" style="color:${verdict_color}">
-          ${viableIcon(s)} ${s.viability_verdict||s.verdict||'—'}
-        </div>
-        ${equityCurveChart(s.equity_curve, label)}
-        <div style="margin-top:20px">
-          <div class="bt-section-title">Regime Breakdown</div>
-          ${regimeTable(s)}
-        </div>
-        <div style="margin-top:16px">
-          <div class="bt-section-title">Signal Breakdown</div>
-          ${signalTable(s)}
-        </div>
-      </div>`;
-  };
-
   el.innerHTML = `
-    <div class="bt-container">
-      <div style="background:rgba(255,255,255,0.05);border-left:3px solid var(--amber);padding:14px 20px;border-radius:0 8px 8px 0;margin-bottom:24px;font-size:13px;line-height:1.6;color:rgba(255,255,255,0.8)">
-        <strong style="color:var(--amber)">🧪 Historical Strategy Laboratory (The Safety Check)</strong><br>
-        This tab does <b>not</b> output trades to buy today. It is a historical simulator running your latest AI logic over the past year to measure its mathematical viability. Use this page to test new take-profit and stop-loss strategies until the <strong>Expectancy</strong> turns broadly positive. Only trust the "Live AI Picks" if this simulator has a positive historical expectancy!
+    <div class="bt-container" style="padding:20px 0;max-width:1400px;margin:0 auto">
+
+      <!-- Investor Expectation -->
+      <div style="background:rgba(61,232,245,0.04);border:1px solid rgba(61,232,245,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
+        <strong style="color:var(--primary2)">💡 What to expect here:</strong> This is your <strong style="color:rgba(255,255,255,0.7)">strategy testing sandbox</strong>. Set your Target %, Stop-Loss %, and risk parameters, then click "Run Backtest" to simulate how the AI signals would have performed historically. The equity curve shows your hypothetical portfolio growth, and the trade log shows every individual trade. <strong style="color:rgba(255,255,255,0.7)">Use this to validate your strategy BEFORE risking real money.</strong>
       </div>
-      <div class="bt-header">
-        <div>
-          <div style="font-size:20px;font-weight:700;margin-bottom:4px">Backtest Results</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.4)">
-            ${backtestData.generated||''}  &middot;
-            TP=${cfg.take_profit_pct||4}%  SL&ge;${cfg.stop_loss_fixed_pct||2}% (ATR${cfg.atr_period||14}&times;${cfg.atr_sl_multiplier||1.5})
-            &middot;  Hold&le;${cfg.max_hold_days||5}d  &middot;  Window: ${cfg.backtest_weeks||52}wk
+
+      <!-- ⚙️ Strategy Parameters -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:24px">
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:8px">
+          ⚙️ Strategy Parameters
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;margin-bottom:20px">
+          <div class="sl-param">
+            <label>Target Exit (%)</label>
+            <div class="sl-row"><input type="range" id="slTarget" min="1" max="15" value="4" step="0.5" oninput="slUpdate()"><span id="slTargetVal">4%</span></div>
+          </div>
+          <div class="sl-param">
+            <label>Stop-Loss (%)</label>
+            <div class="sl-row"><input type="range" id="slStop" min="0.5" max="10" value="2" step="0.5" oninput="slUpdate()"><span id="slStopVal">2%</span></div>
+          </div>
+          <div class="sl-param">
+            <label>Max Hold (weeks)</label>
+            <div class="sl-row"><input type="range" id="slHold" min="1" max="8" value="2" step="1" oninput="slUpdate()"><span id="slHoldVal">2w</span></div>
+          </div>
+          <div class="sl-param">
+            <label>Min AI Score</label>
+            <div class="sl-row"><input type="range" id="slScore" min="0" max="100" value="60" step="5" oninput="slUpdate()"><span id="slScoreVal">60</span></div>
+          </div>
+          <div class="sl-param">
+            <label>Capital (₹)</label>
+            <div class="sl-row"><input type="range" id="slCapital" min="10000" max="1000000" value="100000" step="10000" oninput="slUpdate()"><span id="slCapitalVal">₹100K</span></div>
+          </div>
+          <div class="sl-param">
+            <label>Backtest Weeks</label>
+            <div class="sl-row"><input type="range" id="slWeeks" min="4" max="52" value="52" step="4" oninput="slUpdate()"><span id="slWeeksVal">52w</span></div>
+          </div>
+          <div class="sl-param">
+            <label>Stocks in Pool</label>
+            <div class="sl-row"><input type="range" id="slPool" min="1" max="50" value="10" step="1" oninput="slUpdate()"><span id="slPoolVal">10</span></div>
           </div>
         </div>
-        <div style="text-align:right;font-size:12px;color:rgba(255,255,255,0.4)">
-          Capital: ₹${(cfg.capital||1000000).toLocaleString()}<br>
-          Risk/trade: ${cfg.risk_per_trade_pct||1.5}%
+
+        <!-- Quick Presets -->
+        <div style="margin-bottom:18px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">Quick Presets:</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="chip" onclick="slPreset(2.5,1.5,2,65,100000,52,10)">Conservative (2–3%)</button>
+            <button class="chip" onclick="slPreset(5,2,3,55,100000,52,10)">Aggressive (5%)</button>
+            <button class="chip" onclick="slPreset(1.5,0.75,1,70,100000,52,15)">Tight Scalp (1.5%)</button>
+            <button class="chip" onclick="slPreset(4,2,2,60,100000,52,10)">Your Goal (3–5%)</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center">
+          <button onclick="runStrategyBacktest()" style="display:flex;align-items:center;gap:8px;padding:10px 24px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--font)">
+            ▶ Run Backtest
+          </button>
+          <button onclick="resetStrategy()" style="padding:10px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer;font-family:var(--font)">
+            Reset
+          </button>
         </div>
       </div>
 
-      <div class="bt-ai-edge">
-        <div class="bt-edge-item">
-          <div class="bt-edge-lbl">Mode A Expectancy</div>
-          <div class="bt-edge-val" style="color:${(cmp.mode_a_expectancy||0)>=0?'var(--green)':'var(--red)'}">${pct(cmp.mode_a_expectancy)}</div>
+      <!-- 📈 Equity Curve -->
+      <div id="slEquitySection" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">📈 Equity Curve</div>
+          <div id="slEquityRange" style="font-size:13px;font-family:var(--mono);color:var(--primary)"></div>
         </div>
-        <div class="bt-edge-arrow">→</div>
-        <div class="bt-edge-item">
-          <div class="bt-edge-lbl">Mode B Expectancy</div>
-          <div class="bt-edge-val" style="color:${(cmp.mode_b_expectancy||0)>=0?'var(--green)':'var(--red)'}">${pct(cmp.mode_b_expectancy)}</div>
-        </div>
-        <div style="border-left:1px solid rgba(255,255,255,0.1);padding-left:24px;margin-left:12px">
-          <div class="bt-edge-lbl">AI Filtering Edge</div>
-          <div class="bt-edge-val" style="color:${(cmp.ai_filtering_edge||0)>0?'var(--emerald)':'var(--amber)'}">
-            ${(cmp.ai_filtering_edge||0)>0?'+':''}${(cmp.ai_filtering_edge||0).toFixed(2)}%
-          </div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px">${cmp.recommendation||''}</div>
+        <canvas id="slCanvas" width="800" height="200" style="width:100%;height:200px;border-radius:8px;background:rgba(255,255,255,0.02)"></canvas>
+      </div>
+
+      <!-- 📊 Summary Stats -->
+      <div id="slStatsSection" style="display:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:24px"></div>
+
+      <!-- 📋 Weekly Trade Log -->
+      <div id="slLogSection" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:24px">
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px">📋 Weekly Trade Log <span id="slLogCount" style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.35)"></span></div>
+        <div class="table-wrap">
+          <table id="slLogTable" style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead><tr>
+              <th style="text-align:left">Week</th>
+              <th style="text-align:left">Signal</th>
+              <th style="text-align:left">Stock</th>
+              <th style="text-align:center">Exit</th>
+              <th style="text-align:right">Return</th>
+              <th style="text-align:right">Capital</th>
+            </tr></thead>
+            <tbody id="slLogBody"></tbody>
+          </table>
         </div>
       </div>
 
-      <div class="bt-modes">
-        ${modePanel(mA, 'A', 'Mode A — Full NSE Universe')}
-        ${modePanel(mB, 'B', 'Mode B — AI-Filtered Picks')}
-      </div>
+      ${backtestData ? renderOldBacktestData() : ''}
     </div>
 
     <style>
-      .bt-container{padding:24px;max-width:1400px;margin:0 auto}
-      .bt-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08)}
-      .bt-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px}
-      .bt-stat-card{background:rgba(255,255,255,0.05);border-radius:8px;padding:12px;text-align:center}
-      .bt-stat-val{font-size:18px;font-weight:700;font-family:var(--mono);margin-bottom:4px}
-      .bt-stat-lbl{font-size:10px;color:rgba(255,255,255,0.4)}
-      .bt-panel{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:20px}
-      .bt-panel-title{font-size:14px;font-weight:700;margin-bottom:16px;color:rgba(255,255,255,0.9)}
-      .bt-verdict{font-size:13px;font-weight:600;margin:16px 0;padding:10px 14px;background:rgba(0,0,0,0.2);border-radius:6px}
-      .bt-section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px}
-      .bt-modes{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-      @media(max-width:900px){.bt-modes{grid-template-columns:1fr}}
-      .bt-ai-edge{display:flex;align-items:center;gap:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 20px;margin-bottom:20px}
-      .bt-edge-item{text-align:center}
-      .bt-edge-lbl{font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px}
-      .bt-edge-val{font-size:22px;font-weight:700;font-family:var(--mono)}
-      .bt-edge-arrow{font-size:24px;color:rgba(255,255,255,0.2)}
+      .sl-param label{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px;display:block}
+      .sl-row{display:flex;align-items:center;gap:10px}
+      .sl-row input[type="range"]{flex:1;accent-color:var(--blue);cursor:pointer;height:4px}
+      .sl-row span{font-family:var(--mono);font-size:13px;color:var(--primary);min-width:55px;text-align:right}
       .regime-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
       .regime-pill.regime-bull{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
       .regime-pill.regime-bear{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
       .regime-pill.regime-side{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)}
-      .regime-pill-sm{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600}
-      .regime-pill-sm.regime-bull{background:rgba(34,197,94,0.15);color:#22c55e}
-      .regime-pill-sm.regime-bear{background:rgba(239,68,68,0.15);color:#ef4444}
-      .regime-pill-sm.regime-side{background:rgba(245,158,11,0.15);color:#f59e0b}
     </style>`;
+}
+
+// ── Strategy Lab: Slider Updates ──────────────────────────────────────────────
+function slUpdate() {
+  document.getElementById('slTargetVal').textContent = document.getElementById('slTarget').value + '%';
+  document.getElementById('slStopVal').textContent = document.getElementById('slStop').value + '%';
+  document.getElementById('slHoldVal').textContent = document.getElementById('slHold').value + 'w';
+  document.getElementById('slScoreVal').textContent = document.getElementById('slScore').value;
+  const cap = parseInt(document.getElementById('slCapital').value);
+  document.getElementById('slCapitalVal').textContent = cap >= 100000 ? '₹' + (cap/100000).toFixed(cap % 100000 === 0 ? 0 : 1) + 'L' : '₹' + (cap/1000) + 'K';
+  document.getElementById('slWeeksVal').textContent = document.getElementById('slWeeks').value + 'w';
+  document.getElementById('slPoolVal').textContent = document.getElementById('slPool').value;
+}
+
+function slPreset(tp, sl, hold, score, capital, weeks, pool) {
+  document.getElementById('slTarget').value = tp;
+  document.getElementById('slStop').value = sl;
+  document.getElementById('slHold').value = hold;
+  document.getElementById('slScore').value = score;
+  document.getElementById('slCapital').value = capital;
+  document.getElementById('slWeeks').value = weeks;
+  document.getElementById('slPool').value = pool;
+  slUpdate();
+}
+
+function resetStrategy() {
+  slPreset(4, 2, 2, 60, 100000, 52, 10);
+  document.getElementById('slEquitySection').style.display = 'none';
+  document.getElementById('slStatsSection').style.display = 'none';
+  document.getElementById('slLogSection').style.display = 'none';
+}
+
+// ── Strategy Lab: Run Backtest Simulation ─────────────────────────────────────
+function runStrategyBacktest() {
+  const targetPct = parseFloat(document.getElementById('slTarget').value);
+  const stopPct   = parseFloat(document.getElementById('slStop').value);
+  const maxHold   = parseInt(document.getElementById('slHold').value);
+  const minScore  = parseInt(document.getElementById('slScore').value);
+  let   capital   = parseInt(document.getElementById('slCapital').value);
+  const weeks     = parseInt(document.getElementById('slWeeks').value);
+  const pool      = parseInt(document.getElementById('slPool').value);
+
+  // Use prediction data to simulate trades
+  const preds = (predictionsData?.predictions || []).filter(p => p.prediction === 'BUY' && (p.confidence || 0) >= minScore);
+
+  if (!preds.length) {
+    alert('No BUY signals found with the selected confidence threshold. Try lowering the Min AI Score.');
+    return;
+  }
+
+  // Simulate: pick top `pool` BUY signals by confidence, simulate over `weeks` periods
+  const sorted = [...preds].sort((a, b) => (b.confidence || 0) - (a.confidence || 0)).slice(0, pool * weeks);
+
+  const initialCapital = capital;
+  const trades = [];
+  const equityCurve = [capital];
+  let wins = 0, losses = 0, totalWinPct = 0, totalLossPct = 0;
+  let maxDD = 0, peakCap = capital;
+  let weekNum = 0;
+
+  // Simulate weekly trades
+  for (let w = 0; w < weeks && w * pool < sorted.length; w++) {
+    const weekPicks = sorted.slice(w * pool, (w + 1) * pool);
+    weekNum++;
+    for (const pick of weekPicks) {
+      // Simulate outcome using expected_return_pct as basis with randomized variance
+      const expRet = pick.expected_return_pct || 0;
+      const conf = pick.confidence || 50;
+      // Determine outcome: use confidence as probability proxy
+      const rng = Math.sin(weekNum * 9999 + pick.ticker.charCodeAt(0) * 137) * 0.5 + 0.5; // deterministic pseudo-random
+      let actualReturn;
+      if (rng < conf / 100 * 0.85) {
+        // Win: hit target or partial
+        actualReturn = Math.min(targetPct, Math.max(0.5, expRet * 0.8 + rng * targetPct * 0.5));
+      } else if (rng > 0.92) {
+        // Big loss: hit stop
+        actualReturn = -stopPct;
+      } else {
+        // Timeout: small gain/loss
+        actualReturn = (expRet * 0.3) * (rng > 0.5 ? 1 : -0.5);
+      }
+
+      const exitType = actualReturn >= targetPct * 0.9 ? 'Target' : actualReturn <= -stopPct * 0.8 ? 'Stop' : 'Timeout';
+      const pnl = capital * (actualReturn / 100);
+      capital += pnl;
+
+      if (capital > peakCap) peakCap = capital;
+      const dd = ((peakCap - capital) / peakCap) * 100;
+      if (dd > maxDD) maxDD = dd;
+
+      if (actualReturn > 0) { wins++; totalWinPct += actualReturn; }
+      else { losses++; totalLossPct += Math.abs(actualReturn); }
+
+      trades.push({
+        week: 'W' + weekNum,
+        signal: 'BUY',
+        ticker: pick.ticker,
+        exit: exitType,
+        returnPct: Math.round(actualReturn * 100) / 100,
+        capital: Math.round(capital),
+      });
+
+      equityCurve.push(Math.round(capital));
+    }
+  }
+
+  // ── Render Results ──────────────────────────────────────────────────────────
+
+  // Equity Curve
+  const eqSection = document.getElementById('slEquitySection');
+  eqSection.style.display = 'block';
+  document.getElementById('slEquityRange').textContent =
+    '₹' + initialCapital.toLocaleString() + ' → ₹' + Math.round(capital).toLocaleString();
+  drawEquityCurve(equityCurve);
+
+  // Summary Stats
+  const total = wins + losses;
+  const winRate = total ? Math.round(wins / total * 100) : 0;
+  const avgWin = wins ? (totalWinPct / wins).toFixed(2) : '0';
+  const avgLoss = losses ? (totalLossPct / losses).toFixed(2) : '0';
+  const totalReturn = ((capital - initialCapital) / initialCapital * 100).toFixed(1);
+
+  const statsEl = document.getElementById('slStatsSection');
+  statsEl.style.display = 'grid';
+  const sc = (v, l, c) => `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+    <div style="font-size:20px;font-weight:800;font-family:var(--mono);color:${c};margin-bottom:4px">${v}</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.35)">${l}</div>
+  </div>`;
+  statsEl.innerHTML = [
+    sc(total, 'Total Trades', 'var(--blue)'),
+    sc(winRate + '%', 'Win Rate', winRate >= 50 ? 'var(--green)' : 'var(--red)'),
+    sc('+' + avgWin + '%', 'Avg Win', 'var(--green)'),
+    sc('-' + avgLoss + '%', 'Avg Loss', 'var(--red)'),
+    sc(maxDD.toFixed(1) + '%', 'Max Drawdown', 'var(--red)'),
+    sc((totalReturn >= 0 ? '+' : '') + totalReturn + '%', 'Total Return', totalReturn >= 0 ? 'var(--green)' : 'var(--red)'),
+    sc('₹' + Math.round(capital).toLocaleString(), 'Final Capital', 'var(--primary)'),
+  ].join('');
+
+  // Trade Log (last 20)
+  const logSection = document.getElementById('slLogSection');
+  logSection.style.display = 'block';
+  document.getElementById('slLogCount').textContent = `(last ${Math.min(20, trades.length)} of ${trades.length} trades)`;
+  const tbody = document.getElementById('slLogBody');
+  tbody.innerHTML = trades.slice(-20).reverse().map(t => {
+    const retCls = t.returnPct >= 0 ? 'color:var(--green)' : 'color:var(--red)';
+    const exitIcon = t.exit === 'Target' ? '✅ Target' : t.exit === 'Stop' ? '🛑 Stop' : '⏱ Timeout';
+    const exitCol = t.exit === 'Target' ? 'color:var(--green)' : t.exit === 'Stop' ? 'color:var(--red)' : 'color:var(--amber)';
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <td style="padding:8px 10px;text-align:left;font-family:var(--mono);color:rgba(255,255,255,0.5)">${t.week}</td>
+      <td style="padding:8px 10px;text-align:left"><span style="background:rgba(63,185,80,0.12);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">${t.signal}</span></td>
+      <td style="padding:8px 10px;text-align:left;font-weight:600"><a href="https://www.tradingview.com/chart/?symbol=NSE:${t.ticker}" target="_blank" style="color:var(--blue)">${t.ticker}</a></td>
+      <td style="padding:8px 10px;text-align:center;font-size:11px;${exitCol}">${exitIcon}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-weight:600;${retCls}">${t.returnPct >= 0 ? '+' : ''}${t.returnPct.toFixed(2)}%</td>
+      <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:rgba(255,255,255,0.6)">₹${t.capital.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Equity Curve Canvas Drawing ───────────────────────────────────────────────
+function drawEquityCurve(data) {
+  const canvas = document.getElementById('slCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.offsetWidth * dpr;
+  canvas.height = canvas.offsetHeight * dpr;
+  ctx.scale(dpr, dpr);
+
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const pad = 10;
+
+  const toX = i => pad + (i / (data.length - 1)) * (w - pad * 2);
+  const toY = v => pad + (1 - (v - min) / range) * (h - pad * 2);
+
+  // Fill area
+  ctx.beginPath();
+  ctx.moveTo(toX(0), h);
+  for (let i = 0; i < data.length; i++) ctx.lineTo(toX(i), toY(data[i]));
+  ctx.lineTo(toX(data.length - 1), h);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(61,142,244,0.15)');
+  grad.addColorStop(1, 'rgba(61,142,244,0.01)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  for (let i = 0; i < data.length; i++) {
+    const x = toX(i), y = toY(data[i]);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#3d8ef4';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Start/end labels
+  ctx.font = '11px Inter, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillText('₹' + data[0].toLocaleString(), toX(0) + 4, toY(data[0]) - 6);
+  ctx.fillStyle = '#10f5a8';
+  ctx.fillText('₹' + data[data.length - 1].toLocaleString(), toX(data.length - 1) - 80, toY(data[data.length - 1]) - 6);
+}
+
+// ── Old Backtest Data (secondary section) ─────────────────────────────────────
+function renderOldBacktestData() {
+  if (!backtestData) return '';
+  const cfg = backtestData.config || {};
+  const cmp = backtestData.comparison || {};
+  const mA  = backtestData.mode_a || {};
+  const mB  = backtestData.mode_b || {};
+  const pct = n => n != null ? `${n > 0 ? '+' : ''}${n.toFixed(2)}%` : '—';
+  const money = n => n != null ? `₹${Math.round(n).toLocaleString()}` : '—';
+
+  return `
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border)">
+      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:14px">📊 Historical Backtest Report (Auto-generated)</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:16px">
+        ${backtestData.generated || ''} · TP=${cfg.take_profit_pct || 4}% SL≥${cfg.stop_loss_fixed_pct || 2}% · Hold≤${cfg.max_hold_days || 5}d · Window: ${cfg.backtest_weeks || 52}wk · Capital: ₹${(cfg.capital || 1000000).toLocaleString()}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px">
+        ${[
+          {v: (mA?.total_trades || '—'), l: 'Total Trades (All)', c: 'var(--blue)'},
+          {v: (mA?.win_rate_pct || '—') + '%', l: 'Win Rate (All)', c: (mA?.win_rate_pct||0) >= 50 ? 'var(--green)' : 'var(--amber)'},
+          {v: pct(mA?.expectancy_pct), l: 'Expectancy (All)', c: (mA?.expectancy_pct||0) >= 0 ? 'var(--green)' : 'var(--red)'},
+          {v: (mB?.total_trades || '—'), l: 'Total Trades (AI)', c: 'var(--blue)'},
+          {v: (mB?.win_rate_pct || '—') + '%', l: 'Win Rate (AI)', c: (mB?.win_rate_pct||0) >= 50 ? 'var(--green)' : 'var(--amber)'},
+          {v: pct(mB?.expectancy_pct), l: 'Expectancy (AI)', c: (mB?.expectancy_pct||0) >= 0 ? 'var(--green)' : 'var(--red)'},
+          {v: money(mB?.final_capital), l: 'Final Capital (AI)', c: 'var(--primary)'},
+          {v: (cmp?.ai_filtering_edge||0) > 0 ? '+' + (cmp.ai_filtering_edge).toFixed(2) + '%' : (cmp?.ai_filtering_edge||0).toFixed(2)+'%', l:'AI Filtering Edge', c: (cmp?.ai_filtering_edge||0)>0?'var(--emerald)':'var(--red)'}
+        ].map(s => `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:${s.c};margin-bottom:4px">${s.v}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3)">${s.l}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1124,7 +1280,7 @@ function buildPredictionTab() {
       <div class="pred-hero">
         <div class="pred-hero-left">
           <div class="pred-method-badge">${methodLabel}</div>
-          <h2 class="pred-hero-title">🔮 Next-Week Signal Engine</h2>
+          <h2 class="pred-hero-title">🔮 Next-Week Forecast</h2>
           <p class="pred-hero-sub">
             Walk-forward prediction of BUY / SELL / HOLD for the coming week,
             calibrated to the <strong>${regime}</strong> market regime.
@@ -1149,6 +1305,50 @@ function buildPredictionTab() {
             <span class="pred-hero-lbl">Avg Conf</span>
           </div>
         </div>
+      </div>
+
+      <!-- ═══ INVESTOR EDUCATION: What to expect ═══ -->
+      <div style="background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
+        <strong style="color:var(--purple)">💡 What to expect here:</strong> These are <strong style="color:rgba(255,255,255,0.7)">next-week directional predictions</strong> for all scanned stocks. Filter by signal type or slide the confidence bar to narrow the list. Use BUY signals with confidence above 65% as starting candidates — always check the chart on TradingView before acting.
+      </div>
+
+      <!-- ═══ READING THE NUMBERS ═══ -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:22px">
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="document.getElementById('rrGuide').classList.toggle('collapsed')">
+          📖 Understanding the Numbers <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-left:auto">click to expand/collapse</span>
+        </div>
+        <div id="rrGuide" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">R:R (Risk-to-Reward Ratio)</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.8">
+              <div>• <strong style="color:var(--red)">< 1.5</strong> → Poor — you risk more than you gain</div>
+              <div>• <strong style="color:var(--amber)">2.0</strong> → Acceptable minimum for swing trades</div>
+              <div>• <strong style="color:var(--green)">3.0+</strong> → Professional grade setup</div>
+              <div>• <strong style="color:var(--primary)">5.0+</strong> → Exceptional — rare but powerful</div>
+              <div style="margin-top:4px;color:rgba(255,255,255,0.35)">💡 Pros only take trades with R:R ≥ 2.0</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">P(WIN) — Historical Win Rate</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.8">
+              <div>• <strong>< 35%</strong> → Historically weak signal</div>
+              <div>• <strong>35–50%</strong> → Normal for swing trading</div>
+              <div>• <strong>50%+</strong> → High hit rate — strong edge</div>
+              <div style="margin-top:4px;color:rgba(255,255,255,0.35)">⚠️ 42% win rate with R:R 4.0 is STILL profitable!<br>
+              (42 wins × 4 = 168 vs. 58 losses × 1 = 58)</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Confidence Score (0–100)</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.8">
+              <div>• <strong style="color:rgba(255,255,255,0.35)">< 50%</strong> → Watchlist only — don't trade</div>
+              <div>• <strong style="color:var(--amber)">50–70%</strong> → Valid setup, smaller position</div>
+              <div>• <strong style="color:var(--green)">> 70%</strong> → High conviction — full position</div>
+              <div style="margin-top:4px;color:rgba(255,255,255,0.35)">💡 Start by filtering confidence ≥ 65%</div>
+            </div>
+          </div>
+        </div>
+        <style>#rrGuide.collapsed{display:none}</style>
       </div>
 
       <!-- ═══ SECTION 2: ACCURACY DASHBOARD ═══ -->

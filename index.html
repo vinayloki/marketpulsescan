@@ -804,21 +804,24 @@
 
     <!-- TABS -->
     <nav class="tab-nav" id="tabNav">
-      <button class="tab-btn active" data-tab="opportunities" id="oppTab">🎯 Opportunities <span class="tab-badge" id="oppBadge">0</span></button>
-      <button class="tab-btn" data-tab="movers">🏆 Top Movers <span class="tab-badge" id="moversBadge">0</span></button>
-      <button class="tab-btn" data-tab="fullscan">📋 Full Scan <span class="tab-badge" id="fsBadge">0</span></button>
-      <button class="tab-btn" data-tab="news">📰 News</button>
-      <button class="tab-btn" data-tab="aipicks" id="aiPicksTab">🤖 AI Picks <span class="tab-badge" style="background:var(--blue);color:#fff">LIVE</span></button>
-      <button class="tab-btn" data-tab="predictions" id="predTab">🔮 Predictions <span class="tab-badge" style="background:var(--purple);color:#fff" id="predBadge">—</span></button>
-      <button class="tab-btn" data-tab="about">ℹ️ About &amp; Guide</button>
-      <button class="tab-btn" data-tab="backtest">Backtest</button>
+      <button class="tab-btn active" data-tab="opportunities" id="oppTab">🎯 Trade Setups <span class="tab-badge" id="oppBadge">0</span></button>
+      <button class="tab-btn" data-tab="movers">📊 Market Overview <span class="tab-badge" id="moversBadge">0</span></button>
+      <button class="tab-btn" data-tab="fullscan">🔬 Stock Screener <span class="tab-badge" id="fsBadge">0</span></button>
+      <button class="tab-btn" data-tab="news">📰 Market News</button>
+      <button class="tab-btn" data-tab="aipicks" id="aiPicksTab">🤖 AI Signals <span class="tab-badge" style="background:var(--blue);color:#fff">LIVE</span></button>
+      <button class="tab-btn" data-tab="predictions" id="predTab">🔮 Next-Week Forecast <span class="tab-badge" style="background:var(--purple);color:#fff" id="predBadge">—</span></button>
+      <button class="tab-btn" data-tab="about">📖 Learn &amp; Guide</button>
+      <button class="tab-btn" data-tab="backtest">🧪 Strategy Lab</button>
     </nav>
 
     <!-- TAB: OPPORTUNITIES -->
     <div class="tab-panel active" id="tab-opportunities">
       <div class="section-head">
-        <h2>🎯 Opportunity Engine — Ranked Setups</h2>
+        <h2>🎯 Trade Setups — Today's Best Opportunities</h2>
         <span class="sh-sub">52W Breakout · Volume Spike · EMA Momentum · Updated daily after market close</span>
+      </div>
+      <div style="background:rgba(16,245,168,0.04);border:1px solid rgba(16,245,168,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
+        <strong style="color:var(--primary)">💡 What to expect here:</strong> These are the highest-conviction trade setups from today's scan. Each card is scored (0–100) based on breakout proximity, volume surge, and momentum alignment. <strong style="color:rgba(255,255,255,0.7)">Higher score = more signals align = stronger setup.</strong> Start your research here, then validate on TradingView.
       </div>
       <div class="opp-controls">
         <input class="opp-input" id="oppSearch" type="text" placeholder="🔍 Search ticker..." oninput="onOppSearch()">
@@ -843,8 +846,11 @@
     <!-- TAB: TOP MOVERS -->
     <div class="tab-panel" id="tab-movers">
       <div class="section-head">
-        <h2>🏆 All NSE Stocks — Fundamentals + Momentum</h2>
-        <span class="sh-sub">All 2000+ NSE stocks by 1M performance · Fundamentals for top movers · MCap from NSE index</span>
+        <h2>📊 Market Overview — All NSE Stocks</h2>
+        <span class="sh-sub">All 2000+ NSE stocks ranked by momentum · Enriched with fundamentals · Filter by sector, P/E, market cap</span>
+      </div>
+      <div style="background:rgba(61,142,244,0.04);border:1px solid rgba(61,142,244,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
+        <strong style="color:var(--blue)">💡 What to expect here:</strong> Browse the full NSE universe — every stock ranked by recent performance. Use filters (sector, P/E, market cap) to narrow down candidates. Cards show momentum across 6 timeframes (1W→12M) plus fundamentals like P/E, Market Cap, and Dividend Yield. <strong style="color:rgba(255,255,255,0.7)">This is your discovery screen — find stocks, then check them in Trade Setups or AI Signals.</strong>
       </div>
       <div class="tm-controls">
         <input class="tm-input" id="tmSearch" type="text" placeholder="🔍 Search ticker..." oninput="onTmSearch()">
@@ -872,8 +878,11 @@
     <!-- TAB: FULL SCAN -->
     <div class="tab-panel" id="tab-fullscan">
       <div class="section-head">
-        <h2>📋 Full NSE Scan — All Stocks</h2>
+        <h2>🔬 Stock Screener — Filter & Sort</h2>
         <span class="sh-sub">Click any column header to sort · Ticker links open TradingView</span>
+      </div>
+      <div style="background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
+        <strong style="color:var(--purple)">💡 What to expect here:</strong> Raw performance data for every NSE stock in a sortable table. Click column headers to find the biggest gainers/losers over any timeframe. Use the search box and filters to screen for specific criteria like <strong style="color:rgba(255,255,255,0.7)">"Large Caps that gained 10%+ this month"</strong> or <strong style="color:rgba(255,255,255,0.7)">"Small Caps with 12M returns above 100%"</strong>.
       </div>
       <div class="fs-controls">
         <input class="fs-input" id="fsSearch" type="text" placeholder="🔍 Search ticker..." oninput="onFsSearch()">
@@ -916,8 +925,11 @@
     <!-- TAB: NEWS -->
     <div class="tab-panel" id="tab-news">
       <div class="section-head">
-        <h2>📰 Market News</h2>
+        <h2>📰 Market News — Stay Informed</h2>
         <span class="sh-sub">LiveMint · Economic Times · Latest updates</span>
+      </div>
+      <div style="background:rgba(245,166,35,0.04);border:1px solid rgba(245,166,35,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
+        <strong style="color:var(--amber)">💡 What to expect here:</strong> Latest market headlines from trusted Indian financial sources, refreshed daily. Use this to <strong style="color:rgba(255,255,255,0.7)">cross-check your trade ideas against current events</strong> — sector policy changes, earnings surprises, or macro developments that could impact your positions.
       </div>
       <div id="newsContent"></div>
     </div>
@@ -928,8 +940,51 @@
       <!-- ① HERO -->
       <div class="ai-hero">
         <div class="ai-hero-badge"><span class="ai-hero-pulse"></span> EOD Intelligence Engine</div>
-        <h1>AI-Powered Stock Picks<br><span>EOD Intelligence</span></h1>
+        <h1>AI-Powered Stock Signals<br><span>EOD Intelligence</span></h1>
         <p>Daily post-market insights with Buy, Hold, and Sell recommendations—powered by data, not noise. Every signal is explained so you always know the <em>why</em> behind each call.</p>
+      </div>
+
+      <!-- ACTION GUIDE -->
+      <div id="aiActionGuide" style="background:linear-gradient(135deg,rgba(63,185,80,0.05),rgba(245,166,35,0.04),rgba(248,81,73,0.04));border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px 26px;margin-bottom:24px;position:relative">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;cursor:pointer" onclick="this.parentElement.querySelector('.guide-body').classList.toggle('collapsed')">
+          <div style="font-size:14px;font-weight:700;color:#fff">📋 How to Act on These Signals</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3)">click to expand/collapse</div>
+        </div>
+        <div class="guide-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+            <div style="background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.15);border-radius:10px;padding:14px 16px">
+              <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">🟢 BUY Signal — Consider Entry</div>
+              <ul style="font-size:12px;color:rgba(255,255,255,0.55);line-height:2;list-style:none;padding:0">
+                <li>✓ Open the TradingView chart (link on card)</li>
+                <li>✓ Only enter if price is ABOVE its 21-day EMA</li>
+                <li>✓ Set Stop-Loss: 1.5× ATR below entry</li>
+                <li>✓ Target: 3× your stop distance (R:R ≥ 1:3)</li>
+              </ul>
+            </div>
+            <div style="background:rgba(248,81,73,0.06);border:1px solid rgba(248,81,73,0.15);border-radius:10px;padding:14px 16px">
+              <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px">🔴 SELL Signal — Manage Risk</div>
+              <ul style="font-size:12px;color:rgba(255,255,255,0.55);line-height:2;list-style:none;padding:0">
+                <li>✓ If you hold this stock, tighten your stop</li>
+                <li>✓ Avoid new entries; wait for recovery</li>
+                <li>✓ Don't short without a confirmed breakdown</li>
+              </ul>
+            </div>
+            <div style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);border-radius:10px;padding:14px 16px">
+              <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:8px">🟡 HOLD Signal — No Clear Edge</div>
+              <ul style="font-size:12px;color:rgba(255,255,255,0.55);line-height:2;list-style:none;padding:0">
+                <li>✓ Add to watchlist, wait for direction</li>
+                <li>✓ Do fundamental research in the meantime</li>
+                <li>✓ Enter only when BUY signal triggers</li>
+              </ul>
+            </div>
+          </div>
+          <div style="margin-top:14px;font-size:11.5px;color:rgba(255,255,255,0.35);display:flex;gap:20px;flex-wrap:wrap">
+            <span><strong style="color:rgba(255,255,255,0.5)">Confidence &lt; 50%:</strong> Watchlist only</span>
+            <span><strong style="color:rgba(255,255,255,0.5)">50–70%:</strong> Valid setup, use half position size</span>
+            <span><strong style="color:rgba(255,255,255,0.5)">&gt; 70%:</strong> High conviction — full position candidate</span>
+          </div>
+        </div>
+        <style>.guide-body.collapsed{display:none}</style>
       </div>
 
       <!-- ② HOW IT WORKS -->
@@ -1085,8 +1140,11 @@
     <!-- TAB: ABOUT & GUIDE -->
     <div class="tab-panel" id="tab-about">
       <div class="section-head">
-        <h2>ℹ️ About & User Guide</h2>
-        <span class="sh-sub">Everything you need to know about this scanner</span>
+        <h2>📖 Learn & Guide</h2>
+        <span class="sh-sub">Everything you need to know about MarketPulse India</span>
+      </div>
+      <div style="background:rgba(16,245,168,0.04);border:1px solid rgba(16,245,168,0.1);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7">
+        <strong style="color:var(--primary)">💡 What to expect here:</strong> This section explains how every tab works, what each data point means, and where the data comes from. <strong style="color:rgba(255,255,255,0.7)">Read this first if you're new</strong> — it covers the scanning schedule, data sources, auto-tags, and important limitations.
       </div>
 
       <div class="about-grid">
