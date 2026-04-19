@@ -153,19 +153,22 @@ def classify_stock_state(feat_row: "pd.Series") -> tuple[str, str]:
     rsi     = _f(rsi, 50.0)
     ema_al  = int(_f(ema_al))
 
-    # ── SQUEEZE: BB compressed + low volatility (coiled setup) ───────────────
-    if bb_sq == 1 and atr_pct < 2.5:
+    # ── SQUEEZE: BB compressed (coiled setup) ─────────────────────────────────
+    # bb_squeeze==1 is computed from BB-width percentile < 20th over 252 days
+    # in features.py — it already implies compression, no redundant ATR gate.
+    if bb_sq == 1:
         reason = (
-            f"BB compressed (ATR {atr_pct:.1f}%) · "
-            f"RSI {rsi:.0f} · Awaiting breakout"
+            f"BB compressed (ATR {atr_pct:.1f}%) \u00b7 "
+            f"RSI {rsi:.0f} \u00b7 Awaiting breakout"
         )
         return "SQUEEZE", reason
 
-    # ── QUIET: Volume drying up + low ATR (accumulation/distribution) ────────
-    if vol_con == 1 and atr_pct < 1.8:
+    # ── QUIET: Volume drying up (accumulation/distribution) ──────────────────
+    # vol_contraction==1 when current vol < 0.7x 20-week average.
+    if vol_con == 1:
         vol_desc = f"Vol ratio {vol_rat:.2f}x 20w avg"
         reason = (
-            f"Low ATR {atr_pct:.1f}% · {vol_desc} · "
+            f"ATR {atr_pct:.1f}% \u00b7 {vol_desc} \u00b7 "
             f"Possible quiet accumulation"
         )
         return "QUIET", reason

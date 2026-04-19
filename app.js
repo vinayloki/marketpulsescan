@@ -1656,13 +1656,14 @@ function buildPredictionTab() {
             <button class="chip" onclick="onPredSignal('SELL')">🔴 SELL</button>
             <button class="chip" onclick="onPredSignal('HOLD')">🟡 HOLD</button>
           </div>
-          <!-- State filter chips -->
+          <!-- State filter chips — dynamic count badges injected from preds -->
           <div class="opp-chips" id="predStateChips" style="border-left:1px solid rgba(255,255,255,0.08);padding-left:10px">
             <button class="chip active" onclick="onPredState('')" title="Show all stocks regardless of state">All States</button>
-            <button class="chip" onclick="onPredState('SQUEEZE')" title="Bollinger Bands compressed + low ATR — coiled, awaiting directional breakout" style="--chip-active-bg:rgba(224,123,0,0.8)">🗜 Squeeze</button>
-            <button class="chip" onclick="onPredState('QUIET')" title="Below-avg ATR + volume contraction — quiet accumulation or distribution phase" style="--chip-active-bg:rgba(107,114,128,0.8)">📉 Quiet</button>
-            <button class="chip" onclick="onPredState('LEADER')" title="Outperforming Nifty 50 · RSI > 55 · Above 50-EMA — confirmed relative strength" style="--chip-active-bg:rgba(21,128,61,0.8)">🏆 Leader</button>
+            <button class="chip" onclick="onPredState('SQUEEZE')" title="Bollinger Bands compressed — coiled, awaiting directional breakout" style="--chip-active-bg:rgba(224,123,0,0.8)">🗜 Squeeze <span class="chip-count">${preds.filter(p=>(p.state||'NEUTRAL')==='SQUEEZE').length}</span></button>
+            <button class="chip" onclick="onPredState('QUIET')" title="Volume contraction — quiet accumulation or distribution phase" style="--chip-active-bg:rgba(107,114,128,0.8)">📉 Quiet <span class="chip-count">${preds.filter(p=>(p.state||'NEUTRAL')==='QUIET').length}</span></button>
+            <button class="chip" onclick="onPredState('LEADER')" title="Outperforming Nifty 50 · RSI > 55 · Above 50-EMA — confirmed relative strength" style="--chip-active-bg:rgba(21,128,61,0.8)">🏆 Leader <span class="chip-count">${preds.filter(p=>(p.state||'NEUTRAL')==='LEADER').length}</span></button>
           </div>
+
           <select class="opp-select" id="predRegime" onchange="onPredFilter()">
             <option value="">All Regimes</option>
             <option value="Bull">Bull</option>
