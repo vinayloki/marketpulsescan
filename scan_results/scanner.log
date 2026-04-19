@@ -1,7 +1,302 @@
-00:22:16 │ INFO    │ 📂 Loading OHLCV from parquet cache (5.2h old)...
-00:22:17 │ INFO    │    ✅ Cache ready: 2064 stocks × 268 days
-00:22:17 │ INFO    │ 📊 Computing market regime...
-00:22:21 │ ERROR   │ 
+23:07:27 │ INFO    │ 🔍 Fetching NSE ticker universe...
+23:07:27 │ INFO    │    📡 Fetching ticker universe from NSE Live...
+23:07:30 │ INFO    │    ✅ 2190 equity tickers from NSE Live
+23:07:30 │ INFO    │ 📊 Total unique tickers: 2190
+23:07:30 │ INFO    │ 📡 Downloading 5y OHLCV for 2190 stocks...
+23:07:30 │ INFO    │ 📡 Downloading 5y OHLCV for 2190 stocks (1d interval)...
+23:07:30 │ INFO    │    📦 Batch 1/44 — 50 stocks...
+23:07:31 │ ERROR   │ HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: ACSTECH.NS"}}}
+23:07:31 │ ERROR   │ HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: 3BBLACKBIO.NS"}}}
+23:07:31 │ ERROR   │ $ACSTECH.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:31 │ ERROR   │ $3BBLACKBIO.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:35 │ ERROR   │ $ABANSENT.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:36 │ ERROR   │ $ABMKNO.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:36 │ ERROR   │ 
+4 Failed downloads:
+23:07:36 │ ERROR   │ ['ACSTECH.NS', '3BBLACKBIO.NS', 'ABANSENT.NS', 'ABMKNO.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:38 │ INFO    │    📦 Batch 2/44 — 50 stocks...
+23:07:41 │ ERROR   │ $AKCAPIT.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:43 │ ERROR   │ 
 1 Failed download:
-00:22:21 │ ERROR   │ ['^NSEI']: YFRateLimitError('Too Many Requests. Rate limited. Try after a while.')
-00:22:21 │ INFO    │    ✅ market_regime.json — Regime: Bull | A/D: 9.69
+23:07:43 │ ERROR   │ ['AKCAPIT.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:45 │ INFO    │    📦 Batch 3/44 — 50 stocks...
+23:07:46 │ ERROR   │ $AMBALALSA.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:51 │ ERROR   │ 
+1 Failed download:
+23:07:51 │ ERROR   │ ['AMBALALSA.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:53 │ INFO    │    📦 Batch 4/44 — 50 stocks...
+23:07:54 │ ERROR   │ $ASHIKA.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:56 │ ERROR   │ $ARIHANT.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:57 │ ERROR   │ $ASTAR.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:07:58 │ ERROR   │ 
+3 Failed downloads:
+23:07:58 │ ERROR   │ ['ASHIKA.NS', 'ARIHANT.NS', 'ASTAR.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:00 │ INFO    │    📦 Batch 5/44 — 50 stocks...
+23:08:01 │ ERROR   │ $BAJAJST.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:02 │ ERROR   │ $AVAILFC.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:05 │ ERROR   │ 
+2 Failed downloads:
+23:08:05 │ ERROR   │ ['BAJAJST.NS', 'AVAILFC.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:07 │ INFO    │    📦 Batch 6/44 — 50 stocks...
+23:08:08 │ ERROR   │ $BI.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:10 │ ERROR   │ $BEEKAY.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:12 │ ERROR   │ $BENGALASM.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:13 │ ERROR   │ $BATLIBOI.NS: possibly delisted; no price data found  (period=5y)
+23:08:13 │ ERROR   │ 
+4 Failed downloads:
+23:08:13 │ ERROR   │ ['BI.NS', 'BEEKAY.NS', 'BENGALASM.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:13 │ ERROR   │ ['BATLIBOI.NS']: possibly delisted; no price data found  (period=5y)
+23:08:15 │ INFO    │    📦 Batch 7/44 — 50 stocks...
+23:08:16 │ ERROR   │ $BTTL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:16 │ ERROR   │ $BLACKROSE.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:17 │ ERROR   │ $BIMETAL.NS: possibly delisted; no price data found  (period=5y)
+23:08:18 │ ERROR   │ $BNALTD.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:19 │ ERROR   │ $BNAGROCHEM.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:20 │ ERROR   │ $BIRLAPREC.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:20 │ ERROR   │ $BLIL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:20 │ ERROR   │ 
+7 Failed downloads:
+23:08:20 │ ERROR   │ ['BTTL.NS', 'BLACKROSE.NS', 'BNALTD.NS', 'BNAGROCHEM.NS', 'BIRLAPREC.NS', 'BLIL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:20 │ ERROR   │ ['BIMETAL.NS']: possibly delisted; no price data found  (period=5y)
+23:08:23 │ INFO    │    📦 Batch 8/44 — 50 stocks...
+23:08:30 │ INFO    │    📦 Batch 9/44 — 50 stocks...
+23:08:33 │ ERROR   │ $COCKERILL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:33 │ ERROR   │ $COMFINTE.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:35 │ ERROR   │ 
+2 Failed downloads:
+23:08:35 │ ERROR   │ ['COCKERILL.NS', 'COMFINTE.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:37 │ INFO    │    📦 Batch 10/44 — 50 stocks...
+23:08:38 │ ERROR   │ $DAICHI.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:41 │ ERROR   │ $DECNGOLD.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:42 │ ERROR   │ 
+2 Failed downloads:
+23:08:42 │ ERROR   │ ['DAICHI.NS', 'DECNGOLD.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:44 │ INFO    │    📦 Batch 11/44 — 50 stocks...
+23:08:47 │ ERROR   │ $DRAGARWQ.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:49 │ ERROR   │ $DISAQ.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:50 │ ERROR   │ 
+2 Failed downloads:
+23:08:50 │ ERROR   │ ['DRAGARWQ.NS', 'DISAQ.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:52 │ INFO    │    📦 Batch 12/44 — 50 stocks...
+23:08:52 │ ERROR   │ $ELANTAS.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:53 │ ERROR   │ $EMPOWER.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:54 │ ERROR   │ $ELPROINTL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:56 │ ERROR   │ $ELCIDIN.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:57 │ ERROR   │ $ELITECON.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:08:58 │ ERROR   │ 
+5 Failed downloads:
+23:08:58 │ ERROR   │ ['ELANTAS.NS', 'EMPOWER.NS', 'ELPROINTL.NS', 'ELCIDIN.NS', 'ELITECON.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:00 │ INFO    │    📦 Batch 13/44 — 50 stocks...
+23:09:03 │ ERROR   │ $FRONTSP.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:03 │ ERROR   │ $FEDDERSHOL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:04 │ ERROR   │ $FERMENTA.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:05 │ ERROR   │ 
+3 Failed downloads:
+23:09:05 │ ERROR   │ ['FRONTSP.NS', 'FEDDERSHOL.NS', 'FERMENTA.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:07 │ INFO    │    📦 Batch 14/44 — 50 stocks...
+23:09:14 │ INFO    │    📦 Batch 15/44 — 50 stocks...
+23:09:15 │ ERROR   │ $GRAVISSHO.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:17 │ ERROR   │ $GRANDOAK.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:19 │ ERROR   │ $GNRL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:19 │ ERROR   │ 
+3 Failed downloads:
+23:09:19 │ ERROR   │ ['GRAVISSHO.NS', 'GRANDOAK.NS', 'GNRL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:21 │ INFO    │    📦 Batch 16/44 — 50 stocks...
+23:09:25 │ ERROR   │ $HALDYNGL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:25 │ ERROR   │ $HBESD.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:26 │ ERROR   │ $HAWKINCOOK.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:27 │ ERROR   │ 
+3 Failed downloads:
+23:09:27 │ ERROR   │ ['HALDYNGL.NS', 'HBESD.NS', 'HAWKINCOOK.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:29 │ INFO    │    📦 Batch 17/44 — 50 stocks...
+23:09:36 │ INFO    │    📦 Batch 18/44 — 50 stocks...
+23:09:43 │ INFO    │    📦 Batch 19/44 — 50 stocks...
+23:09:47 │ ERROR   │ $INDPRUD.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:48 │ ERROR   │ $IWP.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:49 │ ERROR   │ $INVPRECQ.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:49 │ ERROR   │ 
+3 Failed downloads:
+23:09:49 │ ERROR   │ ['INDPRUD.NS', 'IWP.NS', 'INVPRECQ.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:09:51 │ INFO    │    📦 Batch 20/44 — 50 stocks...
+23:09:58 │ INFO    │    📦 Batch 21/44 — 50 stocks...
+23:10:03 │ ERROR   │ $KAMAHOLD.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:04 │ ERROR   │ $KANCHI.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:04 │ ERROR   │ 
+2 Failed downloads:
+23:10:04 │ ERROR   │ ['KAMAHOLD.NS', 'KANCHI.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:06 │ INFO    │    📦 Batch 22/44 — 50 stocks...
+23:10:07 │ ERROR   │ $KPL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:08 │ ERROR   │ $KIRANVYPAR.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:11 │ ERROR   │ $KOTIC.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:11 │ ERROR   │ $KLBRENG-B.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:11 │ ERROR   │ 
+4 Failed downloads:
+23:10:11 │ ERROR   │ ['KPL.NS', 'KIRANVYPAR.NS', 'KOTIC.NS', 'KLBRENG-B.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:14 │ INFO    │    📦 Batch 23/44 — 50 stocks...
+23:10:18 │ ERROR   │ $LAHOTIOV.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:19 │ ERROR   │ 
+1 Failed download:
+23:10:19 │ ERROR   │ ['LAHOTIOV.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:21 │ INFO    │    📦 Batch 24/44 — 50 stocks...
+23:10:23 │ ERROR   │ $MAFATIND.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:24 │ ERROR   │ $MAJESAUT.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:26 │ ERROR   │ $MADHAVIPL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:27 │ ERROR   │ 
+3 Failed downloads:
+23:10:27 │ ERROR   │ ['MAFATIND.NS', 'MAJESAUT.NS', 'MADHAVIPL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:29 │ INFO    │    📦 Batch 25/44 — 50 stocks...
+23:10:30 │ ERROR   │ $METROGLOBL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:34 │ ERROR   │ $MERCANTILE.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:34 │ ERROR   │ $MCCHRLS-B.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:35 │ ERROR   │ $MENNPIS.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:35 │ ERROR   │ 
+4 Failed downloads:
+23:10:35 │ ERROR   │ ['METROGLOBL.NS', 'MERCANTILE.NS', 'MCCHRLS-B.NS', 'MENNPIS.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:37 │ INFO    │    📦 Batch 26/44 — 50 stocks...
+23:10:42 │ ERROR   │ $MMWL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:42 │ ERROR   │ 
+1 Failed download:
+23:10:42 │ ERROR   │ ['MMWL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:44 │ INFO    │    📦 Batch 27/44 — 50 stocks...
+23:10:45 │ ERROR   │ $NATIONSTD.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:49 │ ERROR   │ $NEAGI.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:50 │ ERROR   │ 
+2 Failed downloads:
+23:10:50 │ ERROR   │ ['NATIONSTD.NS', 'NEAGI.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:52 │ INFO    │    📦 Batch 28/44 — 50 stocks...
+23:10:54 │ ERROR   │ $NIRLON.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:56 │ ERROR   │ $NITTAGELA.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:56 │ ERROR   │ $NILE.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:10:57 │ ERROR   │ 
+3 Failed downloads:
+23:10:57 │ ERROR   │ ['NIRLON.NS', 'NITTAGELA.NS', 'NILE.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:00 │ INFO    │    📦 Batch 29/44 — 50 stocks...
+23:11:07 │ INFO    │    📦 Batch 30/44 — 50 stocks...
+23:11:09 │ ERROR   │ $PIONRINV.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:11 │ ERROR   │ $PML.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:12 │ ERROR   │ 
+2 Failed downloads:
+23:11:12 │ ERROR   │ ['PIONRINV.NS', 'PML.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:14 │ INFO    │    📦 Batch 31/44 — 50 stocks...
+23:11:15 │ ERROR   │ $PRAVEG.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:15 │ ERROR   │ $PRADPME.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:19 │ ERROR   │ $PREMCO.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:19 │ ERROR   │ 
+3 Failed downloads:
+23:11:19 │ ERROR   │ ['PRAVEG.NS', 'PRADPME.NS', 'PREMCO.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:21 │ INFO    │    📦 Batch 32/44 — 50 stocks...
+23:11:23 │ ERROR   │ $QUINT.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:23 │ ERROR   │ $RAJPALAYAM.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:27 │ ERROR   │ 
+2 Failed downloads:
+23:11:27 │ ERROR   │ ['QUINT.NS', 'RAJPALAYAM.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:29 │ INFO    │    📦 Batch 33/44 — 50 stocks...
+23:11:31 │ ERROR   │ $RRIL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:33 │ ERROR   │ $RSDFIN.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:34 │ ERROR   │ 
+2 Failed downloads:
+23:11:34 │ ERROR   │ ['RRIL.NS', 'RSDFIN.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:37 │ INFO    │    📦 Batch 34/44 — 50 stocks...
+23:11:40 │ ERROR   │ $SAPPL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:41 │ ERROR   │ $SAYAJIHOTL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:42 │ ERROR   │ 
+2 Failed downloads:
+23:11:42 │ ERROR   │ ['SAPPL.NS', 'SAYAJIHOTL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:44 │ INFO    │    📦 Batch 35/44 — 50 stocks...
+23:11:45 │ ERROR   │ $SCANSTL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:45 │ ERROR   │ $SEIL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:48 │ ERROR   │ $SHBAJRG.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:50 │ ERROR   │ $SHARDUL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:50 │ ERROR   │ 
+4 Failed downloads:
+23:11:50 │ ERROR   │ ['SCANSTL.NS', 'SEIL.NS', 'SHBAJRG.NS', 'SHARDUL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:52 │ INFO    │    📦 Batch 36/44 — 50 stocks...
+23:11:53 │ ERROR   │ $SHRIKRISH.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:54 │ ERROR   │ $SHINDL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:54 │ ERROR   │ $SIKA.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:58 │ ERROR   │ $SICAGEN.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:11:58 │ ERROR   │ 
+4 Failed downloads:
+23:11:58 │ ERROR   │ ['SHRIKRISH.NS', 'SHINDL.NS', 'SIKA.NS', 'SICAGEN.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:00 │ INFO    │    📦 Batch 37/44 — 50 stocks...
+23:12:01 │ ERROR   │ $SONAL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:05 │ ERROR   │ 
+1 Failed download:
+23:12:05 │ ERROR   │ ['SONAL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:07 │ INFO    │    📦 Batch 38/44 — 50 stocks...
+23:12:10 │ ERROR   │ $SURYALA.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:12 │ ERROR   │ 
+1 Failed download:
+23:12:12 │ ERROR   │ ['SURYALA.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:14 │ INFO    │    📦 Batch 39/44 — 50 stocks...
+23:12:18 │ ERROR   │ $TAALTECH.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:18 │ ERROR   │ $TAMBOLIIN.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:20 │ ERROR   │ 
+2 Failed downloads:
+23:12:20 │ ERROR   │ ['TAALTECH.NS', 'TAMBOLIIN.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:22 │ INFO    │    📦 Batch 40/44 — 50 stocks...
+23:12:23 │ ERROR   │ $THACKER.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:23 │ ERROR   │ $TIMEX.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:24 │ ERROR   │ $THAKDEV.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:25 │ ERROR   │ $TECHNVISN.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:27 │ ERROR   │ 
+4 Failed downloads:
+23:12:27 │ ERROR   │ ['THACKER.NS', 'TIMEX.NS', 'THAKDEV.NS', 'TECHNVISN.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:30 │ INFO    │    📦 Batch 41/44 — 50 stocks...
+23:12:31 │ ERROR   │ $TRANSPEK.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:34 │ ERROR   │ $ULTRAMAR.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:35 │ ERROR   │ 
+2 Failed downloads:
+23:12:35 │ ERROR   │ ['TRANSPEK.NS', 'ULTRAMAR.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:37 │ INFO    │    📦 Batch 42/44 — 50 stocks...
+23:12:38 │ ERROR   │ $VELJAN.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:42 │ ERROR   │ 
+1 Failed download:
+23:12:42 │ ERROR   │ ['VELJAN.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:44 │ INFO    │    📦 Batch 43/44 — 50 stocks...
+23:12:46 │ ERROR   │ $WELSPLSOL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:50 │ ERROR   │ 
+1 Failed download:
+23:12:50 │ ERROR   │ ['WELSPLSOL.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:52 │ INFO    │    📦 Batch 44/44 — 40 stocks...
+23:12:53 │ ERROR   │ $ZFSTEERING.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:56 │ ERROR   │ $ZSARACOM.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:56 │ ERROR   │ $WPIL.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:56 │ ERROR   │ $WIMPLAST.NS: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:57 │ ERROR   │ 
+4 Failed downloads:
+23:12:57 │ ERROR   │ ['ZFSTEERING.NS', 'ZSARACOM.NS', 'WPIL.NS', 'WIMPLAST.NS']: possibly delisted; no price data found  (period=5y) (Yahoo error = "No data found, symbol may be delisted")
+23:12:57 │ INFO    │    ✅ OHLCV ready: 2071 stocks × 1236 trading days
+23:12:58 │ INFO    │ Calculating multi-timeframe performance (calendar-anchored)...
+23:13:00 │ INFO    │    Performance calculated for 2071 stocks (calendar-anchored)
+23:13:00 │ INFO    │ 📊 Fetching NSE indices for Market Cap classification...
+23:13:01 │ INFO    │    ✅ Market Cap mapping complete: 100 Large, 150 Mid
+23:13:01 │ INFO    │ 🏆 Ranking stocks and exporting results...
+23:13:01 │ INFO    │    📄 Full scan CSV: full_scan_2026-04-19_2313.csv
+23:13:01 │ INFO    │    📄 Top performers JSON: top_performers_2026-04-19_2313.json
+23:13:01 │ INFO    │    📄 Summary JSON: latest_scan_summary.json
+23:13:01 │ INFO    │    📄 Full summary JSON: full_summary.json (2071 stocks)
+23:13:01 │ INFO    │ 🔬 Fetching fundamentals for top movers...
+23:13:01 │ INFO    │ 🔬 Fetching fundamentals for 85 stocks...
+23:13:02 │ INFO    │    📦 Fundamentals: 25/85 done
+23:13:02 │ INFO    │    📦 Fundamentals: 50/85 done
+23:13:03 │ INFO    │    📦 Fundamentals: 75/85 done
+23:13:03 │ INFO    │    ✅ Fundamentals: 85/85 with data
+23:13:03 │ INFO    │    📄 Fundamentals JSON saved: fundamentals.json
+23:13:03 │ INFO    │ 🎯 Running Opportunity Engine...
+23:13:03 │ INFO    │    ⚡ Running 52W_BREAKOUT...
+23:13:04 │ INFO    │    📈 BreakoutScanner: 28 signals found
+23:13:04 │ INFO    │    ⚡ Running VOLUME_SPIKE...
+23:13:05 │ INFO    │    📊 VolumeScanner: 121 signals found
+23:13:05 │ INFO    │    ⚡ Running EMA_MOMENTUM...
+23:13:09 │ INFO    │    🚀 MomentumScanner: 0 signals found
+23:13:09 │ INFO    │    📊 Total raw signals: 149
+23:13:09 │ INFO    │ ⚙️  Fusing scanner results...
+23:13:09 │ INFO    │    ✅ 37 opportunities (threshold: 25+, max: 100)
+23:13:09 │ INFO    │    📄 opportunities.json saved (37 entries)
+23:13:09 │ INFO    │ 📊 Computing sector daily performance heatmap...
+23:13:09 │ INFO    │    ✅ sector_daily_performance.json — 10 days × 2 sectors
+23:13:09 │ INFO    │ 📊 Computing market regime...
+23:13:09 │ WARNING │    ⚠️ Nifty fetch failed: float() argument must be a string or a real number, not 'Series'
+23:13:09 │ INFO    │    ✅ market_regime.json — Regime: Bull | A/D: 9.70
+23:13:09 │ INFO    │ ⏱️  Total time: 342.3s
