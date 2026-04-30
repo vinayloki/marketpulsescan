@@ -1,24 +1,24 @@
 {
-  "generated": "29 Apr 2026 12:22",
-  "regime": "Sideways",
-  "size_multiplier": 0.5,
-  "nifty_close": 24177.65,
-  "ema_200": 24756.76,
-  "pct_vs_ema200": -2.34,
-  "last_date": "2026-04-29",
+  "generated": "30 Apr 2026 12:21",
+  "regime": "Bear",
+  "size_multiplier": 0.25,
+  "nifty_close": 23997.55,
+  "ema_200": 24749.2,
+  "pct_vs_ema200": -3.04,
+  "last_date": "2026-04-30",
   "regime_breakdown_52w": {
     "Bull": {
-      "days": 151,
-      "pct_of_year": 59.9
+      "days": 150,
+      "pct_of_year": 59.5
     },
     "Sideways": {
       "days": 76,
       "pct_of_year": 30.2
     },
     "Bear": {
-      "days": 25,
-      "pct_of_year": 9.9
+      "days": 26,
+      "pct_of_year": 10.3
     }
   },
-  "interpretation": "NIFTY near EMA200 — be selective, only high-score setups"
+  "interpretation": "NIFTY below EMA200 — avoid longs; highest confidence only"
 }
