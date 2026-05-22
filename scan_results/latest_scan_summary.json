@@ -1,6 +1,6 @@
 {
-  "scan_date": "21 May 2026",
-  "scan_timestamp": "2026-05-21_1444",
+  "scan_date": "22 May 2026",
+  "scan_timestamp": "2026-05-22_1347",
   "total_stocks_scanned": 2949,
   "timeframes": [
     "1W",
@@ -12,221 +12,221 @@
   ],
   "market_breadth": {
     "1W": {
-      "advancing": 1875,
-      "declining": 934,
-      "unchanged": 140,
-      "advance_decline_ratio": 2.01,
-      "avg_return_pct": 30.56,
-      "median_return_pct": 0.91
+      "advancing": 1870,
+      "declining": 951,
+      "unchanged": 128,
+      "advance_decline_ratio": 1.97,
+      "avg_return_pct": 30.76,
+      "median_return_pct": 1.0
     },
     "2W": {
-      "advancing": 806,
-      "declining": 2072,
-      "unchanged": 71,
-      "advance_decline_ratio": 0.39,
-      "avg_return_pct": 26.34,
-      "median_return_pct": -2.33
+      "advancing": 835,
+      "declining": 2040,
+      "unchanged": 74,
+      "advance_decline_ratio": 0.41,
+      "avg_return_pct": 26.52,
+      "median_return_pct": -2.11
     },
     "1M": {
-      "advancing": 1238,
-      "declining": 1659,
+      "advancing": 1187,
+      "declining": 1710,
       "unchanged": 52,
-      "advance_decline_ratio": 0.75,
-      "avg_return_pct": 27.43,
-      "median_return_pct": -1.22
+      "advance_decline_ratio": 0.69,
+      "avg_return_pct": 27.39,
+      "median_return_pct": -1.57
     },
     "3M": {
-      "advancing": 1451,
-      "declining": 1424,
+      "advancing": 1444,
+      "declining": 1431,
       "unchanged": 40,
-      "advance_decline_ratio": 1.02,
-      "avg_return_pct": 29.54,
+      "advance_decline_ratio": 1.01,
+      "avg_return_pct": 29.74,
       "median_return_pct": 0.0
     },
     "6M": {
-      "advancing": 972,
-      "declining": 1843,
-      "unchanged": 28,
-      "advance_decline_ratio": 0.53,
-      "avg_return_pct": 23.75,
-      "median_return_pct": -7.65
+      "advancing": 982,
+      "declining": 1834,
+      "unchanged": 27,
+      "advance_decline_ratio": 0.54,
+      "avg_return_pct": 23.94,
+      "median_return_pct": -7.43
     },
     "12M": {
-      "advancing": 991,
-      "declining": 1669,
+      "advancing": 1008,
+      "declining": 1652,
       "unchanged": 20,
-      "advance_decline_ratio": 0.59,
-      "avg_return_pct": 29.96,
-      "median_return_pct": -8.69
+      "advance_decline_ratio": 0.61,
+      "avg_return_pct": 30.63,
+      "median_return_pct": -8.54
     }
   },
   "top_10_by_timeframe": {
     "1W": [
       {
         "ticker": "NV20",
-        "last_close": 11990.65,
-        "1W": 85792.91
+        "last_close": 12009.3,
+        "1W": 85926.5
       },
       {
         "ticker": "NOIDATOLL",
-        "last_close": 6.76,
-        "1W": 57.94
-      },
-      {
-        "ticker": "JAYBARMARU",
-        "last_close": 117.35,
-        "1W": 37.04
-      },
-      {
-        "ticker": "UFBL",
-        "last_close": 480.95,
-        "1W": 31.93
-      },
-      {
-        "ticker": "KDDL",
-        "last_close": 2883.7,
-        "1W": 31.27
-      },
-      {
-        "ticker": "DREDGECORP",
-        "last_close": 1105.25,
-        "1W": 27.66
-      },
-      {
-        "ticker": "MANUGRAPH",
-        "last_close": 16.3,
-        "1W": 26.06
+        "last_close": 7.17,
+        "1W": 67.52
       },
       {
         "ticker": "EXICOM",
-        "last_close": 137.91,
-        "1W": 24.99
+        "last_close": 157.84,
+        "1W": 43.05
       },
       {
-        "ticker": "HITECHCORP",
-        "last_close": 169.05,
-        "1W": 24.61
+        "ticker": "JAYBARMARU",
+        "last_close": 119.36,
+        "1W": 39.39
       },
       {
-        "ticker": "CENTENKA",
-        "last_close": 539.65,
-        "1W": 24.34
+        "ticker": "NIBE",
+        "last_close": 1450.5,
+        "1W": 36.43
+      },
+      {
+        "ticker": "GENESYS",
+        "last_close": 277.4,
+        "1W": 35.55
+      },
+      {
+        "ticker": "UFBL",
+        "last_close": 475.25,
+        "1W": 30.37
+      },
+      {
+        "ticker": "SPARC",
+        "last_close": 209.77,
+        "1W": 29.3
+      },
+      {
+        "ticker": "KDDL",
+        "last_close": 2804.5,
+        "1W": 27.66
+      },
+      {
+        "ticker": "OCCLLTD",
+        "last_close": 116.14,
+        "1W": 27.12
       }
     ],
     "2W": [
       {
         "ticker": "NV20",
-        "last_close": 11990.65,
-        "2W": 84699.51
+        "last_close": 12009.3,
+        "2W": 84831.4
       },
       {
         "ticker": "NOIDATOLL",
-        "last_close": 6.76,
-        "2W": 79.79
-      },
-      {
-        "ticker": "SAKAR",
-        "last_close": 786.75,
-        "2W": 48.56
-      },
-      {
-        "ticker": "AHLWEST",
-        "last_close": 715.65,
-        "2W": 47.69
-      },
-      {
-        "ticker": "INSPIRISYS",
-        "last_close": 132.05,
-        "2W": 43.39
+        "last_close": 7.17,
+        "2W": 90.69
       },
       {
         "ticker": "JARO",
-        "last_close": 552.6,
-        "2W": 36.93
+        "last_close": 581.05,
+        "2W": 43.98
       },
       {
-        "ticker": "MORARJEE",
-        "last_close": 9.99,
-        "2W": 31.27
+        "ticker": "SAKAR",
+        "last_close": 761.6,
+        "2W": 43.81
       },
       {
-        "ticker": "MODINATUR",
-        "last_close": 484.75,
-        "2W": 31.14
+        "ticker": "NIBE",
+        "last_close": 1450.5,
+        "2W": 41.54
+      },
+      {
+        "ticker": "AHLWEST",
+        "last_close": 684.05,
+        "2W": 41.17
+      },
+      {
+        "ticker": "INSPIRISYS",
+        "last_close": 125.45,
+        "2W": 36.23
+      },
+      {
+        "ticker": "ONELIFECAP",
+        "last_close": 25.1,
+        "2W": 33.65
+      },
+      {
+        "ticker": "JAYBARMARU",
+        "last_close": 119.36,
+        "2W": 29.71
       },
       {
         "ticker": "BALAMINES",
-        "last_close": 1836.9,
-        "2W": 29.87
-      },
-      {
-        "ticker": "UFBL",
-        "last_close": 480.95,
-        "2W": 29.44
+        "last_close": 1822.5,
+        "2W": 28.85
       }
     ],
     "1M": [
       {
         "ticker": "NV20",
-        "last_close": 11990.65,
-        "1M": 80374.17
+        "last_close": 12009.3,
+        "1M": 81540.38
       },
       {
         "ticker": "AHLWEST",
-        "last_close": 715.65,
-        "1M": 191.61
-      },
-      {
-        "ticker": "SANCO",
-        "last_close": 4.05,
-        "1M": 82.43
+        "last_close": 684.05,
+        "1M": 153.4
       },
       {
         "ticker": "OMAXAUTO",
-        "last_close": 206.62,
-        "1M": 81.99
-      },
-      {
-        "ticker": "BBOX",
-        "last_close": 952.05,
-        "1M": 79.84
+        "last_close": 216.95,
+        "1M": 93.43
       },
       {
         "ticker": "NOIDATOLL",
-        "last_close": 6.76,
-        "1M": 76.96
+        "last_close": 7.17,
+        "1M": 89.68
+      },
+      {
+        "ticker": "BBOX",
+        "last_close": 955.35,
+        "1M": 79.59
+      },
+      {
+        "ticker": "SANCO",
+        "last_close": 3.93,
+        "1M": 69.4
       },
       {
         "ticker": "CALSOFT",
-        "last_close": 21.28,
-        "1M": 71.61
+        "last_close": 20.82,
+        "1M": 69.13
       },
       {
-        "ticker": "WHEELS",
-        "last_close": 1676.4,
-        "1M": 60.28
+        "ticker": "DSSL",
+        "last_close": 1734.4,
+        "1M": 64.77
       },
       {
-        "ticker": "JAINAM",
-        "last_close": 290.0,
-        "1M": 58.73
+        "ticker": "ONELIFECAP",
+        "last_close": 25.1,
+        "1M": 64.27
       },
       {
-        "ticker": "INSPIRISYS",
-        "last_close": 132.05,
-        "1M": 58.66
+        "ticker": "VERANDA",
+        "last_close": 241.45,
+        "1M": 55.9
       }
     ],
     "3M": [
       {
         "ticker": "NV20",
-        "last_close": 11990.65,
-        "3M": 78326.65
+        "last_close": 12009.3,
+        "3M": 78448.63
       },
       {
         "ticker": "STLTECH",
-        "last_close": 420.15,
-        "3M": 162.69
+        "last_close": 441.15,
+        "3M": 175.82
       },
       {
         "ticker": "NEUEON",
@@ -244,36 +244,36 @@
         "3M": 128.4
       },
       {
-        "ticker": "MTARTECH",
-        "last_close": 7947.5,
-        "3M": 117.29
+        "ticker": "DEEDEV",
+        "last_close": 523.8,
+        "3M": 127.24
       },
       {
-        "ticker": "DEEDEV",
-        "last_close": 498.9,
-        "3M": 116.43
+        "ticker": "MTARTECH",
+        "last_close": 8075.5,
+        "3M": 120.79
       },
       {
         "ticker": "UCL",
-        "last_close": 150.0,
-        "3M": 115.83
+        "last_close": 153.0,
+        "3M": 120.14
       },
       {
         "ticker": "PRIZOR",
-        "last_close": 669.5,
-        "3M": 115.41
+        "last_close": 658.2,
+        "3M": 111.78
       },
       {
-        "ticker": "ACCORD",
-        "last_close": 53.0,
-        "3M": 106.63
+        "ticker": "HFCL",
+        "last_close": 148.21,
+        "3M": 107.84
       }
     ],
     "6M": [
       {
         "ticker": "NV20",
-        "last_close": 11990.65,
-        "6M": 78413.95
+        "last_close": 12009.3,
+        "6M": 78536.06
       },
       {
         "ticker": "NEUEON",
@@ -282,75 +282,75 @@
       },
       {
         "ticker": "STLTECH",
-        "last_close": 420.15,
-        "6M": 296.14
+        "last_close": 441.15,
+        "6M": 315.94
       },
       {
         "ticker": "UCL",
-        "last_close": 150.0,
-        "6M": 207.69
+        "last_close": 153.0,
+        "6M": 213.85
       },
       {
         "ticker": "MTARTECH",
-        "last_close": 7947.5,
-        "6M": 204.98
+        "last_close": 8075.5,
+        "6M": 209.89
       },
       {
         "ticker": "UFBL",
-        "last_close": 480.95,
-        "6M": 170.88
+        "last_close": 475.25,
+        "6M": 167.67
       },
       {
         "ticker": "SANGINITA",
-        "last_close": 25.95,
-        "6M": 156.17
-      },
-      {
-        "ticker": "SILKFLEX",
-        "last_close": 207.25,
-        "6M": 150.0
+        "last_close": 26.46,
+        "6M": 161.2
       },
       {
         "ticker": "KESORAMIND",
-        "last_close": 12.43,
-        "6M": 134.53
+        "last_close": 13.03,
+        "6M": 145.85
       },
       {
-        "ticker": "ACCORD",
-        "last_close": 53.0,
-        "6M": 131.44
+        "ticker": "SILKFLEX",
+        "last_close": 200.0,
+        "6M": 141.25
+      },
+      {
+        "ticker": "OMAXAUTO",
+        "last_close": 216.95,
+        "6M": 140.3
       }
     ],
     "12M": [
       {
         "ticker": "NV20",
-        "last_close": 11990.65,
-        "12M": 79891.0
+        "last_close": 12009.3,
+        "12M": 81330.02
       },
       {
         "ticker": "EASTSILK",
-        "last_close": 57.88,
-        "12M": 3115.56
+        "last_close": 56.78,
+        "12M": 3054.44
       },
       {
         "ticker": "SWANDEF",
-        "last_close": 1910.4,
-        "12M": 1134.59
-      },
-      {
-        "ticker": "CUPID",
-        "last_close": 120.16,
-        "12M": 518.36
+        "last_close": 1923.2,
+        "12M": 1142.86
       },
       {
         "ticker": "STLTECH",
-        "last_close": 420.15,
-        "12M": 514.61
+        "last_close": 441.15,
+        "12M": 544.58
+      },
+      {
+        "ticker": "CUPID",
+        "last_close": 120.31,
+        "12M": 506.65
       },
       {
         "ticker": "MVKAGRO",
-        "last_close": 491.9,
-        "12M": 462.17
+        "last_close": 485.1,
+        "12M": 443.53
       },
       {
         "ticker": "MOXSH",
@@ -364,13 +364,13 @@
       },
       {
         "ticker": "MTARTECH",
-        "last_close": 7947.5,
-        "12M": 382.57
+        "last_close": 8075.5,
+        "12M": 385.51
       },
       {
         "ticker": "MANAV",
         "last_close": 44.95,
-        "12M": 308.64
+        "12M": 289.18
       }
     ]
   }
