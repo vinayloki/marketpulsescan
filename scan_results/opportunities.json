@@ -1,8 +1,8 @@
 {
-  "generated": "27 May 2026",
-  "generated_ts": "2026-05-27_1459",
+  "generated": "28 May 2026",
+  "generated_ts": "2026-05-28_1516",
   "engine_version": "2.0",
-  "total_opportunities": 72,
+  "total_opportunities": 60,
   "opportunities": [
     {
       "ticker": "AIAENG",
@@ -16,7 +16,7 @@
       "indicators": {
         "high_52w": 4495.0,
         "pct_from_52w_high": 1.49,
-        "volume_ratio": 12.75,
+        "volume_ratio": 12.76,
         "price": 4428.1,
         "pct_change_1d": 6.87,
         "above_sma10": true
@@ -35,38 +35,8 @@
       }
     },
     {
-      "ticker": "EQUAL200",
-      "rank": 2,
-      "score": 60,
-      "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 13.68,
-        "pct_from_52w_high": 0.3,
-        "volume_ratio": 6.96,
-        "price": 13.64,
-        "pct_change_1d": 0.66,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Mirae Asset BSE 200 Equal Weight ETF",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 6.3,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "MODISONLTD",
-      "rank": 3,
+      "rank": 2,
       "score": 60,
       "signals": [
         "52W_BREAKOUT",
@@ -96,7 +66,7 @@
     },
     {
       "ticker": "JETFREIGHT",
-      "rank": 4,
+      "rank": 3,
       "score": 56,
       "signals": [
         "52W_BREAKOUT",
@@ -126,7 +96,7 @@
     },
     {
       "ticker": "USHAMART",
-      "rank": 5,
+      "rank": 4,
       "score": 56,
       "signals": [
         "52W_BREAKOUT",
@@ -156,7 +126,7 @@
     },
     {
       "ticker": "NGIL",
-      "rank": 6,
+      "rank": 5,
       "score": 54,
       "signals": [
         "52W_BREAKOUT",
@@ -186,7 +156,7 @@
     },
     {
       "ticker": "STEELXIND",
-      "rank": 7,
+      "rank": 6,
       "score": 52,
       "signals": [
         "52W_BREAKOUT",
@@ -196,7 +166,7 @@
       "indicators": {
         "high_52w": 12.18,
         "pct_from_52w_high": 1.81,
-        "volume_ratio": 4.77,
+        "volume_ratio": 4.78,
         "price": 11.96,
         "pct_change_1d": 10.33,
         "above_sma10": true
@@ -216,7 +186,7 @@
     },
     {
       "ticker": "KSHINTL",
-      "rank": 8,
+      "rank": 7,
       "score": 51,
       "signals": [
         "52W_BREAKOUT",
@@ -246,7 +216,7 @@
     },
     {
       "ticker": "CUMMINSIND",
-      "rank": 9,
+      "rank": 8,
       "score": 47,
       "signals": [
         "52W_BREAKOUT",
@@ -256,7 +226,7 @@
       "indicators": {
         "high_52w": 6099.0,
         "pct_from_52w_high": 1.17,
-        "volume_ratio": 3.97,
+        "volume_ratio": 3.98,
         "price": 6027.5,
         "pct_change_1d": 11.24,
         "above_sma10": true
@@ -276,7 +246,7 @@
     },
     {
       "ticker": "SIEMENS",
-      "rank": 10,
+      "rank": 9,
       "score": 43,
       "signals": [
         "52W_BREAKOUT",
@@ -306,7 +276,7 @@
     },
     {
       "ticker": "MINDACORP",
-      "rank": 11,
+      "rank": 10,
       "score": 42,
       "signals": [
         "52W_BREAKOUT",
@@ -335,37 +305,8 @@
       }
     },
     {
-      "ticker": "AONELIQUID",
-      "rank": 12,
-      "score": 38,
-      "signals": [
-        "52W_BREAKOUT",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 1061.62,
-        "pct_from_52w_high": 0.03,
-        "volume_ratio": 2.64,
-        "price": 1061.26,
-        "pct_change_1d": 0.03,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Angel One Nifty 1D Rate Liquid ETF - Growth",
-        "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 27.7,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "BLISSGVS",
-      "rank": 13,
+      "rank": 11,
       "score": 37,
       "signals": [
         "52W_BREAKOUT",
@@ -374,7 +315,7 @@
       "indicators": {
         "high_52w": 399.6,
         "pct_from_52w_high": 0.69,
-        "volume_ratio": 2.73,
+        "volume_ratio": 2.74,
         "price": 396.85,
         "pct_change_1d": 4.15,
         "above_sma10": true
@@ -394,7 +335,7 @@
     },
     {
       "ticker": "FINCABLES",
-      "rank": 14,
+      "rank": 12,
       "score": 37,
       "signals": [
         "52W_BREAKOUT",
@@ -422,37 +363,8 @@
       }
     },
     {
-      "ticker": "INDIGRID",
-      "rank": 15,
-      "score": 37,
-      "signals": [
-        "52W_BREAKOUT",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 173.73,
-        "pct_from_52w_high": 1.83,
-        "volume_ratio": 2.7,
-        "price": 170.56,
-        "pct_change_1d": 0.66,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "IndiGrid Infrastructure Trust",
-        "sector": "Others",
-        "ind": "Power Transmission & Distribution",
-        "mcap_cr": 16384.1,
-        "pe": 41.1,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "ENRIN",
-      "rank": 16,
+      "rank": 13,
       "score": 36,
       "signals": [
         "52W_BREAKOUT",
@@ -481,7 +393,7 @@
     },
     {
       "ticker": "JSWENERGY",
-      "rank": 17,
+      "rank": 14,
       "score": 36,
       "signals": [
         "52W_BREAKOUT",
@@ -509,37 +421,8 @@
       }
     },
     {
-      "ticker": "GROWWNXT50",
-      "rank": 18,
-      "score": 35,
-      "signals": [
-        "52W_BREAKOUT",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 72.58,
-        "pct_from_52w_high": 0.95,
-        "volume_ratio": 2.65,
-        "price": 71.89,
-        "pct_change_1d": 1.01,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Groww Nifty Next 50 ETF",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 6.4,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "APARINDS",
-      "rank": 19,
+      "rank": 15,
       "score": 34,
       "signals": [
         "52W_BREAKOUT",
@@ -567,37 +450,8 @@
       }
     },
     {
-      "ticker": "METALIETF",
-      "rank": 20,
-      "score": 34,
-      "signals": [
-        "52W_BREAKOUT",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 13.99,
-        "pct_from_52w_high": 1.29,
-        "volume_ratio": 2.53,
-        "price": 13.81,
-        "pct_change_1d": 1.99,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "ICICI Prudential Nifty Metal ETF",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 12.4,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "HDFCLIQUID",
-      "rank": 21,
+      "rank": 16,
       "score": 30,
       "signals": [
         "52W_BREAKOUT"
@@ -623,7 +477,7 @@
     },
     {
       "ticker": "CGPOWER",
-      "rank": 22,
+      "rank": 17,
       "score": 29,
       "signals": [
         "52W_BREAKOUT"
@@ -649,7 +503,7 @@
     },
     {
       "ticker": "VIDYAWIRES",
-      "rank": 23,
+      "rank": 18,
       "score": 29,
       "signals": [
         "52W_BREAKOUT"
@@ -674,34 +528,8 @@
       }
     },
     {
-      "ticker": "ANLON",
-      "rank": 24,
-      "score": 27,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 644.7,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.85,
-        "price": 644.7
-      },
-      "fundamental": {
-        "name": "Anlon Technology Solutions Ltd",
-        "sector": "Others",
-        "ind": "Construction & Engineering",
-        "mcap_cr": 337.3,
-        "pe": 52.0,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "POWERINDIA",
-      "rank": 25,
+      "rank": 19,
       "score": 27,
       "signals": [
         "52W_BREAKOUT"
@@ -727,7 +555,7 @@
     },
     {
       "ticker": "SBIMIDMOM",
-      "rank": 26,
+      "rank": 20,
       "score": 26,
       "signals": [
         "52W_BREAKOUT"
@@ -735,7 +563,7 @@
       "indicators": {
         "high_52w": 65.0,
         "pct_from_52w_high": 1.94,
-        "volume_ratio": 2.45,
+        "volume_ratio": 2.5,
         "price": 63.74
       },
       "fundamental": {
@@ -753,7 +581,7 @@
     },
     {
       "ticker": "GVPIL",
-      "rank": 27,
+      "rank": 21,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -779,7 +607,7 @@
     },
     {
       "ticker": "HINDALCO",
-      "rank": 28,
+      "rank": 22,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -805,7 +633,7 @@
     },
     {
       "ticker": "ALKALI",
-      "rank": 29,
+      "rank": 23,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -831,7 +659,7 @@
     },
     {
       "ticker": "ASAHIINDIA",
-      "rank": 30,
+      "rank": 24,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -857,7 +685,7 @@
     },
     {
       "ticker": "ATGL",
-      "rank": 31,
+      "rank": 25,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -883,7 +711,7 @@
     },
     {
       "ticker": "BBTCL",
-      "rank": 32,
+      "rank": 26,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -909,7 +737,7 @@
     },
     {
       "ticker": "BHARATRAS",
-      "rank": 33,
+      "rank": 27,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -935,7 +763,7 @@
     },
     {
       "ticker": "BSL",
-      "rank": 34,
+      "rank": 28,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -961,13 +789,13 @@
     },
     {
       "ticker": "COALINDIA",
-      "rank": 35,
+      "rank": 29,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 7.61,
+        "volume_ratio": 7.74,
         "price": 463.05,
         "pct_change_1d": 1.07,
         "above_sma10": true
@@ -987,7 +815,7 @@
     },
     {
       "ticker": "COFFEEDAY",
-      "rank": 36,
+      "rank": 30,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1013,7 +841,7 @@
     },
     {
       "ticker": "DBEIL",
-      "rank": 37,
+      "rank": 31,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1038,40 +866,14 @@
       }
     },
     {
-      "ticker": "DEEM",
-      "rank": 38,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 8.16,
-        "price": 39.9,
-        "pct_change_1d": 17.35,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Deem Roll Tech Ltd",
-        "sector": "Others",
-        "ind": "Iron & Steel",
-        "mcap_cr": 30.3,
-        "pe": 10.5,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "FDC",
-      "rank": 39,
+      "rank": 32,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 8.25,
+        "volume_ratio": 8.26,
         "price": 429.55,
         "pct_change_1d": 6.55,
         "above_sma10": true
@@ -1091,13 +893,13 @@
     },
     {
       "ticker": "FILATEX",
-      "rank": 40,
+      "rank": 33,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 7.95,
+        "volume_ratio": 7.96,
         "price": 46.75,
         "pct_change_1d": 6.83,
         "above_sma10": true
@@ -1117,7 +919,7 @@
     },
     {
       "ticker": "FINPIPE",
-      "rank": 41,
+      "rank": 34,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1142,8 +944,34 @@
       }
     },
     {
+      "ticker": "GLOBALPET",
+      "rank": 35,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 6.83,
+        "price": 156.95,
+        "pct_change_1d": 1.95,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Global Pet Industries Ltd",
+        "sector": "Others",
+        "ind": "Industrial Machinery",
+        "mcap_cr": 137.9,
+        "pe": 32.3,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
       "ticker": "GRANULES",
-      "rank": 42,
+      "rank": 36,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1169,7 +997,7 @@
     },
     {
       "ticker": "GUJTHEM",
-      "rank": 43,
+      "rank": 37,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1195,13 +1023,13 @@
     },
     {
       "ticker": "GULFPETRO",
-      "rank": 44,
+      "rank": 38,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 8.26,
+        "volume_ratio": 8.27,
         "price": 36.62,
         "pct_change_1d": 10.07,
         "above_sma10": true
@@ -1221,7 +1049,7 @@
     },
     {
       "ticker": "HONDAPOWER",
-      "rank": 45,
+      "rank": 39,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1247,13 +1075,13 @@
     },
     {
       "ticker": "INDOSTAR",
-      "rank": 46,
+      "rank": 40,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 7.66,
+        "volume_ratio": 7.67,
         "price": 230.25,
         "pct_change_1d": 8.96,
         "above_sma10": true
@@ -1272,34 +1100,8 @@
       }
     },
     {
-      "ticker": "INM",
-      "rank": 47,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.68,
-        "price": 192.9,
-        "pct_change_1d": 14.82,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Interiors & More Ltd",
-        "sector": "Others",
-        "ind": "Plastic Products",
-        "mcap_cr": 218.6,
-        "pe": 18.3,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "JASH",
-      "rank": 48,
+      "rank": 41,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1325,7 +1127,7 @@
     },
     {
       "ticker": "JINDWORLD",
-      "rank": 49,
+      "rank": 42,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1351,7 +1153,7 @@
     },
     {
       "ticker": "JKTYRE",
-      "rank": 50,
+      "rank": 43,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1377,13 +1179,13 @@
     },
     {
       "ticker": "JOCIL",
-      "rank": 51,
+      "rank": 44,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 14.95,
+        "volume_ratio": 14.96,
         "price": 151.12,
         "pct_change_1d": 3.55,
         "above_sma10": true
@@ -1402,60 +1204,8 @@
       }
     },
     {
-      "ticker": "JPPOWER",
-      "rank": 52,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.57,
-        "price": 22.87,
-        "pct_change_1d": 19.55,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Jaiprakash Power Ventures Ltd",
-        "sector": "Others",
-        "ind": "Renewable Energy",
-        "mcap_cr": 13515.0,
-        "pe": 16.6,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "KARNIKA",
-      "rank": 53,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.39,
-        "price": 145.8,
-        "pct_change_1d": 11.51,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Karnika Industries Ltd",
-        "sector": "Others",
-        "ind": "Textiles",
-        "mcap_cr": 825.2,
-        "pe": 45.8,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "KREBSBIO",
-      "rank": 54,
+      "rank": 45,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1481,7 +1231,7 @@
     },
     {
       "ticker": "MANCREDIT",
-      "rank": 55,
+      "rank": 46,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1507,7 +1257,7 @@
     },
     {
       "ticker": "MAXIND",
-      "rank": 56,
+      "rank": 47,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1532,34 +1282,8 @@
       }
     },
     {
-      "ticker": "MILTON",
-      "rank": 57,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.0,
-        "price": 42.6,
-        "pct_change_1d": 4.67,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Milton Industries Ltd",
-        "sector": "Others",
-        "ind": "Wood Products",
-        "mcap_cr": 81.2,
-        "pe": 68.3,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "MOHITIND",
-      "rank": 58,
+      "rank": 48,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1585,7 +1309,7 @@
     },
     {
       "ticker": "NDTV",
-      "rank": 59,
+      "rank": 49,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1611,7 +1335,7 @@
     },
     {
       "ticker": "NRL",
-      "rank": 60,
+      "rank": 50,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1637,7 +1361,7 @@
     },
     {
       "ticker": "PENIND",
-      "rank": 61,
+      "rank": 51,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1663,13 +1387,13 @@
     },
     {
       "ticker": "PGHL",
-      "rank": 62,
+      "rank": 52,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 11.96,
+        "volume_ratio": 11.97,
         "price": 6247.5,
         "pct_change_1d": 10.53,
         "above_sma10": true
@@ -1688,14 +1412,40 @@
       }
     },
     {
-      "ticker": "RAMCOIND",
-      "rank": 63,
+      "ticker": "QFIL",
+      "rank": 53,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 14.3,
+        "volume_ratio": 20.0,
+        "price": 41.85,
+        "pct_change_1d": 4.89,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Quality Foils (India) Ltd",
+        "sector": "Others",
+        "ind": "Metals - Diversified",
+        "mcap_cr": 11.4,
+        "pe": 8.0,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "RAMCOIND",
+      "rank": 54,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 14.31,
         "price": 311.35,
         "pct_change_1d": 4.43,
         "above_sma10": true
@@ -1715,13 +1465,13 @@
     },
     {
       "ticker": "REFEX",
-      "rank": 64,
+      "rank": 55,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 7.21,
+        "volume_ratio": 7.22,
         "price": 328.75,
         "pct_change_1d": 11.38,
         "above_sma10": true
@@ -1740,50 +1490,24 @@
       }
     },
     {
-      "ticker": "ROCKINGDCE",
-      "rank": 65,
+      "ticker": "SIGNORIA",
+      "rank": 56,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 6.62,
-        "price": 217.45,
-        "pct_change_1d": 8.18,
+        "volume_ratio": 7.5,
+        "price": 59.85,
+        "pct_change_1d": 5.0,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Rockingdeals Circular Economy Ltd",
+        "name": "Signoria Creation Ltd",
         "sector": "Others",
-        "ind": "Technology Hardware",
-        "mcap_cr": 134.1,
-        "pe": 25.1,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SELECTIPO",
-      "rank": 66,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 10.9,
-        "price": 43.97,
-        "pct_change_1d": 0.92,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Mirae Asset BSE Select IPO ETF",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 6.0,
-        "pe": null,
+        "ind": "Apparel & Accessories",
+        "mcap_cr": 30.6,
+        "pe": 10.2,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -1793,7 +1517,7 @@
     },
     {
       "ticker": "TVSSRICHAK",
-      "rank": 67,
+      "rank": 57,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1819,7 +1543,7 @@
     },
     {
       "ticker": "VETO",
-      "rank": 68,
+      "rank": 58,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1844,34 +1568,8 @@
       }
     },
     {
-      "ticker": "VIVIANA",
-      "rank": 69,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.31,
-        "price": 984.7,
-        "pct_change_1d": 17.47,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Viviana Power Tech Ltd",
-        "sector": "Others",
-        "ind": "Electrical Components & Equipments",
-        "mcap_cr": 826.2,
-        "pe": 41.7,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "ZEEL",
-      "rank": 70,
+      "rank": 59,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1897,7 +1595,7 @@
     },
     {
       "ticker": "ZEELEARN",
-      "rank": 71,
+      "rank": 60,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1914,32 +1612,6 @@
         "ind": "Education Services",
         "mcap_cr": 171.1,
         "pe": 13.4,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ZENITHDRUG",
-      "rank": 72,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.46,
-        "price": 46.45,
-        "pct_change_1d": 16.13,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Zenith Drugs Ltd",
-        "sector": "Others",
-        "ind": "Pharmaceuticals",
-        "mcap_cr": 68.5,
-        "pe": 9.6,
         "eps": null,
         "52h": null,
         "52l": null,
