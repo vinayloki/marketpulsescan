@@ -86,7 +86,8 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
     opp_path = os.path.join(SCAN_RESULTS_DIR, "opportunities.json")
     if os.path.exists(opp_path):
         with open(opp_path) as f:
-            opportunities = json.load(f)[:10]  # top 10
+            opp_data = json.load(f)
+            opportunities = opp_data.get("opportunities", [])[:10]  # top 10
 
     # --- Stage 2 counts per timeframe from DB --------------------------------
     stage2_counts = {}
