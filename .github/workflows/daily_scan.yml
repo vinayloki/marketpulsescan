@@ -14,6 +14,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   scan:
@@ -127,12 +128,9 @@ jobs:
 
       - name: Report Failure
         if: failure()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'Daily Scan Failed 🚨',
-              body: `The daily MarketPulse scan workflow failed on run ${context.runId}.\n\nPlease check the [Actions log](https://github/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`
-            })
+        run: |
+          echo "## ❌ Daily Scan Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The daily MarketPulse scan workflow failed on run **${{ github.run_id }}**." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Actions Log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY

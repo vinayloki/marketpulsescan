@@ -1,6 +1,9 @@
 # ── GitHub Actions dependencies only ──────────────────────────────────
 # streamlit is intentionally EXCLUDED — it's a local dev tool and
 # adds ~60s to every Actions pip install for no benefit.
+# ── GitHub Actions dependencies only ──────────────────────────────────
+# streamlit is intentionally EXCLUDED — it's a local dev tool and
+# adds ~60s to every Actions pip install for no benefit.
 # ──────────────────────────────────────────────────────────────────────
 pandas>=2.0
 numpy>=1.26
@@ -10,3 +13,5 @@ feedparser>=6.0
 pyarrow>=14.0
 sqlalchemy>=2.0
 scikit-learn>=1.4
+fastapi>=0.110
+httpx>=0.27
