@@ -116,6 +116,43 @@ def download_price_data(tickers: list[str]) -> pd.DataFrame:
         log.error("❌ No price data downloaded. Aborting.")
         sys.exit(1)
 
+    # ── Patch latest day with Bhavcopy if available ──
+    if hasattr(provider, "fetch_daily_bhavcopy"):
+        try:
+            bhav_df = provider.fetch_daily_bhavcopy()
+            if not bhav_df.empty:
+                # Assuming bhav_df has columns like SYMBOL, OPEN, HIGH, LOW, CLOSE, TOTTRDQTY
+                sym_col = next((c for c in bhav_df.columns if c.upper() in ["SYMBOL", "TKT_NAME", "INSTRUMENT"]), None)
+                if sym_col:
+                    bhav_df.set_index(sym_col, inplace=True)
+                    # Normalize columns
+                    col_map = {}
+                    for c in bhav_df.columns:
+                        cu = c.upper()
+                        if cu == "OPEN": col_map[c] = "Open"
+                        elif cu == "HIGH": col_map[c] = "High"
+                        elif cu == "LOW": col_map[c] = "Low"
+                        elif cu == "CLOSE": col_map[c] = "Close"
+                        elif cu in ["TOTTRDQTY", "VOLUME", "TRADED_QTY"]: col_map[c] = "Volume"
+                    bhav_df.rename(columns=col_map, inplace=True)
+                    
+                    patched = 0
+                    last_idx = ohlcv.index[-1]
+                    for t in ohlcv.columns.get_level_values(1).unique():
+                        base = t.replace(".NS", "").replace(".BO", "")
+                        if base in bhav_df.index:
+                            row = bhav_df.loc[base]
+                            if isinstance(row, pd.DataFrame):
+                                row = row.iloc[0] # handle duplicates
+                            for f in ["Open", "High", "Low", "Close", "Volume"]:
+                                if f in row and f in ohlcv.columns.get_level_values(0):
+                                    ohlcv.loc[last_idx, (f, t)] = row[f]
+                            patched += 1
+                    if patched > 0:
+                        log.info(f"   🩹 Patched {patched} tickers with official Bhavcopy close")
+        except Exception as e:
+            log.warning(f"⚠️  Bhavcopy patch failed: {e}")
+
     return ohlcv
 
 
