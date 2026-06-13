@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 from fastapi import APIRouter, Depends, Query
@@ -128,4 +129,96 @@ def get_top_performers(
         "timeframe": timeframe,
         "count":     len(performers[:limit]),
         "data":      performers[:limit],
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Full Market Scan — ALL NSE/BSE stocks from latest_full_scan.csv
+# ─────────────────────────────────────────────────────────────────────────────
+
+@router.get("/market")
+def get_market_scan(
+    sort_by: str  = Query("1M",  enum=["1W", "2W", "1M", "3M", "6M", "12M", "last_close"]),
+    order:   str  = Query("desc", enum=["asc", "desc"]),
+    sector:  str  = Query(""),
+    mcap:    str  = Query("", enum=["", "L", "M", "S"]),
+    limit:   int  = Query(500, ge=1, le=3500),
+    offset:  int  = Query(0, ge=0),
+):
+    """
+    Return all NSE+BSE stocks from latest_full_scan.csv joined with
+    fundamentals for sector/name/mcap data.
+    Supports sorting by any return column, and filtering by sector + mcap.
+    """
+    csv_path  = os.path.join(SCAN_RESULTS_DIR, "latest_full_scan.csv")
+    fund_path = os.path.join(SCAN_RESULTS_DIR, "fundamentals.json")
+
+    if not os.path.exists(csv_path):
+        return {"count": 0, "total": 0, "data": []}
+
+    # Build fundamentals lookup {symbol -> record}
+    fund_lookup = {}
+    if os.path.exists(fund_path):
+        with open(fund_path) as f:
+            fund_data = json.load(f)
+        for s in fund_data.get("stocks", []):
+            sym = s.get("s", "")
+            fund_lookup[sym] = s
+            # also index without .NS / .BO suffix
+            base = sym.replace(".NS", "").replace(".BO", "")
+            fund_lookup[base] = s
+
+    rows = []
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            ticker = row.get("ticker", "")
+            base   = ticker.replace(".NS", "").replace(".BO", "")
+            fund   = fund_lookup.get(ticker) or fund_lookup.get(base) or {}
+
+            row_sector   = fund.get("sector", "")
+            row_mcap_code = fund.get("mcap_code", "")
+
+            # Apply filters
+            if sector and sector.lower() not in (row_sector or "").lower():
+                continue
+            if mcap and row_mcap_code != mcap:
+                continue
+
+            def _f(k):
+                try: return float(row.get(k) or 0)
+                except: return 0.0
+
+            rows.append({
+                "ticker":    ticker,
+                "symbol":    base,
+                "name":      fund.get("name", base),
+                "sector":    row_sector,
+                "mcap_code": row_mcap_code,
+                "mcap_cr":   fund.get("mcap"),
+                "exchange":  "BSE" if ".BO" in ticker else "NSE",
+                "price":     _f("last_close"),
+                "last_date": row.get("last_date", ""),
+                "ret_1w":    _f("1W"),
+                "ret_2w":    _f("2W"),
+                "ret_1m":    _f("1M"),
+                "ret_3m":    _f("3M"),
+                "ret_6m":    _f("6M"),
+                "ret_12m":   _f("12M"),
+            })
+
+    # Sort
+    sort_col_map = {
+        "1W": "ret_1w", "2W": "ret_2w", "1M": "ret_1m",
+        "3M": "ret_3m", "6M": "ret_6m", "12M": "ret_12m",
+        "last_close": "price",
+    }
+    sort_col = sort_col_map.get(sort_by, "ret_1m")
+    rows.sort(key=lambda r: r.get(sort_col) or 0, reverse=(order == "desc"))
+
+    total = len(rows)
+    return {
+        "total":  total,
+        "count":  len(rows[offset: offset + limit]),
+        "data":   rows[offset: offset + limit],
     }
