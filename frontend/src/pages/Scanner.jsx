@@ -1,4 +1,34 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+
+// ─── External links ───────────────────────────────────────────────────────────
+function tvUrl(symbol, exchange) {
+  // e.g. NSE-APOLLOPIPE or BSE-GOLDIAM
+  const exch = (exchange || 'NSE').toUpperCase();
+  const clean = symbol.replace(/\.NS$|\.BO$/i, '');
+  return `https://in.tradingview.com/symbols/${exch}-${clean}/`;
+}
+function screenerUrl(symbol) {
+  const clean = symbol.replace(/\.NS$|\.BO$/i, '');
+  return `https://www.screener.in/company/${clean}/`;
+}
+function ExternalLinks({ symbol, exchange }) {
+  return (
+    <span className="ext-links">
+      <a href={tvUrl(symbol, exchange)} target="_blank" rel="noreferrer" className="ext-link tv" title="TradingView chart">
+        <svg viewBox="0 0 24 24" fill="none" width="13" height="13" stroke="currentColor" strokeWidth="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+        TV
+      </a>
+      <a href={screenerUrl(symbol)} target="_blank" rel="noreferrer" className="ext-link sc" title="Screener.in fundamentals">
+        <svg viewBox="0 0 24 24" fill="none" width="13" height="13" stroke="currentColor" strokeWidth="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        SC
+      </a>
+    </span>
+  );
+}
 import axios from 'axios';
 
 // ─── View modes ───────────────────────────────────────────────────────────────
@@ -320,7 +350,10 @@ function MarketRow({ stock, rank }) {
   return (
     <tr className="data-row">
       <td className="td-rank">{rank}</td>
-      <td className="td-symbol">{stock.symbol}</td>
+      <td className="td-symbol">
+        {stock.symbol}
+        <ExternalLinks symbol={stock.symbol} exchange={stock.exchange} />
+      </td>
       <td className="td-name">{stock.name}</td>
       <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{stock.sector}</td>
       <td><McapBadge code={stock.mcap_code} /></td>
@@ -344,7 +377,10 @@ function Stage2Row({ stock, rank }) {
   return (
     <tr className="data-row">
       <td className="td-rank">{rank}</td>
-      <td className="td-symbol">{stock.symbol}</td>
+      <td className="td-symbol">
+        {stock.symbol}
+        <ExternalLinks symbol={stock.symbol} exchange={stock.exchange} />
+      </td>
       <td className="td-name">{stock.name}</td>
       <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{stock.sector}</td>
       <td>

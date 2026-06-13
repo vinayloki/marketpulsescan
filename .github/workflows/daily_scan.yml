@@ -1,15 +1,13 @@
 name: Daily NSE Market Scan
 
 on:
-  push:
-    branches: [ main ]
   schedule:
-    # 4:00 PM IST (10:30 UTC) Mon–Fri
-    # NSE closes at 3:30 PM IST — 30 min buffer for yfinance to publish final EOD data
-    - cron: '30 10 * * 1-5'
-  workflow_dispatch:   # manual trigger anytime
+    # 4:15 PM IST (10:45 UTC) Mon–Fri
+    # NSE closes 3:30 PM IST — 45 min buffer for yfinance EOD data to settle
+    - cron: '45 10 * * 1-5'
+  workflow_dispatch:   # manual trigger anytime from GitHub Actions tab
 
-# Prevent two daily runs from pushing at the same time
+# Prevent two runs from conflicting
 concurrency:
   group: daily-scan
   cancel-in-progress: false
@@ -18,107 +16,162 @@ permissions:
   contents: write
 
 jobs:
-  update-scanner-data:
+  scan:
     runs-on: ubuntu-latest
 
     steps:
+      # ── 1. Checkout ───────────────────────────────────────────────────────
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0          # full history required for rebase
+          fetch-depth: 0
 
-      - name: Setup Python
+      # ── 2. Python setup ───────────────────────────────────────────────────
+      - name: Setup Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Cache pip dependencies
+      - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements-actions.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
-      - name: Install Python Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-actions.txt
 
-      - name: Detect Screener CSV
-        run: |
-          CSV_COUNT=$(ls -1 Stock_Screener_*.csv 2>/dev/null | wc -l)
-          if [ "$CSV_COUNT" -gt 0 ]; then
-            echo "📄 Found $CSV_COUNT Screener CSV file(s):"
-            ls -lh Stock_Screener_*.csv
-            echo "Scanner will auto-enrich fundamentals from CSV data."
-          else
-            echo "ℹ️  No Screener CSV found — using yfinance fundamentals only."
-            echo "To enrich: export from Tickertape, commit as Stock_Screener_*.csv"
-          fi
+      # ── 3. Initialise SQLite DB (creates tables if first run) ─────────────
+      - name: Initialise Database
+        run: python -c "from database.init_db import init_db; init_db(); print('DB ready')"
 
-      - name: Run MarketPulse Scanner
+      # ── 4. Main market scanner (produces scan_results/ JSON & CSV) ────────
+      - name: Run Market Scanner
         run: python scanner.py
 
+      # ── 5. Supporting data enrichment steps (non-fatal) ──────────────────
       - name: Fetch Market News
         run: python news_fetcher.py
-        continue-on-error: true   # non-fatal if RSS feed temporarily down
+        continue-on-error: true
 
       - name: Update Market Regime
         run: python regime_filter.py
-        continue-on-error: true   # non-fatal if NIFTY data temporarily unavailable
+        continue-on-error: true
 
-      - name: Run AI EOD Intelligence Engine
+      - name: Run AI Intelligence Engine
         run: python ai_engine.py
-        continue-on-error: true   # non-fatal — scanner data is already written
+        continue-on-error: true
         timeout-minutes: 10
 
       - name: Run Prediction Engine
         run: python prediction_engine.py --backtest-weeks 12
-        continue-on-error: true   # non-fatal — predictions augment but don't replace scanner data
+        continue-on-error: true
         timeout-minutes: 15
 
+      # ── 6. Stage 2 Multi-Timeframe Scanner → SQLite DB ───────────────────
+      #    Runs AFTER main scanner so OHLCV data is freshly cached.
+      #    Produces data/marketpulse.db with daily / weekly / monthly results.
+      - name: Run Stage 2 Scanner (Daily / Weekly / Monthly)
+        run: |
+          python - <<'EOF'
+          import logging
+          logging.basicConfig(level=logging.INFO)
+
+          from data_providers.yfinance_provider import YFinanceProvider
+          from scanners.stage2_scanner import Stage2Scanner
+          from database.db_updater import update_stage2_results
+          from engine.timeframe_resampler import resample_to_weekly, resample_to_monthly
+
+          yf = YFinanceProvider()
+          tickers = yf.fetch_ticker_universe()
+          print(f"Universe: {len(tickers)} tickers")
+
+          # Stagger-download in small batches to avoid yfinance rate limits
+          import time, pandas as pd
+          all_ohlcv = {}
+          batch_size = 50
+          for i in range(0, len(tickers), batch_size):
+              batch = tickers[i:i+batch_size]
+              try:
+                  df = yf.fetch_ohlcv(batch, period="2y", interval="1d")
+                  if not df.empty:
+                      for ticker in df["Close"].columns:
+                          all_ohlcv[ticker] = df.xs(ticker, axis=1, level=1)
+              except Exception as e:
+                  print(f"Batch {i//batch_size+1} error: {e}")
+              time.sleep(2)  # 2-second pause per batch = ~polite rate
+
+          if not all_ohlcv:
+              print("No OHLCV data — skipping Stage 2 DB update")
+              exit(0)
+
+          # Reconstruct MultiIndex DataFrame
+          combined = pd.concat(
+              {col: df for col, df in all_ohlcv.items()},
+              axis=1
+          ).swaplevel(axis=1).sort_index(axis=1)
+
+          scanner = Stage2Scanner()
+          for tf_name, tf_ohlcv in [
+              ("daily",   combined),
+              ("weekly",  resample_to_weekly(combined)),
+              ("monthly", resample_to_monthly(combined)),
+          ]:
+              print(f"Running Stage 2 [{tf_name}]...")
+              results = scanner.scan(tf_ohlcv, timeframe=tf_name)
+              update_stage2_results(results, timeframe=tf_name)
+              print(f"  → {len(results)} Stage 2 stocks saved")
+          EOF
+        continue-on-error: true
+        timeout-minutes: 30
+
+      # ── 7. Validate sector labels ─────────────────────────────────────────
       - name: Validate Sector Labels
-        continue-on-error: true   # informational only — does not block the scan
+        continue-on-error: true
         run: |
           python -c "
-          import json, sys
+          import json
           from config.sector_map import CANONICAL_SECTORS
           try:
               with open('scan_results/fundamentals.json') as f:
                   data = json.load(f)
               stocks = data.get('stocks', [])
-              invalid = [s.get('s','?') + ':' + str(s.get('sector','')) for s in stocks if s.get('sector') not in CANONICAL_SECTORS]
+              invalid = [s.get('s','?') for s in stocks if s.get('sector') not in CANONICAL_SECTORS]
               if invalid:
-                  print(f'WARNING: {len(invalid)} stocks with non-canonical sectors: {set(s.split(\":\")[1] for s in invalid)}')
+                  print(f'WARNING: {len(invalid)} stocks with non-canonical sectors')
               else:
-                  print(f'OK: All {len(stocks)} sector labels are canonical.')
+                  print(f'OK: All {len(stocks)} sector labels valid')
           except Exception as e:
               print(f'Sector validation skipped: {e}')
           "
 
+      # ── 8. Commit results ─────────────────────────────────────────────────
       - name: Commit and Push Results
         run: |
-          git config --global user.name "github-actions[bot]"
+          git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Stage only the scan_results we care about first
+          # Stage scan results (powers GitHub Pages site — DO NOT REMOVE)
           git add scan_results/
 
-          # Stash staged + unstaged + untracked (cache/, logs, etc.) so the
-          # rebase has a clean working tree — this is the only 100% reliable approach
+          # Stage SQLite DB (powers new FastAPI / React platform)
+          git add data/marketpulse.db 2>/dev/null || true
+
+          # Stash everything so rebase is clean
           git stash push --include-untracked -m "ci: pre-pull stash"
-
-          # Pull any concurrent pushes that landed while the scan was running
           git pull --rebase origin main
-
-          # Restore everything the scanner wrote
           git stash pop
 
-          # Re-stage scan_results and commit if anything actually changed
+          # Re-stage and commit if anything changed
           git add scan_results/
+          git add data/marketpulse.db 2>/dev/null || true
+
           git diff --staged --quiet \
-            && echo "ℹ️  No data changes — nothing to commit." \
-            || git commit -m "📊 Daily Market Update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+            && echo "No data changes — nothing to commit." \
+            || git commit -m "📊 Auto Scan: $(date -u +'%Y-%m-%d %H:%M UTC')"
 
           git push origin HEAD:main

@@ -525,3 +525,40 @@ nav { display: flex; gap: 0.25rem; }
 .ret-val.red   { color: var(--accent-red); }
 .ret-zero      { color: var(--text-dim); font-size: 0.85rem; }
 
+/* ═══════════════════════════════════════════════════════════════
+   EXTERNAL LINKS  (TradingView · Screener)
+══════════════════════════════════════════════════════════════ */
+.ext-links {
+  display: inline-flex;
+  gap: 0.3rem;
+  margin-left: 0.45rem;
+  vertical-align: middle;
+}
+
+.ext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: opacity var(--transition), transform var(--transition);
+  line-height: 1;
+}
+.ext-link:hover { opacity: 0.8; transform: translateY(-1px); }
+
+.ext-link.tv {
+  background: rgba(33,150,243,0.15);
+  color: #2196F3;
+  border: 1px solid rgba(33,150,243,0.3);
+}
+.ext-link.sc {
+  background: rgba(255,152,0,0.12);
+  color: #FF9800;
+  border: 1px solid rgba(255,152,0,0.3);
+}
+
+
