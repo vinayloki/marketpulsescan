@@ -30,7 +30,7 @@ const CANONICAL_SECTORS = [
 ];
 
 /* ── External link helpers ──────────────────────────────────────────────── */
-const TV_BASE = 'https://in.tradingview.com/chart/?symbol=NSE:';
+const TV_BASE = 'https://in.tradingview.com/chart/kkc9tJsQ/?symbol=NSE:';
 const SC_BASE = 'https://www.screener.in/company/';
 /** Inline ticker+screener links for table td-ticker cells */
 function tickerLinks(sym, tvStyle='', scStyle='') {

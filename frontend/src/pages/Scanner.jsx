@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import axios from 'axios';
+import TradingViewChart from '../components/TradingViewChart';
 
 // ─── External links ───────────────────────────────────────────────────────────
-function tvUrl(symbol, exchange) {
-  // e.g. NSE-APOLLOPIPE or BSE-GOLDIAM
-  const exch = (exchange || 'NSE').toUpperCase();
+function tvSymbol(symbol, exchange) {
+  const exch  = (exchange || 'NSE').toUpperCase();
   const clean = symbol.replace(/\.NS$|\.BO$/i, '');
-  return `https://in.tradingview.com/symbols/${exch}-${clean}/`;
+  return `${exch}:${clean}`;           // e.g. "NSE:APOLLOPIPE" for the widget
+}
+function tvUrl(symbol, exchange) {
+  const clean = symbol.replace(/\.NS$|\.BO$/i, '');
+  const exch  = (exchange || 'NSE').toUpperCase();
+  return `https://in.tradingview.com/chart/kkc9tJsQ/?symbol=${exch}:${clean}`;
 }
 function screenerUrl(symbol) {
   const clean = symbol.replace(/\.NS$|\.BO$/i, '');
@@ -14,13 +20,13 @@ function screenerUrl(symbol) {
 function ExternalLinks({ symbol, exchange }) {
   return (
     <span className="ext-links">
-      <a href={tvUrl(symbol, exchange)} target="_blank" rel="noreferrer" className="ext-link tv" title="TradingView chart">
+      <a href={tvUrl(symbol, exchange)} target="_blank" rel="noreferrer" className="ext-link tv" title="Open TradingView">
         <svg viewBox="0 0 24 24" fill="none" width="13" height="13" stroke="currentColor" strokeWidth="2">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
         TV
       </a>
-      <a href={screenerUrl(symbol)} target="_blank" rel="noreferrer" className="ext-link sc" title="Screener.in fundamentals">
+      <a href={screenerUrl(symbol)} target="_blank" rel="noreferrer" className="ext-link sc" title="Open Screener.in">
         <svg viewBox="0 0 24 24" fill="none" width="13" height="13" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
@@ -29,7 +35,34 @@ function ExternalLinks({ symbol, exchange }) {
     </span>
   );
 }
-import axios from 'axios';
+
+// ─── Chart slide-out panel ──────────────────────────────────────────────────────
+function ChartPanel({ stock, onClose }) {
+  if (!stock) return null;
+  const sym = tvSymbol(stock.symbol || stock.ticker, stock.exchange);
+  return (
+    <div className="chart-overlay" onClick={onClose}>
+      <div className="chart-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="chart-panel-header">
+          <div>
+            <span className="chart-panel-symbol">{stock.symbol || stock.ticker}</span>
+            <span className="chart-panel-name">{stock.name}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <a href={tvUrl(stock.symbol || stock.ticker, stock.exchange)}
+               target="_blank" rel="noreferrer" className="ext-link tv">Open full chart ↗</a>
+            <a href={screenerUrl(stock.symbol || stock.ticker)}
+               target="_blank" rel="noreferrer" className="ext-link sc">Screener.in ↗</a>
+            <button className="chart-close-btn" onClick={onClose}>✕</button>
+          </div>
+        </div>
+        <div className="chart-panel-body">
+          <TradingViewChart symbol={sym} theme="dark" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── View modes ───────────────────────────────────────────────────────────────
 const VIEWS = [
@@ -103,18 +136,19 @@ function SkeletonRow({ cols }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 function Scanner() {
-  const [view, setView]           = useState('market');
-  const [stage2Tf, setStage2Tf]   = useState('daily');
-  const [returnTf, setReturnTf]   = useState('1M');
+  const [view, setView]             = useState('market');
+  const [stage2Tf, setStage2Tf]     = useState('daily');
+  const [returnTf, setReturnTf]     = useState('1M');
   const [mcapFilter, setMcapFilter] = useState('');
-  const [search, setSearch]       = useState('');
-  const [sortKey, setSortKey]     = useState(null);
-  const [sortDir, setSortDir]     = useState('desc');
-  const [page, setPage]           = useState(1);
-  const [data, setData]           = useState([]);
-  const [total, setTotal]         = useState(0);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState(null);
+  const [search, setSearch]         = useState('');
+  const [sortKey, setSortKey]       = useState(null);
+  const [sortDir, setSortDir]       = useState('desc');
+  const [page, setPage]             = useState(1);
+  const [data, setData]             = useState([]);
+  const [total, setTotal]           = useState(0);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
+  const [selectedStock, setSelectedStock] = useState(null);  // chart panel
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
   const fetchData = useCallback(() => {
@@ -321,8 +355,8 @@ function Scanner() {
                   : paginated.map((stock, idx) => {
                     const rank = (page - 1) * PAGE_SIZE + idx + 1;
                     return isMarket
-                      ? <MarketRow key={stock.ticker} stock={stock} rank={rank} />
-                      : <Stage2Row key={stock.symbol} stock={stock} rank={rank} />;
+                      ? <MarketRow key={stock.ticker} stock={stock} rank={rank} onClick={() => setSelectedStock(stock)} />
+                      : <Stage2Row key={stock.symbol} stock={stock} rank={rank} onClick={() => setSelectedStock(stock)} />;
                   })
               }
             </tbody>
@@ -340,15 +374,20 @@ function Scanner() {
           <button className="page-btn" disabled={page === totalPages} onClick={() => setPage(totalPages)}>»</button>
         </div>
       )}
+
+      {/* ── Chart Panel Overlay ── */}
+      {selectedStock && (
+        <ChartPanel stock={selectedStock} onClose={() => setSelectedStock(null)} />
+      )}
     </div>
   );
 }
 
 // ─── Row components ──────────────────────────────────────────────────────────
 
-function MarketRow({ stock, rank }) {
+function MarketRow({ stock, rank, onClick }) {
   return (
-    <tr className="data-row">
+    <tr className="data-row" onClick={onClick} style={{ cursor: 'pointer' }}>
       <td className="td-rank">{rank}</td>
       <td className="td-symbol">
         {stock.symbol}
@@ -373,9 +412,9 @@ function MarketRow({ stock, rank }) {
   );
 }
 
-function Stage2Row({ stock, rank }) {
+function Stage2Row({ stock, rank, onClick }) {
   return (
-    <tr className="data-row">
+    <tr className="data-row" onClick={onClick} style={{ cursor: 'pointer' }}>
       <td className="td-rank">{rank}</td>
       <td className="td-symbol">
         {stock.symbol}
