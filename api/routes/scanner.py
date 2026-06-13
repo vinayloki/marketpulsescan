@@ -124,8 +124,10 @@ def get_top_performers(
     with open(path) as f:
         all_performers = json.load(f)
 
-    # Structure: {timeframe: [{ticker, last_close, return}, ...]}
-    performers = all_performers.get(timeframe, [])
+    # Structure: {timeframe: {"top_gainers": [...], "top_losers": [...]}}
+    timeframe_data = all_performers.get(timeframe, {})
+    performers = timeframe_data.get("top_gainers", [])
+    
     return {
         "timeframe": timeframe,
         "count":     len(performers[:limit]),
