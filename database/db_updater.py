@@ -47,6 +47,7 @@ def update_stage2_results(scan_results: dict, timeframe: str = "daily"):
 
             record.stage = "Stage 2"
             record.composite_score = result.score
+            record.trend_score = result.score
             record.rs_score = ind.get("rs_rating", 0)
             record.d_close = ind.get("price")
             record.d_ema50 = ind.get("sma_50")

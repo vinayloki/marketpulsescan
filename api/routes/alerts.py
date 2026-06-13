@@ -24,3 +24,21 @@ def create_alert(item: AlertCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_item)
     return db_item
+@router.delete("/{alert_id}")
+def delete_alert(alert_id: int, db: Session = Depends(get_db)):
+    db_item = db.query(Alert).filter(Alert.id == alert_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    db.delete(db_item)
+    db.commit()
+    return {"message": "Alert deleted"}
+
+@router.put("/{alert_id}/toggle")
+def toggle_alert(alert_id: int, db: Session = Depends(get_db)):
+    db_item = db.query(Alert).filter(Alert.id == alert_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    db_item.is_active = not db_item.is_active
+    db.commit()
+    db.refresh(db_item)
+    return db_item

@@ -45,7 +45,7 @@ class MomentumScanner(BaseScanner):
 
         close_df = ohlcv["Close"]
         triggered_count = 0
-        one_month_days = TIMEFRAMES["1M"]  # 21
+        one_month_days = 21  # 21 trading days in a month
 
         for ticker in close_df.columns:
             try:

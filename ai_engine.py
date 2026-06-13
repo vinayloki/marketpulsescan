@@ -405,102 +405,107 @@ def process_stock(stock: dict, fund: dict,
                   regime: str = "Bull",
                   win_rates: dict = None) -> dict:
     """Process one stock -> AI pick record (v2 with entry/SL/TP and P(win))."""
-    ticker    = stock["t"]
-    price     = stock["c"]
-    mcap_code = stock.get("m", "S")
+    try:
+        ticker    = stock["t"]
+        price     = stock["c"]
+        mcap_code = stock.get("m", "S")
 
-    score, avail_tfs = weighted_score(stock)
-    trend, trend_label = classify_trend(stock)
-    rec, horizon, confidence = determine_recommendation(score, trend)
-    reasons, risks = build_reasons_and_risks(stock, fund, score, trend, rec)
+        score, avail_tfs = weighted_score(stock)
+        trend, trend_label = classify_trend(stock)
+        rec, horizon, confidence = determine_recommendation(score, trend)
+        reasons, risks = build_reasons_and_risks(stock, fund, score, trend, rec)
 
-    # Direction arrow
-    direction = {"up": "Up", "down": "Down", "sideways": "Neutral"}[trend]
+        # Direction arrow
+        direction = {"up": "Up", "down": "Down", "sideways": "Neutral"}[trend]
 
-    # Timeframe details
-    tf_details = {}
-    for tf in TF_KEYS:
-        val = stock.get(tf)
-        if val is None:
-            tf_details[tf] = {"pct": None, "signal": "na"}
-        elif val > STRONG_GAIN:
-            tf_details[tf] = {"pct": round(val, 2), "signal": "strong_up"}
-        elif val > WEAK_GAIN:
-            tf_details[tf] = {"pct": round(val, 2), "signal": "up"}
-        elif val < STRONG_LOSS:
-            tf_details[tf] = {"pct": round(val, 2), "signal": "strong_down"}
-        elif val < WEAK_LOSS:
-            tf_details[tf] = {"pct": round(val, 2), "signal": "down"}
+        # Timeframe details
+        tf_details = {}
+        for tf in TF_KEYS:
+            val = stock.get(tf)
+            if val is None:
+                tf_details[tf] = {"pct": None, "signal": "na"}
+            elif val > STRONG_GAIN:
+                tf_details[tf] = {"pct": round(val, 2), "signal": "strong_up"}
+            elif val > WEAK_GAIN:
+                tf_details[tf] = {"pct": round(val, 2), "signal": "up"}
+            elif val < STRONG_LOSS:
+                tf_details[tf] = {"pct": round(val, 2), "signal": "strong_down"}
+            elif val < WEAK_LOSS:
+                tf_details[tf] = {"pct": round(val, 2), "signal": "down"}
+            else:
+                tf_details[tf] = {"pct": round(val, 2), "signal": "neutral"}
+
+        # ── v2: Trade levels (entry / SL / TP) ────────────────────────────
+        entry_price  = round(price, 2)
+        sl_fixed_pct = STOP_LOSS_FIXED / 100
+        # ATR proxy: 1.5% of price if no ATR data in full_summary
+        # (This is a simplified proxy since actual OHLCV ATR isn't passed here yet)
+        atr_proxy    = price * 0.015
+        sl_atr       = atr_proxy * ATR_SL_MULTIPLIER
+        sl_dist      = max(price * sl_fixed_pct, sl_atr)
+        sl_pct       = round(sl_dist / price * 100, 2)
+        tp_pct_      = TAKE_PROFIT_PCT
+        stop_loss    = round(entry_price - sl_dist, 2)
+        take_profit  = round(entry_price * (1 + tp_pct_ / 100), 2)
+        risk_reward  = round((take_profit - entry_price) / max(sl_dist, 0.01), 2)
+
+        # ── v2: P(win) from historical backtest calibration ────────────────
+        # Infer signal type from trend + timeframe pattern
+        if (stock.get("1W", 0) or 0) > 10:
+            sig_type = "BREAKOUT"
+        elif trend == "up" and (stock.get("3M", 0) or 0) > 5:
+            sig_type = "MOMENTUM"
         else:
-            tf_details[tf] = {"pct": round(val, 2), "signal": "neutral"}
+            sig_type = "default"
 
-    # ── v2: Trade levels (entry / SL / TP) ────────────────────────────
-    entry_price  = round(price, 2)
-    sl_fixed_pct = STOP_LOSS_FIXED / 100
-    # ATR proxy: 1.5% of price if no ATR data in full_summary
-    # (When scanner.py provides ATR in full_summary, use it here)
-    atr_proxy    = price * 0.015
-    sl_atr       = atr_proxy * ATR_SL_MULTIPLIER
-    sl_dist      = max(price * sl_fixed_pct, sl_atr)
-    sl_pct       = round(sl_dist / price * 100, 2)
-    tp_pct_      = TAKE_PROFIT_PCT
-    stop_loss    = round(entry_price - sl_dist, 2)
-    take_profit  = round(entry_price * (1 + tp_pct_ / 100), 2)
-    risk_reward  = round((take_profit - entry_price) / max(sl_dist, 0.01), 2)
+        regime_rates = (win_rates or {}).get(regime, {})
+        base_wr      = regime_rates.get(sig_type, regime_rates.get("default", 50))
 
-    # ── v2: P(win) from historical backtest calibration ────────────────
-    # Infer signal type from trend + timeframe pattern
-    if (stock.get("1W", 0) or 0) > 10:
-        sig_type = "BREAKOUT"
-    elif trend == "up" and (stock.get("3M", 0) or 0) > 5:
-        sig_type = "MOMENTUM"
-    else:
-        sig_type = "default"
+        # Adjust base win rate by confidence (score-derived confidence)
+        # Higher confidence stocks get a small uplift
+        conf_delta   = (confidence - 50) * 0.1   # max ±4.5 pts
+        p_success    = round(max(20, min(85, base_wr + conf_delta)), 1)
 
-    regime_rates = (win_rates or {}).get(regime, {})
-    base_wr      = regime_rates.get(sig_type, regime_rates.get("default", 50))
+        # ── v2: Regime-adjusted confidence ────────────────────────────────
+        regime_mult   = REGIME_SCORE_MULT.get(regime, 1.0)
+        adj_confidence = min(95, round(confidence * regime_mult))
 
-    # Adjust base win rate by confidence (score-derived confidence)
-    # Higher confidence stocks get a small uplift
-    conf_delta   = (confidence - 50) * 0.1   # max ±4.5 pts
-    p_success    = round(max(20, min(85, base_wr + conf_delta)), 1)
-
-    # ── v2: Regime-adjusted confidence ────────────────────────────────
-    regime_mult   = REGIME_SCORE_MULT.get(regime, 1.0)
-    adj_confidence = min(95, round(confidence * regime_mult))
-
-    return {
-        "ticker":       ticker,
-        "price":        price,
-        "date":         stock.get("d", ""),
-        "mcap_code":    mcap_code,
-        "cap_label":    get_cap_label(mcap_code, fund.get("mcap")),
-        "sector":       fund.get("sector") or fund.get("ind") or "",
-        "name":         fund.get("name") or ticker,
-        "pe":           fund.get("pe"),
-        "mcap_cr":      fund.get("mcap"),
-        "div_yield":    fund.get("dy"),
-        # AI recommendation
-        "recommendation": rec,
-        "trend":          trend,
-        "trend_label":    trend_label,
-        "direction":      direction,
-        "horizon":        horizon,
-        "confidence":     adj_confidence,
-        "score":          score,
-        "tf_details":     tf_details,
-        "reasons":        reasons,
-        "risks":          risks,
-        # v2: Trade execution levels
-        "regime":         regime,
-        "entry_price":    entry_price,
-        "stop_loss":      stop_loss,
-        "take_profit":    take_profit,
-        "sl_pct":         sl_pct,
-        "tp_pct":         tp_pct_,
-        "risk_reward":    risk_reward,
-        "p_success":      p_success,
-    }
+        return {
+            "ticker":       ticker,
+            "price":        price,
+            "date":         stock.get("d", ""),
+            "mcap_code":    mcap_code,
+            "cap_label":    get_cap_label(mcap_code, fund.get("mcap")),
+            "sector":       fund.get("sector") or fund.get("ind") or "",
+            "name":         fund.get("name") or ticker,
+            "pe":           fund.get("pe"),
+            "mcap_cr":      fund.get("mcap"),
+            "div_yield":    fund.get("dy"),
+            # AI recommendation
+            "recommendation": rec,
+            "trend":          trend,
+            "trend_label":    trend_label,
+            "direction":      direction,
+            "horizon":        horizon,
+            "confidence":     adj_confidence,
+            "score":          score,
+            "tf_details":     tf_details,
+            "reasons":        reasons,
+            "risks":          risks,
+            # v2: Trade execution levels
+            "regime":         regime,
+            "entry_price":    entry_price,
+            "stop_loss":      stop_loss,
+            "take_profit":    take_profit,
+            "sl_pct":         sl_pct,
+            "tp_pct":         tp_pct_,
+            "risk_reward":    risk_reward,
+            "p_success":      p_success,
+        }
+    except Exception as e:
+        import logging
+        logging.getLogger("ai_engine").warning(f"Failed to process stock {stock.get('t', 'UNKNOWN')}: {e}")
+        return None
 
 
 def main():

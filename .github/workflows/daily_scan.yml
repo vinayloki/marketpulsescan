@@ -72,62 +72,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 15
 
-      # ── 6. Stage 2 Multi-Timeframe Scanner → SQLite DB ───────────────────
-      #    Runs AFTER main scanner so OHLCV data is freshly cached.
-      #    Produces data/marketpulse.db with daily / weekly / monthly results.
-      - name: Run Stage 2 Scanner (Daily / Weekly / Monthly)
-        run: |
-          python - <<'EOF'
-          import logging
-          logging.basicConfig(level=logging.INFO)
 
-          from data_providers.yfinance_provider import YFinanceProvider
-          from scanners.stage2_scanner import Stage2Scanner
-          from database.db_updater import update_stage2_results
-          from engine.timeframe_resampler import resample_to_weekly, resample_to_monthly
-
-          yf = YFinanceProvider()
-          tickers = yf.fetch_ticker_universe()
-          print(f"Universe: {len(tickers)} tickers")
-
-          # Stagger-download in small batches to avoid yfinance rate limits
-          import time, pandas as pd
-          all_ohlcv = {}
-          batch_size = 50
-          for i in range(0, len(tickers), batch_size):
-              batch = tickers[i:i+batch_size]
-              try:
-                  df = yf.fetch_ohlcv(batch, period="2y", interval="1d")
-                  if not df.empty:
-                      for ticker in df["Close"].columns:
-                          all_ohlcv[ticker] = df.xs(ticker, axis=1, level=1)
-              except Exception as e:
-                  print(f"Batch {i//batch_size+1} error: {e}")
-              time.sleep(2)  # 2-second pause per batch = ~polite rate
-
-          if not all_ohlcv:
-              print("No OHLCV data — skipping Stage 2 DB update")
-              exit(0)
-
-          # Reconstruct MultiIndex DataFrame
-          combined = pd.concat(
-              {col: df for col, df in all_ohlcv.items()},
-              axis=1
-          ).swaplevel(axis=1).sort_index(axis=1)
-
-          scanner = Stage2Scanner()
-          for tf_name, tf_ohlcv in [
-              ("daily",   combined),
-              ("weekly",  resample_to_weekly(combined)),
-              ("monthly", resample_to_monthly(combined)),
-          ]:
-              print(f"Running Stage 2 [{tf_name}]...")
-              results = scanner.scan(tf_ohlcv, timeframe=tf_name)
-              update_stage2_results(results, timeframe=tf_name)
-              print(f"  → {len(results)} Stage 2 stocks saved")
-          EOF
-        continue-on-error: true
-        timeout-minutes: 30
 
       # ── 7. Export DB to static JSON for serverless React app ─────────────
       - name: Export Static API
@@ -179,3 +124,15 @@ jobs:
             || git commit -m "📊 Auto Scan: $(date -u +'%Y-%m-%d %H:%M UTC')"
 
           git push origin HEAD:main
+
+      - name: Report Failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Daily Scan Failed 🚨',
+              body: `The daily MarketPulse scan workflow failed on run ${context.runId}.\n\nPlease check the [Actions log](https://github/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`
+            })

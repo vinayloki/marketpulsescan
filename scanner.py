@@ -151,6 +151,9 @@ def _tf_anchor(last_dt, tf_code):
         return last_dt - pd.DateOffset(months=6)
     elif tf_code == '12M':
         return last_dt - pd.DateOffset(months=12)
+    else:
+        log.warning(f"⚠️ Unknown timeframe code: {tf_code}")
+        return None
 
 
 def calculate_performance(prices: pd.DataFrame) -> pd.DataFrame:

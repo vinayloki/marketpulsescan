@@ -220,6 +220,21 @@ async function loadEverything() {
       sectorPulseData = await sectorRes.value.json();
       console.log(`Sector pulse loaded: ${sectorPulseData.days_tracked} days`);
     }
+
+    // Track failed files
+    let failedFiles = [];
+    if (summRes.status !== 'fulfilled' || !summRes.value.ok) failedFiles.push('Summary');
+    if (fullRes.status !== 'fulfilled' || !fullRes.value.ok) failedFiles.push('Full Scan');
+    if (fundRes.status !== 'fulfilled' || !fundRes.value.ok) failedFiles.push('Fundamentals');
+    if (newsRes.status !== 'fulfilled' || !newsRes.value.ok) failedFiles.push('News');
+    if (oppRes.status !== 'fulfilled' || !oppRes.value.ok) failedFiles.push('Opportunities');
+    if (aiRes.status !== 'fulfilled' || !aiRes.value.ok) failedFiles.push('AI Picks');
+    if (btRes.status !== 'fulfilled' || !btRes.value.ok) failedFiles.push('Backtest');
+    if (regRes.status !== 'fulfilled' || !regRes.value.ok) failedFiles.push('Regime');
+    if (predRes.status !== 'fulfilled' || !predRes.value.ok) failedFiles.push('Predictions');
+    if (sectorRes.status !== 'fulfilled' || !sectorRes.value.ok) failedFiles.push('Sector Pulse');
+    window._failedFiles = failedFiles;
+
   } catch (err) {
     // Network failure — show inline warning banner; AI Picks still works (static data)
     console.warn('Scan data fetch failed:', err.message);
@@ -245,6 +260,37 @@ function buildDashboard() {
   document.getElementById('hScanDate').textContent   = scanDate;
   document.getElementById('hStockCount').textContent  = stockCount;
   document.getElementById('footerDate').textContent   = scanDate;
+
+  // Stale data check
+  if (scanDate !== '—') {
+    const scanTime = new Date(scanDate).getTime();
+    const now = new Date().getTime();
+    if (!isNaN(scanTime)) {
+      const hoursOld = (now - scanTime) / (1000 * 60 * 60);
+      if (hoursOld > 24) {
+        const header = document.querySelector('header');
+        if (header && !document.getElementById('staleBanner')) {
+          const banner = document.createElement('div');
+          banner.id = 'staleBanner';
+          banner.style.cssText = 'background: #ff9800; color: #000; padding: 8px; text-align: center; font-weight: bold; font-size: 0.9em;';
+          banner.innerHTML = `⚠️ Data is ${Math.round(hoursOld)} hours old. The latest daily scan may have failed.`;
+          header.parentNode.insertBefore(banner, header);
+        }
+      }
+    }
+  }
+
+  // Failed files check
+  if (window._failedFiles && window._failedFiles.length > 0) {
+    const header = document.querySelector('header');
+    if (header && !document.getElementById('errorBanner')) {
+      const banner = document.createElement('div');
+      banner.id = 'errorBanner';
+      banner.style.cssText = 'background: #dc3545; color: #fff; padding: 8px; text-align: center; font-weight: bold; font-size: 0.9em;';
+      banner.innerHTML = `⚠️ Failed to load: ${window._failedFiles.join(', ')}. Some tabs may be empty.`;
+      header.parentNode.insertBefore(banner, header.nextSibling);
+    }
+  }
 
   // Live regime badge in header (requires regimeBadge element in HTML)
   const regBadge = document.getElementById('regimeBadge');
