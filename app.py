@@ -18,7 +18,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-TV_BASE = "https://in.tradingview.com/chart/?symbol=NSE:"
+TV_BASE = "https://in.tradingview.com/symbols/NSE:"
 SCAN_DIR = "scan_results"
 
 # ─── CSS ──────────────────────────────────────────────────────────────────────
@@ -154,7 +154,7 @@ opps     = opp_raw.get("opportunities", [])
 mb       = perf_data.get("mode_b", {})
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
-def tv(ticker): return f"{TV_BASE}{ticker}"
+def tv(ticker): return f"{TV_BASE}{ticker}/"
 def tv_link(ticker, label=None):
     lab = label or ticker
     return f'<a href="{tv(ticker)}" target="_blank" class="tv-link">{lab}</a>'
