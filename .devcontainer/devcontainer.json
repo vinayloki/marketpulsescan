@@ -24,7 +24,7 @@
     }
   },
   "updateContentCommand": "pip3 install --user -r requirements.txt && cd frontend && npm install",
-  "postAttachCommand": "echo '✅ Environment ready! Run: uvicorn api.main:app --reload (for API) and cd frontend && npm run dev (for UI)'",
+  "postAttachCommand": "bash .devcontainer/start.sh",
   "portsAttributes": {
     "5173": {
       "label": "Frontend (React)",
