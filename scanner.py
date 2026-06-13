@@ -389,14 +389,25 @@ def run_opportunity_engine(ohlcv: pd.DataFrame, fundamentals: dict[str, dict]):
     # ── Save output ─────────────────────────────────────────────────
     engine.save(opportunities)
 
-    # ── Stage 2 Scanner to DB ───────────────────────────────────────
+    # ── Stage 2 Scanner — Daily / Weekly / Monthly to DB ────────────
     try:
         from scanners.stage2_scanner import Stage2Scanner
         from database.db_updater import update_stage2_results
-        
-        log.info("🎯 Running Stage 2 Scanner & Updating DB...")
-        stage2_results = Stage2Scanner().scan(ohlcv)
-        update_stage2_results(stage2_results)
+        from engine.timeframe_resampler import resample_to_weekly, resample_to_monthly
+
+        scanner = Stage2Scanner()
+
+        timeframe_data = {
+            "daily":   ohlcv,
+            "weekly":  resample_to_weekly(ohlcv),
+            "monthly": resample_to_monthly(ohlcv),
+        }
+
+        for tf_name, tf_ohlcv in timeframe_data.items():
+            log.info(f"🎯 Running Stage 2 Scanner [{tf_name}]...")
+            tf_results = scanner.scan(tf_ohlcv, timeframe=tf_name)
+            update_stage2_results(tf_results, timeframe=tf_name)
+
     except Exception as e:
         log.error(f"Error running Stage 2 DB updates: {e}")
 

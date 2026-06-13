@@ -1,0 +1,483 @@
+
+<h2 class="sr-only">ISME v5.6 Pine Script audit dashboard showing bugs, edge cases, and industry standard comparison</h2>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:14px;color:var(--color-text-primary)}
+.tabs{display:flex;gap:4px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:6px 14px;border:0.5px solid transparent;border-radius:var(--border-radius-md) var(--border-radius-md) 0 0;cursor:pointer;font-size:13px;color:var(--color-text-secondary);background:transparent;border-bottom:none;position:relative;bottom:-0.5px}
+.tab.active{border-color:var(--color-border-tertiary);border-bottom-color:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;background:var(--color-background-primary)}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;margin-bottom:10px}
+.badge{display:inline-block;padding:2px 8px;border-radius:var(--border-radius-md);font-size:11px;font-weight:500;margin-right:6px}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-amber{background:#FAEEDA;color:#854F0B}
+.badge-green{background:#EAF3DE;color:#3B6D11}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+.badge-purple{background:#EEEDFE;color:#3C3489}
+.title{font-size:13px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.desc{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.fix{font-size:12px;color:#185FA5;background:#E6F1FB;border-radius:var(--border-radius-md);padding:6px 10px;margin-top:8px;font-family:var(--font-mono)}
+.score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.score-bar-wrap{flex:1;height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden}
+.score-bar{height:100%;border-radius:4px;transition:width 0.4s}
+.score-label{font-size:12px;font-weight:500;min-width:32px;text-align:right}
+.dim-label{font-size:12px;color:var(--color-text-secondary);min-width:130px}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;text-align:center}
+.metric-num{font-size:24px;font-weight:500;line-height:1.1}
+.metric-lbl{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.collapsible{cursor:pointer;user-select:none}
+.collapsible:hover{opacity:0.8}
+.collapse-body{overflow:hidden;transition:max-height 0.3s;max-height:0}
+.collapse-body.open{max-height:600px}
+.prompt-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;font-size:12px;font-family:var(--font-mono);line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-top:12px;color:var(--color-text-primary)}
+.copy-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;cursor:pointer;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-weight:500}
+td{padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.cat-header{background:var(--color-background-secondary);font-weight:500;color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-btn{padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;font-size:12px;background:transparent;color:var(--color-text-secondary)}
+.filter-btn.active{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-primary)}
+</style>
+
+<div style="padding:1rem 0">
+
+<div class="summary-grid">
+  <div class="metric-card">
+    <div class="metric-num" style="color:#A32D2D">5</div>
+    <div class="metric-lbl">Critical bugs</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-num" style="color:#854F0B">7</div>
+    <div class="metric-lbl">Edge case gaps</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-num" style="color:#185FA5">8</div>
+    <div class="metric-lbl">Industry deviations</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-num" style="color:#3B6D11">62</div>
+    <div class="metric-lbl">Overall score /100</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('bugs')">Bugs & edge cases</button>
+  <button class="tab" onclick="showTab('standards')">Industry standards</button>
+  <button class="tab" onclick="showTab('scorecard')">Scorecard</button>
+  <button class="tab" onclick="showTab('prompt')">Analysis prompt</button>
+</div>
+
+<div id="bugs" class="panel active">
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterBugs('all',this)">All</button>
+    <button class="filter-btn" onclick="filterBugs('critical',this)">Critical</button>
+    <button class="filter-btn" onclick="filterBugs('edge',this)">Edge cases</button>
+    <button class="filter-btn" onclick="filterBugs('logic',this)">Logic</button>
+    <button class="filter-btn" onclick="filterBugs('perf',this)">Performance</button>
+  </div>
+  <div id="bug-list"></div>
+</div>
+
+<div id="standards" class="panel">
+  <div id="std-list"></div>
+</div>
+
+<div id="scorecard" class="panel">
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:500;margin-bottom:14px">Dimension scores</div>
+    <div id="score-bars"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">Comparison: ISME v5.6 vs institutional-grade standard</div>
+    <table>
+      <thead><tr><th>Dimension</th><th>ISME v5.6</th><th>Industry target</th><th>Gap</th></tr></thead>
+      <tbody id="score-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="prompt" class="panel">
+  <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:10px">Paste this prompt (with your script) to run a structured audit on any Pine Script v6 indicator or strategy.</p>
+  <div class="prompt-box" id="prompt-text"></div>
+  <button class="copy-btn" onclick="copyPrompt()"><i class="ti ti-copy" aria-hidden="true"></i> Copy prompt</button>
+</div>
+
+</div>
+
+<script>
+const bugs = [
+  {
+    id:'B1', sev:'critical', cat:'logic',
+    title:'entryStop can exceed entryPrice (negative riskAmt)',
+    line:'~820',
+    desc:'When a stock gaps up on entry, lowest10 (10-bar swing low) may be set ABOVE close on the entry bar if calculated before the gap resolves. riskAmt = entryPrice - entryStop becomes negative, corrupting target2R, sharesSize, and the Final Call panel.',
+    fix:'Guard: float riskAmt = (not na(entryPrice) and not na(entryStop) and entryPrice > entryStop) ? entryPrice - entryStop : na'
+  },
+  {
+    id:'B2', sev:'critical', cat:'logic',
+    title:'pyramidCount over-counts on multi-bar ADD state',
+    line:'~700',
+    desc:'pyramidCount increments every bar while posState == "ADD" (before it transitions to HOLD after holdGrace bars), so a 3-bar ADD grace period increments the counter 3×, blowing past maxPyramidInput.',
+    fix:'Change to: if posState == "ADD" and posState[1] != "ADD" \\n    pyramidCount := math.min(pyramidCount + 1, maxPyramidInput)'
+  },
+  {
+    id:'B3', sev:'critical', cat:'logic',
+    title:'bt_autoStart millisecond double-multiplication',
+    line:'~1060',
+    desc:'timeframe.in_seconds() returns seconds, then multiplied by 1000. But time in Pine is already in milliseconds, so the formula is correct — HOWEVER the variable is declared with no type qualifier and bt_lookbackBars * timeframe.in_seconds() * 1000 overflows int on weekly charts (large values). The result can push start_time to the distant past, including ALL bars.',
+    fix:'Cast explicitly: int bt_autoStart = int(time) - bt_lookbackBars * int(timeframe.in_seconds(timeframe.period)) * 1000'
+  },
+  {
+    id:'B4', sev:'critical', cat:'logic',
+    title:'wScore monthly bonus fires when showMTF = false',
+    line:'~530',
+    desc:'The "if showMTF" block adds bonus AND subtracts 10 if not monthlyAligned, but the if-guard runs even when showMTF is false for the subtraction branch, silently penalising wScore. This means strongBuy threshold of 70 is harder to reach when the monthly filter is toggled off.',
+    fix:'Move the penalty inside: if showMTF and not monthlyAligned \\n    wScore -= 10'
+  },
+  {
+    id:'B5', sev:'critical', cat:'logic',
+    title:'posState EXIT never actually resets to NONE within same bar',
+    line:'~670',
+    desc:'The FSM sets posState = "EXIT" on sellZ/sellY, then checks "if posState == EXIT → posState := NONE". Both branches execute in the same barstate.isconfirmed tick because Pine evaluates if-elseif in sequence — the EXIT branch is hit, but then the next elif checks posState == "EXIT" again. Since Pine variables update immediately, NONE is set on the SAME bar. This means the EXIT state is never visible in the table (it shows NONE). Users lose the EXIT signal feedback.',
+    fix:'Use a separate var bool wantsExit and resolve in the NEXT bar, or restructure with a priority queue pattern.'
+  },
+  {
+    id:'E1', sev:'edge', cat:'edge',
+    title:'RS ratio is na when index has no volume (holidays)',
+    line:'~310',
+    desc:'On NSE market holidays, indexClose returns na. The guard "not na(indexClose) and indexClose > 0" handles this for rs, but rsEMA = ta.ema(rs, rsMAPeriod) will carry forward the last valid value rather than na — causing weeklyRSup to compare stale rs vs fresh rsEMA on the first post-holiday bar.',
+    fix:'Use: rsEMA = ta.ema(na(rs) ? na : rs, rsMAPeriod) with fill=false'
+  },
+  {
+    id:'E2', sev:'edge', cat:'edge',
+    title:'VCP base counter never resets on Stage 2→1→2 cycles',
+    line:'~600',
+    desc:'vcpBaseNum only resets in Stage 4. A stock that goes Stage 2 → Stage 3 → Stage 1 → Stage 2 (common W-shaped base) carries over the old base count, misidentifying Base #4 when it is actually Base #1 of a new cycle.',
+    fix:'Add: if stage3 and stage3[1] == false \\n    vcpBaseNum := 0  // reset on Stage 3 entry'
+  },
+  {
+    id:'E3', sev:'edge', cat:'edge',
+    title:'AVWAP accumulates across separate Stage 2 runs',
+    line:'~625',
+    desc:'avwapSumPV and avwapSumV only reset on stage4. If a stock goes Stage 2 → Stage 3 → Stage 2 again, the AVWAP anchor point is NOT reset on the second Stage 2 entry — it continues from the old anchor, making the AVWAP line meaningless.',
+    fix:'Reset on stage2Entered OR stage3 entry: \\nif stage3 and not stage3[1] \\n    avwapSumPV := 0.0; avwapSumV := 0.0'
+  },
+  {
+    id:'E4', sev:'edge', cat:'edge',
+    title:'Earnings proximity uses bar count, not calendar days',
+    line:'~760',
+    desc:'earningsSoon counts bars since last quarterly data update. On weekly charts, 10 bars = 10 weeks, which is a full quarter — not "earnings soon". On daily charts with holidays and half-days, bar counts diverge from calendar. A 50-75 bar window on daily = ~10-15 weeks, which is the ENTIRE NEXT QUARTER.',
+    fix:'Threshold calibration: daily earningsThreshLo=50, Hi=75 → should be Lo=15, Hi=25 (3-5 weeks before)'
+  },
+  {
+    id:'E5', sev:'edge', cat:'edge',
+    title:'Auto-sector detection misses Capital Goods / Defence / Chemicals',
+    line:'~255',
+    desc:'The auto-sector map covers 10 sectors but misses Capital Goods (CGPOWER is in your portfolio), Defence (SJVN), Chemicals (DEEPAKNTR), and Diversified. These fall through to the manual rsSectorSymbol default (NSE:NIFTY), which means all sector RS comparisons use the broad index — weakening the RS vs Sector signal.',
+    fix:'Add: str.contains(_ind,"capital") or str.contains(_ind,"engineering") → "NSE:CNXINFRA" \\nstr.contains(_ind,"chem") → "NSE:CNXCHEM" \\nstr.contains(_ind,"defence") or str.contains(_ind,"aerospace") → "NSE:NIFTYDEFENCE"'
+  },
+  {
+    id:'E6', sev:'edge', cat:'edge',
+    title:'highestCached for RS uses nz(rs[1]) — silent zero fill',
+    line:'~580',
+    desc:'rsHighestCached = ta.highest(nz(rs[1]), p_bhvWindow) uses nz() which substitutes 0 for na. This means when rs is na on holiday bars, it inserts 0 into the highest window, which can make any non-zero rs appear to be a "new RS high" spuriously.',
+    fix:'Use: rsHighestCached = ta.highest(rs[1], p_bhvWindow) — ta.highest handles na correctly by ignoring those bars'
+  },
+  {
+    id:'E7', sev:'edge', cat:'edge',
+    title:'Strategy bracket exit references "Long" but ADD entries use "Add1", "Add2"',
+    line:'~1090',
+    desc:'strategy.exit("Bracket", from_entry="Long") only exits the initial "Long" entry. The pyramid add entries ("Add1", "Add2") are NOT covered by this bracket and will never be exited by stop/target — only by strategy.close_all() on sellZ/sellY.',
+    fix:'Add separate strategy.exit calls for each add: \\nfor i = 1 to maxPyramidInput \\n    strategy.exit("Bracket-Add"+str.tostring(i), from_entry="Add"+str.tostring(i), stop=entryStop, limit=target2R)'
+  },
+  {
+    id:'L1', sev:'logic', cat:'logic',
+    title:'buyP uses buyAllowed but buyA/B/C bypass it — inconsistent regime gating',
+    line:'~490',
+    desc:'buyA, buyB, buyC skip the regime filter (buyAllowed) by design per comment "v5.4.1". But buyP (Pocket Pivot) uses buyAllowed, meaning pocket pivots are blocked in bear markets while more aggressive breakout signals are not. This is inverted from standard O\'Neil practice where pocket pivots are low-risk entries specifically valid near bases.',
+    fix:'Either gate A/B/C with buyAllowed too (safer), or remove the buyAllowed gate from buyP to be consistent.'
+  },
+  {
+    id:'L2', sev:'logic', cat:'perf',
+    title:'Table re-renders every bar on barstate.islast — O(n) cell writes per tick',
+    line:'~850',
+    desc:'All 3 tables (26-row summary, 9-row fundamentals, 41-row legend) write every cell on every barstate.islast tick. On real-time feeds this fires on every tick, not just on bar close. This is a known Pine performance issue causing lag on high-frequency updates.',
+    fix:'Wrap in: if barstate.islast and (barstate.isconfirmed or barstate.isnew) to only update on bar close or new bar.'
+  }
+];
+
+const standards = [
+  {
+    cat:'Entry signals',
+    items:[
+      {criterion:'Volume confirmation on breakout', status:'partial', detail:'BuyB requires volume > volMA (good). BuyA (trend breakout) has NO volume requirement — Minervini\'s trend template requires at least 40-50% above avg volume on the breakout bar.', fix:'Add: volume > volMA * 1.4 to buyA_state'},
+      {criterion:'Pivot point precision (within 5% of base high)', status:'missing', detail:'O\'Neil\'s buy point is a specific price: base high + 0.05 (10 cents for a $20 stock). ISME has no pivot-proximity filter — BuyC fires when close >= high52 but does not check if the stock is within 5% of its pivot.', fix:'Add: close <= high52 * 1.05 to buyC_state'},
+      {criterion:'Base depth validation (VCP)', status:'partial', detail:'VCP tracks base contraction but does not validate minimum depth (Minervini: first contraction 20-25%, second < 15%, third < 10%). The current depth check is a raw percentage with no sequential comparison.', fix:'Add sequential depth check: vcpCurrDepth < vcpLastDepth * 0.8'},
+    ]
+  },
+  {
+    cat:'Risk management',
+    items:[
+      {criterion:'Hard stop at 7-8% loss (O\'Neil rule)', status:'missing', detail:'ISME uses ATR-based structural stops (swing lows). O\'Neil\'s 7-8% hard cut rule regardless of ATR is not implemented. On high-ATR stocks, entryStop can be 15-20% below entry.', fix:'Add: hardStop = entryPrice * 0.92 \\nentryStop := math.max(entryStop, hardStop)'},
+      {criterion:'Position size as % of portfolio', status:'partial', detail:'Sizing uses fixed ₹riskAmount input — good. But it doesn\'t cap position size as % of total portfolio (standard: max 10-15% per position for concentrated, 5-8% for diversified).', fix:'Add portfolio cap input: maxPositionPct with guard: sharesSize = math.min(sharesSize, portfolioSize * maxPct / close)'},
+      {criterion:'Pyramid add size reduction (1/2 of initial)', status:'missing', detail:'Minervini pyramids at 50% of initial position size, 25% for third add. ISME adds the same bt_qty on every add entry, creating equal-weight pyramids which over-concentrate at higher prices.', fix:'Multiply bt_qty by: pyramidCount == 0 ? 1.0 : pyramidCount == 1 ? 0.5 : 0.25'},
+    ]
+  },
+  {
+    cat:'Market context',
+    items:[
+      {criterion:'Follow-Through Day (FTD) detection', status:'missing', detail:'O\'Neil\'s FTD (market rallies 1.7%+ on higher volume on day 4-7 of a rally attempt) is the primary signal to re-enter after a correction. ISME uses EMA50/EMA200 crossover — a much laggier indicator that misses early cycle entries.', fix:'Add FTD detection on the regime index: regimeClose > regimeClose[1]*1.017 and regimeVol > regimeVol[1] and barsSinceRallyAttempt between 4-7'},
+      {criterion:'Distribution day staleness (60-day expiry)', status:'missing', detail:'O\'Neil\'s actual rule expires distribution days after 25 SESSIONS not 25 bars, AND removes old ones after ~60 sessions. ISME rolls a fixed 25-bar window without aging out old distribution days.', fix:'Use a separate ddDates array to timestamp each DD and expire those older than 60 bars'},
+      {criterion:'Sector rotation via RS rank (top 25% filter)', status:'partial', detail:'Sector RS is computed but only shows a directional signal (above/below EMA). Minervini and IBD filter for stocks in the top 25% of their sector by RS Rank — ISME shows rsRank but doesn\'t gate entries on it.', fix:'Add entry gate: rsRank >= 75 as a condition (or input threshold) on strongBuy'},
+    ]
+  },
+  {
+    cat:'Fundamentals',
+    items:[
+      {criterion:'Accelerating EPS growth (last 3 quarters)', status:'partial', detail:'epsYoY is computed but not used as an entry gate. CANSLIM E criterion = 25%+ EPS growth accelerating across last 3 quarters. ISME displays the data but does not enforce it in wScore.', fix:'Add to wScore: (epsYoY > 25 ? 10 : epsYoY > 0 ? 5 : -5)'},
+      {criterion:'Return on Equity (ROE) > 17%', status:'missing', detail:'CANSLIM M criterion. ISME pulls revenue, profit, operating income — but not ROE. This is available via request.financial("RETURN_ON_EQUITY").', fix:'Add: roe = request.financial(cleanTicker, "RETURN_ON_EQUITY", "FQ") and display in fundamentals table'},
+    ]
+  }
+];
+
+const scores = [
+  {dim:'Signal logic', score:68, target:85},
+  {dim:'Risk management', score:55, target:90},
+  {dim:'Market regime', score:72, target:85},
+  {dim:'Fundamentals integration', score:50, target:80},
+  {dim:'Code robustness', score:58, target:85},
+  {dim:'Pine v6 compliance', score:82, target:95},
+  {dim:'Backtest integrity', score:55, target:85},
+  {dim:'Performance', score:65, target:90},
+];
+
+const promptText = `You are an expert Pine Script v6 auditor with deep knowledge of:
+- Minervini Trend Template (8 criteria)
+- Stan Weinstein Stage Analysis (4 stages)
+- O'Neil CANSLIM methodology
+- IBD Market School rules (Distribution Days, Follow-Through Days, Pocket Pivots)
+- Mansfield Relative Strength
+- VCP (Volatility Contraction Pattern) base counting
+- Pine Script v6 execution model (barstate, lookahead, series types)
+- Backtest integrity (look-ahead bias, commission realism, position sizing)
+
+Perform a FULL AUDIT of the attached Pine Script indicator/strategy. Structure your output as follows:
+
+---
+
+## 1. CRITICAL BUGS (execution-breaking)
+For each bug:
+- Line reference (approximate)
+- What the bug is
+- Why it matters for trading decisions
+- Exact Pine v6 fix code
+
+## 2. EDGE CASES (correctness gaps)
+For each edge case:
+- Scenario that triggers it (e.g. "on NSE market holidays", "when stock gaps up 10%")
+- Which variable/signal is affected
+- Severity: HIGH / MEDIUM / LOW
+- Fix recommendation
+
+## 3. LOGIC INCONSISTENCIES
+- Cross-check all entry conditions against stated methodology (Minervini/O'Neil)
+- Verify sell conditions are symmetric with entry logic
+- Check state machine transitions for completeness (every state should have defined transitions)
+- Identify any conditions that can never be true or are always true
+
+## 4. PINE V6 COMPLIANCE AUDIT
+Check for:
+- [ ] lookahead=barmerge.lookahead_off on all request.security() calls
+- [ ] barstate.isconfirmed on all persistent var updates
+- [ ] No [0] indexing on request.security() outputs (repaint risk)
+- [ ] na() guards on all division operations
+- [ ] Type qualifiers on all var declarations
+- [ ] max_bars_back set appropriately for longest lookback used
+- [ ] No circular dependencies between series
+
+## 5. INDUSTRY STANDARD COMPARISON
+For each methodology element, rate IMPLEMENTED / PARTIAL / MISSING:
+
+### Minervini Trend Template
+- [ ] Close > 50d EMA
+- [ ] Close > 150d EMA  
+- [ ] Close > 200d EMA
+- [ ] 50d EMA > 150d EMA
+- [ ] 150d EMA > 200d EMA
+- [ ] 200d EMA rising for at least 1 month
+- [ ] RS rating >= 70
+- [ ] Price within 25% of 52W high
+- [ ] Volume confirmation on breakout (≥40% above avg)
+
+### O'Neil Entry Rules
+- [ ] Buy at pivot point (base high + $0.10)
+- [ ] Within 5% of pivot (not extended)
+- [ ] Volume expansion on pivot day
+- [ ] Pocket Pivot: up day volume > highest down-volume of last 10 days
+- [ ] Hard stop: 7-8% below entry
+
+### Weinstein Stage Analysis
+- [ ] Stage 1: basing (EMA200 flat)
+- [ ] Stage 2: advancing (EMA200 rising)
+- [ ] Stage 3: topping (price breaks below EMA150)
+- [ ] Stage 4: declining
+- [ ] Hysteresis to prevent stage flipping
+
+### Risk Management
+- [ ] Risk per trade as fixed $ amount
+- [ ] Position size = risk / (entry - stop)
+- [ ] Max position size cap (% of portfolio)
+- [ ] Pyramid sizing reduction (50% / 25%)
+- [ ] Trailing stop mechanism
+- [ ] Hard 7-8% stop loss regardless of ATR
+
+### Market Regime
+- [ ] Broad market EMA filter (bull/bear)
+- [ ] Distribution Day count (5-in-25)
+- [ ] Follow-Through Day detection
+- [ ] Sector rotation filter (RS rank >= 75)
+
+## 6. BACKTEST INTEGRITY
+- Identify any lookahead bias in entry/exit logic
+- Check commission and slippage assumptions vs NSE reality
+- Verify position sizing consistency between indicator logic and strategy orders
+- Check for strategy.exit covering ALL entry labels (not just "Long")
+- Assess if backtest window is statistically meaningful
+
+## 7. PERFORMANCE OPTIMIZATION
+- Identify redundant request.security() calls
+- Flag any O(n) operations inside loops
+- Note table cell writes that fire intrabar (barstate.islast vs barstate.isconfirmed)
+- Suggest caching opportunities
+
+## 8. SCORECARD (rate each 0-100)
+| Dimension | Score | Rationale |
+|---|---|---|
+| Signal logic accuracy | | |
+| Risk management completeness | | |
+| Market regime integration | | |
+| Fundamentals quality | | |
+| Code robustness | | |
+| Pine v6 compliance | | |
+| Backtest integrity | | |
+| Performance efficiency | | |
+| **Overall** | | |
+
+## 9. PRIORITY FIX LIST (top 5 changes for maximum impact)
+Ordered by: (severity × ease of fix). For each:
+1. Change to make
+2. Expected improvement in signal quality or safety
+3. Exact code snippet
+
+---
+Apply this framework to the following Pine Script:
+[PASTE YOUR SCRIPT HERE]`;
+
+function renderBugs(filter) {
+  const list = document.getElementById('bug-list');
+  const sevMap = {critical:'critical',edge:'edge',logic:'logic',perf:'perf'};
+  const filtered = filter === 'all' ? bugs : bugs.filter(b => b.sev === filter || b.cat === filter);
+  list.innerHTML = filtered.map(b => {
+    const badge = b.sev === 'critical' ? 'badge-red' : b.sev === 'edge' ? 'badge-amber' : b.sev === 'logic' ? 'badge-blue' : 'badge-gray';
+    const label = b.sev === 'critical' ? 'Critical' : b.sev === 'edge' ? 'Edge case' : b.sev === 'logic' ? 'Logic' : 'Performance';
+    return `<div class="card collapsible" onclick="toggleCard(this)">
+      <div class="title">
+        <span class="badge ${badge}">${label}</span>
+        <span style="font-size:11px;color:var(--color-text-secondary);font-family:var(--font-mono)">~line ${b.line}</span>
+        ${b.title}
+      </div>
+      <div class="collapse-body">
+        <div class="desc" style="margin-top:8px">${b.desc}</div>
+        <div class="fix">${b.fix}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderStandards() {
+  const list = document.getElementById('std-list');
+  list.innerHTML = standards.map(cat => `
+    <div style="margin-bottom:8px;font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.5px;padding:4px 0">${cat.cat}</div>
+    ${cat.items.map(item => {
+      const badge = item.status === 'missing' ? 'badge-red' : item.status === 'partial' ? 'badge-amber' : 'badge-green';
+      const label = item.status === 'missing' ? 'Missing' : item.status === 'partial' ? 'Partial' : 'Implemented';
+      return `<div class="card collapsible" onclick="toggleCard(this)">
+        <div class="title">
+          <span class="badge ${badge}">${label}</span>
+          ${item.criterion}
+        </div>
+        <div class="collapse-body">
+          <div class="desc" style="margin-top:8px">${item.detail}</div>
+          <div class="fix">${item.fix}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  `).join('');
+}
+
+function renderScores() {
+  const barColors = {
+    high: '#3B6D11', mid: '#854F0B', low: '#A32D2D'
+  };
+  document.getElementById('score-bars').innerHTML = scores.map(s => {
+    const col = s.score >= 70 ? barColors.high : s.score >= 55 ? barColors.mid : barColors.low;
+    return `<div class="score-row">
+      <div class="dim-label">${s.dim}</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:${s.score}%;background:${col}"></div></div>
+      <div class="score-label" style="color:${col}">${s.score}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('score-table').innerHTML = scores.map(s => {
+    const gap = s.score - s.target;
+    const gapCol = gap >= -5 ? '#3B6D11' : gap >= -20 ? '#854F0B' : '#A32D2D';
+    return `<tr>
+      <td>${s.dim}</td>
+      <td><strong>${s.score}/100</strong></td>
+      <td style="color:var(--color-text-secondary)">${s.target}/100</td>
+      <td style="color:${gapCol};font-weight:500">${gap}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPrompt() {
+  document.getElementById('prompt-text').textContent = promptText;
+}
+
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function filterBugs(f, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBugs(f);
+}
+
+function toggleCard(el) {
+  const body = el.querySelector('.collapse-body');
+  body.classList.toggle('open');
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(promptText).then(() => {
+    const btn = event.target.closest('button');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> Copied';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  });
+}
+
+renderBugs('all');
+renderStandards();
+renderScores();
+renderPrompt();
+</script>

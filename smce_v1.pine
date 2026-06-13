@@ -1,0 +1,515 @@
+//@version=6
+// ══════════════════════════════════════════════════════════════════════
+// ███████╗███╗   ███╗ ██████╗███████╗
+// ██╔════╝████╗ ████║██╔════╝██╔════╝
+// ███████╗██╔████╔██║██║     █████╗
+// ╚════██║██║╚██╔╝██║██║     ██╔══╝
+// ███████║██║ ╚═╝ ██║╚██████╗███████╗
+// ╚══════╝╚═╝     ╚═╝ ╚═════╝╚══════╝
+//
+// Smart Money Confluence Engine (SMCE) v1.0
+// Companion to ISME v4 — fills institutional blind spots:
+//   1. Momentum Divergence (RSI + MACD)
+//   2. Smart Money Flow (CMF + MFI + OBV)
+//   3. Market Structure (HH/HL/LH/LL + BOS/CHoCH)
+//   4. Squeeze Detector (Bollinger-Keltner)
+//   5. Dynamic Support/Resistance
+//
+// Confluence Score: 0-10 (5 = neutral)
+//   🟢 7+  Strong bullish confluence
+//   🟡 4-7 Mixed / neutral
+//   🔴 <4  Bearish confluence
+//
+// ── DISCLAIMER ──────────────────────────────────────────────────────
+// Educational/informational only. Not financial advice.
+// ══════════════════════════════════════════════════════════════════════
+
+indicator("Smart Money Confluence Engine (SMCE)", shorttitle="SMCE v1", overlay=true, max_labels_count=500, max_bars_back=500)
+
+//====================================================
+// INPUTS
+//====================================================
+
+// ── Divergence ──
+pivotLen    = input.int(5, "Pivot Lookback", minval=2, maxval=15, group="Divergence", tooltip="Bars left/right for pivot detection. Lower = more sensitive, higher = fewer but stronger signals.")
+rsiLen      = input.int(14, "RSI Length", group="Divergence")
+macdFast    = input.int(12, "MACD Fast", group="Divergence")
+macdSlow    = input.int(26, "MACD Slow", group="Divergence")
+macdSig     = input.int(9, "MACD Signal", group="Divergence")
+divExpiry   = input.int(20, "Divergence Expiry (bars)", minval=5, maxval=50, group="Divergence", tooltip="How many bars a detected divergence stays active in the table.")
+
+// ── Smart Money Flow ──
+cmfLen      = input.int(20, "CMF Length", group="Smart Money Flow")
+mfiLen      = input.int(14, "MFI Length", group="Smart Money Flow")
+obvEmaLen   = input.int(20, "OBV EMA Length", group="Smart Money Flow")
+
+// ── Squeeze ──
+bbLen       = input.int(20, "BB Length", group="Squeeze Detector")
+bbMult      = input.float(2.0, "BB Multiplier", step=0.1, group="Squeeze Detector")
+kcLen       = input.int(20, "KC Length", group="Squeeze Detector")
+kcMult      = input.float(1.5, "KC Multiplier", step=0.1, group="Squeeze Detector")
+
+// ── Support/Resistance ──
+srPivotLen  = input.int(10, "S/R Pivot Length", minval=3, maxval=30, group="Support/Resistance", tooltip="Longer = fewer but more significant levels.")
+
+// ── Display ──
+showDiv     = input.bool(true, "Show Divergence Labels", group="Display")
+showStruct  = input.bool(true, "Show Market Structure (HH/HL/LH/LL)", group="Display")
+showBOS     = input.bool(true, "Show BOS/CHoCH Labels", group="Display")
+showSqz     = input.bool(true, "Show Squeeze Dots", group="Display")
+showSR      = input.bool(true, "Show S/R Lines", group="Display")
+tableFontSz = input.string("Normal", "Table Font Size", options=["Tiny", "Small", "Normal", "Large"], group="Display")
+tablePos    = input.string("Top Left", "Dashboard Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Display")
+
+fontSize = tableFontSz == "Tiny" ? size.tiny : tableFontSz == "Small" ? size.small : tableFontSz == "Large" ? size.large : size.normal
+
+f_pos(string p) =>
+    p == "Top Left" ? position.top_left : p == "Top Right" ? position.top_right : p == "Bottom Left" ? position.bottom_left : position.bottom_right
+
+//====================================================
+// CORE CALCULATIONS
+//====================================================
+rsiVal = ta.rsi(close, rsiLen)
+[macdLine, signalLine, histLine] = ta.macd(close, macdFast, macdSlow, macdSig)
+atr14 = ta.atr(14)
+
+//╔══════════════════════════════════════════════════╗
+//║  MODULE 1: MOMENTUM DIVERGENCE ENGINE           ║
+//╚══════════════════════════════════════════════════╝
+
+// ── Pivot detection ──
+float pivotHi = ta.pivothigh(high, pivotLen, pivotLen)
+float pivotLo = ta.pivotlow(low, pivotLen, pivotLen)
+
+// ── Track last two pivot HIGHS (for bearish divergence) ──
+var float ph1 = na,      var float ph2 = na
+var float ph1_rsi = na,  var float ph2_rsi = na
+var float ph1_macd = na, var float ph2_macd = na
+var int   ph1_bar = 0,   var int   ph2_bar = 0
+
+if not na(pivotHi)
+    ph2      := ph1
+    ph2_rsi  := ph1_rsi
+    ph2_macd := ph1_macd
+    ph2_bar  := ph1_bar
+    ph1      := pivotHi
+    ph1_rsi  := rsiVal[pivotLen]
+    ph1_macd := histLine[pivotLen]
+    ph1_bar  := bar_index - pivotLen
+
+// ── Track last two pivot LOWS (for bullish divergence) ──
+var float pl1 = na,      var float pl2 = na
+var float pl1_rsi = na,  var float pl2_rsi = na
+var float pl1_macd = na, var float pl2_macd = na
+var int   pl1_bar = 0,   var int   pl2_bar = 0
+
+if not na(pivotLo)
+    pl2      := pl1
+    pl2_rsi  := pl1_rsi
+    pl2_macd := pl1_macd
+    pl2_bar  := pl1_bar
+    pl1      := pivotLo
+    pl1_rsi  := rsiVal[pivotLen]
+    pl1_macd := histLine[pivotLen]
+    pl1_bar  := bar_index - pivotLen
+
+// ── RSI Divergences ──
+// Regular Bearish: Price HH but RSI LH → potential top
+bool bearDivRSI = not na(pivotHi) and not na(ph2) and ph1 > ph2 and ph1_rsi < ph2_rsi and (bar_index - ph2_bar) < 100
+// Regular Bullish: Price LL but RSI HL → potential bottom
+bool bullDivRSI = not na(pivotLo) and not na(pl2) and pl1 < pl2 and pl1_rsi > pl2_rsi and (bar_index - pl2_bar) < 100
+// Hidden Bullish: Price HL but RSI LL → continuation in uptrend
+bool hidBullRSI = not na(pivotLo) and not na(pl2) and pl1 > pl2 and pl1_rsi < pl2_rsi and (bar_index - pl2_bar) < 100
+// Hidden Bearish: Price LH but RSI HH → continuation in downtrend
+bool hidBearRSI = not na(pivotHi) and not na(ph2) and ph1 < ph2 and ph1_rsi > ph2_rsi and (bar_index - ph2_bar) < 100
+
+// ── MACD Divergences ──
+bool bearDivMACD = not na(pivotHi) and not na(ph2) and ph1 > ph2 and ph1_macd < ph2_macd and (bar_index - ph2_bar) < 100
+bool bullDivMACD = not na(pivotLo) and not na(pl2) and pl1 < pl2 and pl1_macd > pl2_macd and (bar_index - pl2_bar) < 100
+
+// ── Active divergence state (persists for divExpiry bars) ──
+var string activeDivRSI  = "—"
+var int    divRSIbar     = 0
+var string activeDivMACD = "—"
+var int    divMACDbar    = 0
+
+if bullDivRSI
+    activeDivRSI := "▲ Bull"
+    divRSIbar := bar_index
+else if bearDivRSI
+    activeDivRSI := "▼ Bear"
+    divRSIbar := bar_index
+else if hidBullRSI
+    activeDivRSI := "▲ H.Bull"
+    divRSIbar := bar_index
+else if hidBearRSI
+    activeDivRSI := "▼ H.Bear"
+    divRSIbar := bar_index
+if bar_index - divRSIbar > divExpiry
+    activeDivRSI := "—"
+
+if bullDivMACD
+    activeDivMACD := "▲ Bull"
+    divMACDbar := bar_index
+else if bearDivMACD
+    activeDivMACD := "▼ Bear"
+    divMACDbar := bar_index
+if bar_index - divMACDbar > divExpiry
+    activeDivMACD := "—"
+
+//╔══════════════════════════════════════════════════╗
+//║  MODULE 2: SMART MONEY FLOW                     ║
+//╚══════════════════════════════════════════════════╝
+
+// ── Chaikin Money Flow (CMF) ──
+float mfMult   = high != low ? ((close - low) - (high - close)) / (high - low) : 0.0
+float mfVolume = mfMult * volume
+float cmf      = ta.sma(mfVolume, cmfLen) / ta.sma(volume, cmfLen)
+
+// ── Money Flow Index (MFI) ──
+float mfi = ta.mfi(hlc3, mfiLen)
+
+// ── On-Balance Volume (OBV) ──
+var float obvVal = 0.0
+if close > close[1]
+    obvVal := obvVal + volume
+else if close < close[1]
+    obvVal := obvVal - volume
+
+float obvEMA   = ta.ema(obvVal, obvEmaLen)
+bool  obvUp    = obvVal > obvEMA
+
+//╔══════════════════════════════════════════════════╗
+//║  MODULE 3: MARKET STRUCTURE                      ║
+//╚══════════════════════════════════════════════════╝
+
+// Use a longer pivot for structure (more significant swing points)
+float strPivotHi = ta.pivothigh(high, srPivotLen, srPivotLen)
+float strPivotLo = ta.pivotlow(low, srPivotLen, srPivotLen)
+
+// ── Track swing highs ──
+var float swH1 = na, var float swH2 = na
+var int swH1b = 0,   var int swH2b = 0
+
+if not na(strPivotHi)
+    swH2  := swH1
+    swH2b := swH1b
+    swH1  := strPivotHi
+    swH1b := bar_index - srPivotLen
+
+// ── Track swing lows ──
+var float swL1 = na, var float swL2 = na
+var int swL1b = 0,   var int swL2b = 0
+
+if not na(strPivotLo)
+    swL2  := swL1
+    swL2b := swL1b
+    swL1  := strPivotLo
+    swL1b := bar_index - srPivotLen
+
+// ── Structure classification ──
+bool isHH = not na(swH1) and not na(swH2) and swH1 > swH2
+bool isLH = not na(swH1) and not na(swH2) and swH1 < swH2
+bool isHL = not na(swL1) and not na(swL2) and swL1 > swL2
+bool isLL = not na(swL1) and not na(swL2) and swL1 < swL2
+
+var string structState     = "—"
+var string lastStructSig   = "—"
+var int    lastStructSigBar = 0
+
+string newStruct =
+     isHH and isHL ? "Bullish" :
+     isLH and isLL ? "Bearish" :
+     isHH and isLL ? "Expanding" :
+     isLH and isHL ? "Contracting" :
+     structState
+
+// Detect Change of Character (structural reversal) vs Break of Structure (continuation)
+if newStruct != structState and newStruct != "—"
+    if (structState == "Bullish" and newStruct == "Bearish") or (structState == "Bearish" and newStruct == "Bullish")
+        lastStructSig := "CHoCH ⚠"
+        lastStructSigBar := bar_index
+structState := newStruct
+
+// ── BOS via price breaking previous swing ──
+bool bosUp   = not na(swH2) and close > swH2 and close[1] <= swH2
+bool bosDown = not na(swL2) and close < swL2 and close[1] >= swL2
+
+if bosUp
+    lastStructSig := "BOS ▲"
+    lastStructSigBar := bar_index
+if bosDown
+    lastStructSig := "BOS ▼"
+    lastStructSigBar := bar_index
+
+//╔══════════════════════════════════════════════════╗
+//║  MODULE 4: SQUEEZE DETECTOR                      ║
+//╚══════════════════════════════════════════════════╝
+
+[bbMid, bbUp, bbLo] = ta.bb(close, bbLen, bbMult)
+[kcMid, kcUp, kcLo] = ta.kc(close, kcLen, kcMult)
+
+bool sqzOn   = bbLo > kcLo and bbUp < kcUp
+bool sqzOff  = not sqzOn
+bool sqzFire = sqzOff and sqzOn[1]
+
+// Squeeze duration counter
+var int sqzBars = 0
+if sqzOn
+    sqzBars := sqzBars + 1
+else
+    sqzBars := 0
+
+// Squeeze fire persistence (show in table for a few bars after release)
+var int sqzFireBar = 0
+if sqzFire
+    sqzFireBar := bar_index
+bool recentFire = bar_index - sqzFireBar <= 5 and sqzFireBar > 0
+
+// Momentum direction during squeeze
+float sqzMom   = ta.linreg(close - ta.sma(close, bbLen), bbLen, 0)
+bool  sqzMomUp = sqzMom > 0
+
+//╔══════════════════════════════════════════════════╗
+//║  MODULE 5: SUPPORT / RESISTANCE                  ║
+//╚══════════════════════════════════════════════════╝
+
+// Track last 5 pivot highs and lows as S/R candidates
+var float[] rLevels = array.new_float(5, na)
+var float[] sLevels = array.new_float(5, na)
+
+if not na(strPivotHi)
+    array.unshift(rLevels, strPivotHi)
+    array.pop(rLevels)
+
+if not na(strPivotLo)
+    array.unshift(sLevels, strPivotLo)
+    array.pop(sLevels)
+
+// Find nearest resistance (above price) and nearest support (below price)
+float nearR = na
+for i = 0 to array.size(rLevels) - 1
+    float lvl = array.get(rLevels, i)
+    if not na(lvl) and lvl > close
+        if na(nearR) or lvl < nearR
+            nearR := lvl
+
+float nearS = na
+for i = 0 to array.size(sLevels) - 1
+    float lvl = array.get(sLevels, i)
+    if not na(lvl) and lvl < close
+        if na(nearS) or lvl > nearS
+            nearS := lvl
+
+// Proximity percentages
+float distToS = not na(nearS) and nearS > 0 ? (close - nearS) / close * 100 : na
+float distToR = not na(nearR) and nearR > 0 ? (nearR - close) / close * 100 : na
+
+//╔══════════════════════════════════════════════════╗
+//║  CONFLUENCE SCORE (0-10, neutral = 5)            ║
+//║  Each module contributes 0-2 points.             ║
+//║  Module at neutral state = 1 point.              ║
+//╚══════════════════════════════════════════════════╝
+
+// ── Module 1: Divergence (0-2) ──
+float divModScore = 1.0   // neutral baseline
+if str.contains(activeDivRSI, "Bull")
+    divModScore := divModScore + 0.5
+if str.contains(activeDivRSI, "Bear")
+    divModScore := divModScore - 0.5
+if str.contains(activeDivMACD, "Bull")
+    divModScore := divModScore + 0.5
+if str.contains(activeDivMACD, "Bear")
+    divModScore := divModScore - 0.5
+divModScore := math.max(math.min(divModScore, 2.0), 0.0)
+
+// ── Module 2: Flow (0-2) ──
+float flowModScore = 0.0
+// CMF: +0.67 for positive, 0 for negative
+flowModScore := flowModScore + (cmf > 0.05 ? 0.67 : cmf > -0.05 ? 0.33 : 0.0)
+// MFI: +0.67 for healthy (40-70), less for extremes
+flowModScore := flowModScore + (mfi > 40 and mfi < 70 ? 0.67 : mfi >= 70 ? 0.33 : mfi <= 30 ? 0.33 : 0.0)
+// OBV: +0.67 for rising
+flowModScore := flowModScore + (obvUp ? 0.67 : 0.0)
+flowModScore := math.min(flowModScore, 2.0)
+
+// ── Module 3: Structure (0-2) ──
+float structModScore =
+     structState == "Bullish" ? 2.0 :
+     structState == "Bearish" ? 0.0 :
+     structState == "Expanding" ? 1.5 :
+     structState == "Contracting" ? 0.8 :
+     1.0
+
+// ── Module 4: Squeeze (0-2) ──
+float sqzModScore = 1.0  // normal = 1
+if sqzOn
+    sqzModScore := 1.2   // slight positive (anticipation)
+if recentFire and sqzMomUp
+    sqzModScore := 2.0   // fire + bullish = max
+if recentFire and not sqzMomUp
+    sqzModScore := 0.0   // fire + bearish = min
+
+// ── Module 5: S/R (0-2) ──
+float srModScore = 1.0   // neutral
+if not na(distToS) and distToS < 3.0
+    srModScore := 1.8    // near support = bullish
+if not na(distToR) and distToR < 2.0
+    srModScore := 0.3    // near resistance = bearish
+
+// ── Total ──
+float confluence = divModScore + flowModScore + structModScore + sqzModScore + srModScore
+confluence := math.max(math.min(confluence, 10.0), 0.0)
+
+plot(confluence, title="Confluence", display=display.none)
+
+//====================================================
+// VISUAL OVERLAYS
+//====================================================
+
+// ── Divergence labels (offset back to actual pivot bar) ──
+plotshape(showDiv and bullDivRSI, title="Bull RSI Div", text="Bull\nDiv", style=shape.labelup, location=location.belowbar, color=color.new(#00E676, 0), textcolor=color.white, size=size.tiny, offset=-pivotLen)
+plotshape(showDiv and bearDivRSI, title="Bear RSI Div", text="Bear\nDiv", style=shape.labeldown, location=location.abovebar, color=color.new(#FF1744, 0), textcolor=color.white, size=size.tiny, offset=-pivotLen)
+plotshape(showDiv and hidBullRSI, title="Hidden Bull", text="H.Bull", style=shape.labelup, location=location.belowbar, color=color.new(#00E676, 60), textcolor=color.white, size=size.tiny, offset=-pivotLen)
+plotshape(showDiv and hidBearRSI, title="Hidden Bear", text="H.Bear", style=shape.labeldown, location=location.abovebar, color=color.new(#FF1744, 60), textcolor=color.white, size=size.tiny, offset=-pivotLen)
+
+plotshape(showDiv and bullDivMACD, title="Bull MACD Div", text="M▲", style=shape.labelup, location=location.belowbar, color=color.new(#2196F3, 0), textcolor=color.white, size=size.tiny, offset=-pivotLen)
+plotshape(showDiv and bearDivMACD, title="Bear MACD Div", text="M▼", style=shape.labeldown, location=location.abovebar, color=color.new(#FF9100, 0), textcolor=color.white, size=size.tiny, offset=-pivotLen)
+
+// ── Market Structure labels (offset back to pivot bar) ──
+plotshape(showStruct and not na(strPivotHi) and isHH, title="HH", text="HH", style=shape.labeldown, location=location.abovebar, color=color.new(#00E676, 30), textcolor=color.white, size=size.tiny, offset=-srPivotLen)
+plotshape(showStruct and not na(strPivotHi) and isLH, title="LH", text="LH", style=shape.labeldown, location=location.abovebar, color=color.new(#FF1744, 30), textcolor=color.white, size=size.tiny, offset=-srPivotLen)
+plotshape(showStruct and not na(strPivotLo) and isHL, title="HL", text="HL", style=shape.labelup, location=location.belowbar, color=color.new(#00E676, 30), textcolor=color.white, size=size.tiny, offset=-srPivotLen)
+plotshape(showStruct and not na(strPivotLo) and isLL, title="LL", text="LL", style=shape.labelup, location=location.belowbar, color=color.new(#FF1744, 30), textcolor=color.white, size=size.tiny, offset=-srPivotLen)
+
+// ── BOS / CHoCH labels ──
+plotshape(showBOS and bosUp, title="BOS Up", text="BOS▲", style=shape.labelup, location=location.belowbar, color=color.new(#00BCD4, 0), textcolor=color.white, size=size.small)
+plotshape(showBOS and bosDown, title="BOS Down", text="BOS▼", style=shape.labeldown, location=location.abovebar, color=color.new(#E91E63, 0), textcolor=color.white, size=size.small)
+
+// ── Squeeze dots (bottom of chart) ──
+plotshape(showSqz and sqzOn, title="Squeeze On", style=shape.circle, location=location.bottom, color=color.new(#FF1744, 0), size=size.tiny)
+plotshape(showSqz and sqzFire, title="Squeeze Fire", style=shape.diamond, location=location.bottom, color=color.new(#00E676, 0), size=size.small)
+
+// ── S/R horizontal lines ──
+var line srLineR  = na
+var line srLineS  = na
+var label srLblR  = na
+var label srLblS  = na
+
+if barstate.islast and showSR
+    line.delete(srLineR)
+    line.delete(srLineS)
+    label.delete(srLblR)
+    label.delete(srLblS)
+
+    if not na(nearR)
+        srLineR := line.new(bar_index - 60, nearR, bar_index + 10, nearR,
+             color=color.new(#FF1744, 50), style=line.style_dashed, width=2)
+        srLblR := label.new(bar_index + 11, nearR, "R ₹" + str.tostring(nearR, "#.##"),
+             style=label.style_label_left, color=color.new(#FF1744, 85), textcolor=color.new(#FF1744, 0), size=size.tiny)
+
+    if not na(nearS)
+        srLineS := line.new(bar_index - 60, nearS, bar_index + 10, nearS,
+             color=color.new(#00E676, 50), style=line.style_dashed, width=2)
+        srLblS := label.new(bar_index + 11, nearS, "S ₹" + str.tostring(nearS, "#.##"),
+             style=label.style_label_left, color=color.new(#00E676, 85), textcolor=color.new(#00E676, 0), size=size.tiny)
+
+//====================================================
+// CONFLUENCE DASHBOARD TABLE (13 rows)
+//====================================================
+var table dt = table.new(f_pos(tablePos), 2, 13, border_width=1)
+
+if barstate.islast
+
+    color hdrBg = color.new(#0D1117, 0)
+    color lblBg = color.new(#161B22, 0)
+    color txtW  = color.white
+
+    // ── Row 0: Header ──
+    table.cell(dt, 0, 0, "SMCE", text_color=color.new(#58A6FF, 0), bgcolor=hdrBg, text_size=fontSize)
+    table.cell(dt, 1, 0, "v1.0", text_color=color.gray, bgcolor=hdrBg, text_size=fontSize)
+
+    // ── Row 1: RSI Divergence ──
+    color rsiDClr = activeDivRSI == "—" ? color.new(color.gray, 80) : str.contains(activeDivRSI, "Bull") ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(dt, 0, 1, "RSI Div", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 1, activeDivRSI, text_color=txtW, bgcolor=rsiDClr, text_size=fontSize)
+
+    // ── Row 2: MACD Divergence ──
+    color macdDClr = activeDivMACD == "—" ? color.new(color.gray, 80) : str.contains(activeDivMACD, "Bull") ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(dt, 0, 2, "MACD Div", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 2, activeDivMACD, text_color=txtW, bgcolor=macdDClr, text_size=fontSize)
+
+    // ── Row 3: CMF ──
+    color cmfClr = cmf > 0.05 ? color.new(#00E676, 40) : cmf < -0.05 ? color.new(#FF1744, 40) : color.new(color.gray, 70)
+    string cmfDir = cmf > 0 ? "▲" : "▼"
+    table.cell(dt, 0, 3, "CMF", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 3, str.tostring(cmf, "#.##") + " " + cmfDir, text_color=txtW, bgcolor=cmfClr, text_size=fontSize)
+
+    // ── Row 4: MFI ──
+    string mfiTag = mfi > 80 ? "OB ⚠" : mfi > 50 ? "ok" : mfi > 20 ? "weak" : "OS ⚠"
+    color mfiClr = mfi > 80 ? color.new(#FF9100, 30) : mfi > 50 ? color.new(#00E676, 50) : mfi > 20 ? color.new(color.gray, 70) : color.new(#2196F3, 30)
+    table.cell(dt, 0, 4, "MFI", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 4, str.tostring(mfi, "#") + " (" + mfiTag + ")", text_color=txtW, bgcolor=mfiClr, text_size=fontSize)
+
+    // ── Row 5: OBV Trend ──
+    color obvClr = obvUp ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(dt, 0, 5, "OBV Trend", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 5, obvUp ? "▲ rising" : "▼ falling", text_color=txtW, bgcolor=obvClr, text_size=fontSize)
+
+    // ── Row 6: Flow Score ──
+    color flowClr = flowModScore >= 1.4 ? color.new(#00E676, 40) : flowModScore >= 0.7 ? color.new(color.gray, 70) : color.new(#FF1744, 40)
+    table.cell(dt, 0, 6, "Flow", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 6, str.tostring(flowModScore, "#.#") + "/2", text_color=txtW, bgcolor=flowClr, text_size=fontSize)
+
+    // ── Row 7: Market Structure ──
+    color strClr = structState == "Bullish" ? color.new(#00E676, 40) : structState == "Bearish" ? color.new(#FF1744, 40) : color.new(color.gray, 60)
+    // Build compact structure label
+    string hiLabel = isHH ? "HH" : isLH ? "LH" : "—"
+    string loLabel = isHL ? "HL" : isLL ? "LL" : "—"
+    string structDisp = structState + " (" + hiLabel + "/" + loLabel + ")"
+    table.cell(dt, 0, 7, "Structure", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 7, structDisp, text_color=txtW, bgcolor=strClr, text_size=fontSize)
+
+    // ── Row 8: Last Signal ──
+    color sigClr = str.contains(lastStructSig, "▲") ? color.new(#00E676, 40) : str.contains(lastStructSig, "▼") ? color.new(#FF1744, 40) : str.contains(lastStructSig, "CHoCH") ? color.new(#FF9100, 20) : color.new(color.gray, 70)
+    string sigAge = lastStructSigBar > 0 ? " (" + str.tostring(bar_index - lastStructSigBar) + " bars)" : ""
+    table.cell(dt, 0, 8, "Last Signal", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 8, lastStructSig + sigAge, text_color=txtW, bgcolor=sigClr, text_size=fontSize)
+
+    // ── Row 9: Squeeze ──
+    string sqzText = sqzOn ? "🔴 ON (" + str.tostring(sqzBars) + " bars)" : recentFire ? (sqzMomUp ? "🟢 FIRE ▲" : "🟢 FIRE ▼") : "Normal"
+    color sqzClr = sqzOn ? color.new(#FF1744, 40) : recentFire ? color.new(#00E676, 20) : color.new(color.gray, 80)
+    table.cell(dt, 0, 9, "Squeeze", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 9, sqzText, text_color=txtW, bgcolor=sqzClr, text_size=fontSize)
+
+    // ── Row 10: Nearest Support ──
+    string sText = na(nearS) ? "—" : "₹" + str.tostring(nearS, "#.##") + (not na(distToS) ? " (" + str.tostring(distToS, "#.#") + "%)" : "")
+    table.cell(dt, 0, 10, "Nearest S", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 10, sText, text_color=color.new(#00E676, 0), bgcolor=color.new(#00E676, 85), text_size=fontSize)
+
+    // ── Row 11: Nearest Resistance ──
+    string rText = na(nearR) ? "—" : "₹" + str.tostring(nearR, "#.##") + (not na(distToR) ? " (" + str.tostring(distToR, "#.#") + "%)" : "")
+    table.cell(dt, 0, 11, "Nearest R", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 11, rText, text_color=color.new(#FF1744, 0), bgcolor=color.new(#FF1744, 85), text_size=fontSize)
+
+    // ── Row 12: Confluence Score (/10) ──
+    color confClr = confluence >= 7 ? color.new(#00E676, 10) : confluence >= 4 ? color.new(#FFD740, 20) : color.new(#FF1744, 20)
+    string confEmoji = confluence >= 7 ? "🟢" : confluence >= 4 ? "🟡" : "🔴"
+    table.cell(dt, 0, 12, "Confluence", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(dt, 1, 12, confEmoji + " " + str.tostring(confluence, "#.#") + "/10", text_color=txtW, bgcolor=confClr, text_size=fontSize)
+
+//====================================================
+// ALERTS
+//====================================================
+alertcondition(bullDivRSI, title="Bull RSI Divergence", message="▲ Bullish RSI Divergence — {{ticker}} potential bottom")
+alertcondition(bearDivRSI, title="Bear RSI Divergence", message="▼ Bearish RSI Divergence — {{ticker}} potential top")
+alertcondition(bullDivMACD, title="Bull MACD Divergence", message="▲ Bullish MACD Divergence — {{ticker}}")
+alertcondition(bearDivMACD, title="Bear MACD Divergence", message="▼ Bearish MACD Divergence — {{ticker}}")
+alertcondition(hidBullRSI, title="Hidden Bull Divergence", message="▲ Hidden Bullish Divergence — {{ticker}} trend continuation")
+alertcondition(hidBearRSI, title="Hidden Bear Divergence", message="▼ Hidden Bearish Divergence — {{ticker}} trend continuation")
+alertcondition(sqzFire and sqzMomUp, title="Squeeze Fire Bullish", message="🟢 Squeeze Released Bullish — {{ticker}} momentum expanding up")
+alertcondition(sqzFire and not sqzMomUp, title="Squeeze Fire Bearish", message="🔴 Squeeze Released Bearish — {{ticker}} momentum expanding down")
+alertcondition(bosUp, title="BOS Up", message="BOS ▲ — {{ticker}} broke above previous swing high")
+alertcondition(bosDown, title="BOS Down", message="BOS ▼ — {{ticker}} broke below previous swing low")
+alertcondition(confluence >= 8, title="High Confluence", message="🟢 High Confluence {{plot('Confluence')}}/10 — {{ticker}}")
+alertcondition(confluence <= 2, title="Low Confluence", message="🔴 Low Confluence {{plot('Confluence')}}/10 — {{ticker}}")

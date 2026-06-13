@@ -1,0 +1,459 @@
+//@version=6
+indicator("Shaktimaan Stage + RS + Trigger System", overlay=true, max_labels_count=500)
+
+//====================================================
+// INPUTS
+//====================================================
+lengthADX     = input.int(14, "Length ADX")
+thresholdADX  = input.int(14, "Threshold ADX")
+
+lengthRSI     = input.int(14, "Length RSI")
+
+sarStart      = input.float(0.02, "SAR Start")
+sarInc        = input.float(0.02, "SAR Increment")
+sarMax        = input.float(0.2, "SAR Max Value")
+
+multiplier    = input.float(2.5, "ATR Multiplier")
+
+rsSymbol      = input.symbol("NSE:NIFTY", "RS Index")
+rsMAPeriod    = input.int(10, "RS MA Period")
+
+//====================================================
+// CORE CALCULATIONS
+//====================================================
+
+// EMAs
+ema20  = ta.ema(close, 20)
+ema50  = ta.ema(close, 50)
+ema150 = ta.ema(close, 150)
+ema200 = ta.ema(close, 200)
+
+// RSI
+rsi = ta.rsi(close, lengthRSI)
+
+// ADX FIX
+[diplus, diminus, adx] = ta.dmi(lengthADX, lengthADX)
+
+// ATR
+atr = ta.atr(14)
+
+// SAR
+psar = ta.sar(sarStart, sarInc, sarMax)
+
+// Donchian
+donHigh = ta.highest(high, 20)
+donLow  = ta.lowest(low, 20)
+
+// 52 Week High (NO REPAINT)
+high52 = ta.highest(high[1], 252)
+
+// Volume Average
+volMA = ta.sma(volume, 20)
+
+//====================================================
+// RELATIVE STRENGTH
+//====================================================
+indexClose = request.security(rsSymbol, timeframe.period, close)
+
+rs = close / indexClose
+
+rsEMA = ta.ema(rs, rsMAPeriod)
+
+//====================================================
+// BACKGROUND COLOR (RS)
+//====================================================
+bgBull = rs > rsEMA
+
+bgcolor(bgBull ? color.new(color.green, 92) : color.new(color.red, 92))
+
+//====================================================
+// MA CROSSOVER BAND
+//====================================================
+bullBand = ema20 > ema50
+
+plot(
+     bullBand ? low : na,
+     style=plot.style_area,
+     color=color.new(color.lime, 75),
+     linewidth=2,
+     title="Bull Band"
+)
+
+plot(
+     not bullBand ? low : na,
+     style=plot.style_area,
+     color=color.new(color.red, 75),
+     linewidth=2,
+     title="Bear Band"
+)
+
+//====================================================
+// MINERVINI TREND TEMPLATE
+//====================================================
+trendTemplate = (
+    close > ema50 and
+    close > ema150 and
+    close > ema200 and
+    ema50 > ema150 and
+    ema150 > ema200
+)
+
+//====================================================
+// BUY CONDITIONS
+//====================================================
+
+// A = Trend breakout
+buyA = (
+    close > ema20 and
+    ema20 > ema50 and
+    rsi > 55 and
+    adx > thresholdADX and
+    trendTemplate
+)
+
+// B = Donchian breakout
+buyB = (
+    ta.crossover(close, donHigh[1]) and
+    volume > volMA
+)
+
+// C = 52W High breakout
+buyC = (
+    close >= high52 and
+    rs > rsEMA
+)
+
+//====================================================
+// SELL CONDITIONS
+//====================================================
+sellX = (
+    close < ema20 and
+    rsi < 45
+)
+
+sellY = (
+    close < ema50 and
+    rs < rsEMA
+)
+
+sellZ = (
+    close < ema200 and
+    adx > thresholdADX
+)
+
+//====================================================
+// ENTRY SCORE SYSTEM
+//====================================================
+score =(
+    (buyA ? 1 : 0) +
+    (buyB ? 1 : 0) +
+    (buyC ? 1 : 0)
+)
+    
+
+strongBuy = score >= 2
+
+//====================================================
+// ATR STOP LOSS
+//====================================================
+longStop = close - atr * multiplier
+
+plot(
+     longStop,
+     color=color.red,
+     linewidth=1,
+     title="ATR Stop"
+)
+
+//====================================================
+// RS NEW HIGH
+//====================================================
+rsHigh = rs >= ta.highest(rs, 100)
+
+plotshape(
+     rsHigh,
+     title="RS High",
+     style=shape.triangleup,
+     location=location.belowbar,
+     color=color.purple,
+     size=size.tiny
+)
+
+//====================================================
+// BUY SHAPES
+//====================================================
+plotshape(
+     buyA,
+     title="BUY A",
+     text="A",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.green,
+     textcolor=color.white,
+     size=size.tiny
+)
+
+plotshape(
+     buyB,
+     title="BUY B",
+     text="B",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.lime,
+     textcolor=color.black,
+     size=size.tiny
+)
+
+plotshape(
+     buyC,
+     title="BUY C",
+     text="C",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.teal,
+     textcolor=color.white,
+     size=size.tiny
+)
+
+plotshape(
+     strongBuy,
+     title="STRONG BUY",
+     text="STRONG",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.blue,
+     textcolor=color.white,
+     size=size.small
+)
+
+//====================================================
+// SELL SHAPES
+//====================================================
+plotshape(
+     sellX,
+     title="SELL X",
+     text="X",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.red,
+     textcolor=color.white,
+     size=size.tiny
+)
+
+plotshape(
+     sellY,
+     title="SELL Y",
+     text="Y",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.maroon,
+     textcolor=color.white,
+     size=size.tiny
+)
+
+plotshape(
+     sellZ,
+     title="SELL Z",
+     text="Z",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.orange,
+     textcolor=color.white,
+     size=size.tiny
+)
+
+//====================================================
+// DONCHIAN DOT
+//====================================================
+plotshape(
+     high >= donHigh,
+     title="Donchian",
+     style=shape.circle,
+     location=location.abovebar,
+     color=color.orange,
+     size=size.tiny
+)
+
+//====================================================
+// 52W HIGH FLAG
+//====================================================
+plotshape(
+     close >= high52,
+     title="52W High",
+     style=shape.flag,
+     location=location.abovebar,
+     color=color.blue,
+     size=size.tiny
+)
+
+//====================================================
+// STAGE ANALYSIS
+//====================================================
+
+// Stage 1 = Base
+stage1 = (
+    close > ema200 and
+    not ta.rising(ema200, 10) and
+    not ta.falling(ema200, 10)
+)
+
+// Stage 2 = Advancing
+stage2 = (
+    close > ema150 and
+    ema150 > ema200 and
+    ema200 > ema200[20]
+)
+
+// Stage 3 = Distribution
+stage3 = (
+    close < ema150 and
+    close > ema200
+)
+
+// Stage 4 = Declining
+stage4 = (
+    close < ema200 and
+    ema200 < ema200[20]
+)
+
+stageText =
+     stage1 ? "STAGE 1 - BASE" :
+     stage2 ? "STAGE 2 - ADVANCING" :
+     stage3 ? "STAGE 3 - DISTRIBUTION" :
+     "STAGE 4 - DECLINING"
+
+stageColor =
+     stage1 ? color.gray :
+     stage2 ? color.green :
+     stage3 ? color.orange :
+     color.red
+
+//====================================================
+// STAGE LABEL
+//====================================================
+var label stageLabel = na
+
+if barstate.islast
+    label.delete(stageLabel)
+
+    stageLabel := label.new(
+         bar_index,
+         high + atr * 3,
+         stageText,
+         style=label.style_label_down,
+         color=stageColor,
+         textcolor=color.white,
+         size=size.normal
+    )
+
+//====================================================
+// FINANCIAL DATA
+//====================================================
+revenue = request.financial(
+     syminfo.tickerid,
+     "TOTAL_REVENUE",
+     "FQ"
+)
+
+salesGrowth =
+     not na(revenue[1]) and revenue[1] != 0 ?
+     ((revenue - revenue[1]) / revenue[1]) * 100 :
+     na
+
+profit = request.financial(
+     syminfo.tickerid,
+     "NET_INCOME",
+     "FQ"
+)
+
+profitGrowth =
+     not na(profit[1]) and profit[1] != 0 ?
+     ((profit - profit[1]) / profit[1]) * 100 :
+     na
+
+marketCap = request.financial(
+     syminfo.tickerid,
+     "MARKET_CAP",
+     "FQ"
+)
+
+//====================================================
+// TABLE UI
+//====================================================
+var table t = table.new(position.top_right, 2, 10, border_width=1)
+
+if barstate.islast
+
+    table.cell(t, 0, 0, "Shaktimaan", text_color=color.white, bgcolor=color.black)
+
+    table.cell(t, 0, 1, "Stage")
+    table.cell(t, 1, 1, stageText)
+
+    table.cell(t, 0, 2, "RS")
+    table.cell(t, 1, 2, str.tostring(rs, "#.##"))
+
+    table.cell(t, 0, 3, "RS EMA")
+    table.cell(t, 1, 3, str.tostring(rsEMA, "#.##"))
+
+    table.cell(t, 0, 4, "ADX")
+    table.cell(t, 1, 4, str.tostring(adx, "#.##"))
+
+    table.cell(t, 0, 5, "RSI")
+    table.cell(t, 1, 5, str.tostring(rsi, "#.##"))
+
+    table.cell(t, 0, 6, "Sales YoY")
+    table.cell(t, 1, 6, str.tostring(salesGrowth, "#.##") + "%")
+
+    table.cell(t, 0, 7, "Profit YoY")
+    table.cell(t, 1, 7, str.tostring(profitGrowth, "#.##") + "%")
+
+    table.cell(t, 0, 8, "Mkt Cap")
+    table.cell(t, 1, 8, str.tostring(marketCap))
+
+    table.cell(t, 0, 9, "52W High")
+    table.cell(t, 1, 9, close >= high52 ? "YES" : "NO")
+
+//====================================================
+// ALERTS
+//====================================================
+alertcondition(
+     buyA,
+     title="BUY A",
+     message="BUY A Trigger"
+)
+
+alertcondition(
+     buyB,
+     title="BUY B",
+     message="BUY B Trigger"
+)
+
+alertcondition(
+     buyC,
+     title="BUY C",
+     message="BUY C Trigger"
+)
+
+alertcondition(
+     strongBuy,
+     title="STRONG BUY",
+     message="Strong Buy Trigger"
+)
+
+alertcondition(
+     sellX,
+     title="SELL X",
+     message="SELL X Trigger"
+)
+
+alertcondition(
+     sellY,
+     title="SELL Y",
+     message="SELL Y Trigger"
+)
+
+alertcondition(
+     sellZ,
+     title="SELL Z",
+     message="SELL Z Trigger"
+)

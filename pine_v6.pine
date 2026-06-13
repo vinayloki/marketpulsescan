@@ -1,0 +1,1528 @@
+//@version=6
+// ══════════════════════════════════════════════════════════════════════
+// ██╗███████╗███╗   ███╗███████╗    ██╗   ██╗ ██████╗
+// ██║██╔════╝████╗ ████║██╔════╝    ██║   ██║██╔════╝
+// ██║███████╗██╔████╔██║█████╗      ██║   ██║██████╗ 
+// ██║╚════██║██║╚██╔╝██║██╔══╝      ╚██╗ ██╔╝██╔═══╝
+// ██║███████║██║ ╚═╝ ██║███████╗     ╚████╔╝ ██████╗
+// ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝      ╚═══╝  ╚═════╝
+//
+// Institutional Stage Momentum Engine (ISME) v6.1
+// Production-grade audit fix release + industry-standard additions.
+//
+// v6.0 CHANGELOG (audit fixes from institutional review):
+// ─────────────────────────────────────────────────────
+// F01  pyramiding=5 added to strategy() — was 0 (all adds silently failed)
+// F02  Unified entry ID "Long" for initial + pyramid — single bracket covers all
+// F03  Hard 7-8% stop (O'Neil rule) enforced via math.max(swingStop, hardStop)
+// F04  Position size cap: max 25% of capital per trade
+// F05  Pyramid sizing reduction: 100% / 50% / 25% per Minervini
+// F06  riskAmt guarded against negative (entryPrice > entryStop required)
+// F07  EXIT state deferred reset — visible for 1 bar before NONE
+// F08  Pyramid count moved inside barstate.isconfirmed
+// F09  entryPrice updated on ADD from strategy.position_avg_price
+// F10  Monthly EMA inline function (was computing on chart TF, not monthly)
+// F11  regimePrev uses regimeClose[1] — removed 2 redundant security calls
+// F12  Distribution day loop replaced with ta.sum (O(1))
+// F13  Hybrid regime model: showA/B/C visible on chart, signalA/B/C gated for strategy
+// F14  wScore clamped to 100 before strongBuy threshold
+// F15  lastBuyBar updated for ALL buy signals (not just strongBuy)
+// F16  sellX/sellY mutual exclusion (X suppressed when Y fires)
+// F17  Stage hysteresis — 3-bar minimum persistence before stage can change
+// F18  VCP/AVWAP/trailing stop wrapped in barstate.isconfirmed
+// F19  VCP base counter + AVWAP reset on Stage 3 entry (not just Stage 4)
+// F20  Stealth accumulation fixed (was always false — SMA vs SMA)
+// F21  RS nz() fix — ta.highest ignores na natively
+// F22  na guards for atrPct, volSurgeRatio, slopeChange
+// F23  Legend table creation leak fixed (var table, create once)
+// F24  Alert isconfirmed gating standardized
+// F25  REDUCE triggers real 50% partial strategy.close
+// F26  bt_autoStart uses float to prevent integer overflow
+// F27  ENTRY state can transition to ADD on new signal
+// F28  Commission bumped to 0.1% for NSE realism
+// ── v6.1 additions ──────────────────────────────
+// F29  Follow-Through Day (FTD) detection — O'Neil rally day 4-7 with 1.7%+ on higher vol
+// F30  BuyA volume gate: ≥40% above average (Minervini volume expansion rule)
+// F31  BuyC not-extended check: blocked if price >5% above pivot (52W high)
+// F32  rsRank ≥ 75 gate on strongBuy (sector RS rank threshold)
+// ─────────────────────────────────────────────────────
+//
+// ── DISCLAIMER ──────────────────────────────────────────────────────
+// Educational/informational only. Not financial advice.
+// ══════════════════════════════════════════════════════════════════════
+strategy("Institutional Stage Momentum Engine (ISME) v6.1", shorttitle="ISME v6.1", overlay=true, max_labels_count=500, max_bars_back=500, max_lines_count=500, max_boxes_count=500, default_qty_type=strategy.fixed, default_qty_value=1, initial_capital=1000000, commission_type=strategy.commission.percent, commission_value=0.1, slippage=5, calc_on_every_tick=false, process_orders_on_close=true, use_bar_magnifier=false, pyramiding=5)  // F01+F28: pyramiding=5, commission=0.1%
+
+//====================================================
+// INPUTS
+//====================================================
+lengthADX     = input.int(14, "Length ADX", group="Trend & Momentum", tooltip="Period for Average Directional Index calculation.")
+thresholdADX  = input.int(14, "Threshold ADX", group="Trend & Momentum", tooltip="Minimum ADX value for trend confirmation.")
+lengthRSI     = input.int(14, "Length RSI", group="Trend & Momentum", tooltip="Period for Relative Strength Index.")
+
+sarStart      = input.float(0.02, "SAR Start", group="Parabolic SAR")
+sarInc        = input.float(0.02, "SAR Increment", group="Parabolic SAR")
+sarMax        = input.float(0.2, "SAR Max Value", group="Parabolic SAR")
+
+rsSymbol       = input.symbol("NSE:NIFTY", "RS Index", group="Relative Strength", tooltip="Benchmark index for RS calculation.")
+rsSectorSymbol = input.symbol("NSE:NIFTY", "RS Sector Index (manual)", group="Relative Strength", tooltip="Sector benchmark. Overridden if Auto-Sector is ON.")
+rsMAPeriod     = input.int(10, "RS MA Period", group="Relative Strength", tooltip="EMA period for RS ratio line.")
+useAutoSector  = input.bool(true, "Auto-Detect Sector", group="Relative Strength", tooltip="When ON, sector index is auto-picked from syminfo.industry. Falls back to manual RS Sector Index.")
+
+regimeSymbol  = input.symbol("NSE:NIFTY", "Market Regime Index", group="Market Regime", tooltip="General market index. Buys are blocked when this index is in a downtrend (EMA50 < EMA200).")
+useRegime     = input.bool(true, "Block Buys in Bear Market", group="Market Regime", tooltip="When ON, BUY signals are suppressed if the regime index EMA50 is below its EMA200.")
+showPocket    = input.bool(true, "Show Pocket Pivot (BUY P)", group="Display", tooltip="O'Neil-style pocket pivot signal: up day on volume greater than highest down-day volume of last 10 bars.")
+riskAmountInput = input.float(10000, "Risk Per Trade (₹)", minval=1000, step=1000, group="Position Sizing", tooltip="Maximum ₹ risk per trade. Used to calculate position size from entry-to-stop distance.")
+maxPyramidInput = input.int(2, "Max Pyramid Adds", minval=0, maxval=5, group="Position Sizing", tooltip="Maximum pyramid (add) opportunities per position.")
+capitalMaxPct   = input.float(25, "Max Capital Per Trade (%)", minval=5, maxval=100, step=5, group="Position Sizing", tooltip="F04: Maximum percentage of initial capital allowed in a single position.")  // F04
+hardStopPct     = input.float(8, "Hard Stop Loss (%)", minval=3, maxval=15, step=1, group="Position Sizing", tooltip="F03: O'Neil 7-8% hard stop. Position is never allowed to lose more than this % from entry.")  // F03
+
+showMTF       = input.bool(true, "Monthly Confirmation", group="Multi-Timeframe", tooltip="Monthly trend validation for higher-conviction entries.")
+showSAR       = input.bool(true, "Show Parabolic SAR", group="Display")
+showInsider   = input.bool(true, "Show Insider Activity", group="Display")
+showVCP       = input.bool(true, "Show VCP Setups", group="Display")
+showRR        = input.bool(true, "Show Risk/Reward", group="Display")
+showLegend    = input.bool(false, "Show Signal Legend", group="Display")
+showDD        = input.bool(true, "Show Distribution Days", group="Display", tooltip="O'Neil 5-in-25 rule on regime index.")
+showVCPBase   = input.bool(true, "Show VCP Base Counter", group="Display", tooltip="Tracks Base # with pivot price + contraction depths.")
+showAVWAP     = input.bool(true, "Show Anchored VWAP", group="Display", tooltip="Anchored VWAP from last Stage 2 transition.")
+tableFontSize = input.string("Normal", "Table Font Size", options=["Tiny", "Small", "Normal", "Large"], group="Display")
+
+summaryPos    = input.string("Top Right", "Summary Table Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Table Positions")
+fundPos       = input.string("Bottom Right", "Fundamentals Table Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Table Positions")
+legendPos     = input.string("Bottom Left", "Legend Table Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Table Positions")
+finalCallPos  = input.string("Top Left", "Final Call Panel Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Table Positions")
+showFinalCall = input.bool(true, "Show Final Call Panel", group="Display", tooltip="Single-glance decision panel with conviction 1-10, target, stop, R:R, horizon.")
+
+fontSize = tableFontSize == "Tiny" ? size.tiny : tableFontSize == "Small" ? size.small : tableFontSize == "Large" ? size.large : size.normal
+legendSize = tableFontSize == "Tiny" ? size.tiny : tableFontSize == "Small" ? size.tiny : tableFontSize == "Large" ? size.normal : size.small
+
+f_pos(string p) =>
+    p == "Top Left" ? position.top_left : p == "Top Right" ? position.top_right : p == "Bottom Left" ? position.bottom_left : position.bottom_right
+
+//====================================================
+// CORE CALCULATIONS
+//====================================================
+// TF-aware lookback constants (Daily vs Weekly)
+int p_ema200      = timeframe.isweekly ? 30  : 200
+int p_ema150      = timeframe.isweekly ? 22  : 150
+int p_ema50       = timeframe.isweekly ? 10  : 50
+int pf_ema20      = timeframe.isweekly ? 4   : 20
+int p_high52      = timeframe.isweekly ? 52  : 252
+int p_percRank    = timeframe.isweekly ? 52  : 252
+int p_cooldown    = timeframe.isweekly ? 1   : 5
+int p_holdGrace   = timeframe.isweekly ? 1   : 3
+int p_reduceGrace = timeframe.isweekly ? 2   : 5
+int p_lowestStop  = timeframe.isweekly ? 4   : 10
+int p_lowestTight = timeframe.isweekly ? 2   : 5
+int p_slopeLong   = timeframe.isweekly ? 20  : 100
+int p_slopeShort  = timeframe.isweekly ? 8   : 20
+int p_bhvWindow   = timeframe.isweekly ? 20  : 100
+int p_vcpShort    = timeframe.isweekly ? 3   : 5
+int p_vcpLong     = timeframe.isweekly ? 8   : 20
+int p_vcpRef      = timeframe.isweekly ? 4   : 10
+int p_donch       = timeframe.isweekly ? 10  : 20
+int p_stageNet20  = timeframe.isweekly ? 8   : 20
+int p_stageNet10  = timeframe.isweekly ? 4   : 10
+int p_volMA       = timeframe.isweekly ? 4   : 20
+int p_stageHyst   = timeframe.isweekly ? 1   : 3   // F17: stage hysteresis bars
+
+ema20  = ta.ema(close, pf_ema20)
+ema50  = ta.ema(close, p_ema50)
+ema150 = ta.ema(close, p_ema150)
+ema200 = ta.ema(close, p_ema200)
+
+// F22: guard EMA validity for newly listed stocks
+bool emasValid = not na(ema200) and not na(ema150) and not na(ema50) and not na(ema20)
+
+rsi = ta.rsi(close, lengthRSI)
+[diplus, diminus, adx] = ta.dmi(lengthADX, lengthADX)
+atr = ta.atr(14)
+psar = ta.sar(sarStart, sarInc, sarMax)
+
+donHigh = ta.highest(high, p_donch)
+donLow  = ta.lowest(low, p_donch)
+
+// 52 Week High/Low (NO REPAINT — uses [1] to exclude current bar)
+high52 = ta.highest(high[1], p_high52)
+low52  = ta.lowest(low[1], p_high52)
+
+volMA = ta.sma(volume, p_volMA)
+
+// Cached swing lows for risk-reward
+lowest10 = ta.lowest(low, p_lowestStop)
+lowest5  = ta.lowest(low, p_lowestTight)
+
+// F22: ATR % with na guard
+float atrPct = not na(atr) and close > 0 ? atr / close * 100 : na
+
+// F22: Volume surge ratio with na guard
+float volSurgeRatio = not na(volMA) and volMA > 0 ? volume / volMA : na
+
+// Cached donchian breakout level (computed once, used by buyB and donBreak)
+float donchHigh1 = ta.highest(high, p_donch)[1]
+
+//====================================================
+// RELATIVE STRENGTH (enhanced)
+//====================================================
+//====================================================
+// AUTO-SECTOR DETECTION (v5.4 + F05: added Capital Goods, Defence, Chemicals, Telecom)
+//====================================================
+string _ind = str.lower(syminfo.industry)
+string _sec = str.lower(syminfo.sector)
+string autoSector = rsSectorSymbol
+if useAutoSector
+    if str.contains(_ind, "bank") or str.contains(_sec, "bank")
+        autoSector := "NSE:NIFTY_BANK"
+    else if str.contains(_ind, "software") or str.contains(_ind, "technology") or str.contains(_sec, "technology")
+        autoSector := "NSE:CNXIT"
+    else if str.contains(_ind, "pharma") or str.contains(_ind, "drug") or str.contains(_ind, "health")
+        autoSector := "NSE:CNXPHARMA"
+    else if str.contains(_ind, "auto") or str.contains(_ind, "vehicle")
+        autoSector := "NSE:CNXAUTO"
+    else if str.contains(_ind, "metal") or str.contains(_ind, "steel") or str.contains(_ind, "mining")
+        autoSector := "NSE:CNXMETAL"
+    else if str.contains(_ind, "fmcg") or str.contains(_ind, "consumer") or str.contains(_ind, "food") or str.contains(_ind, "beverage")
+        autoSector := "NSE:CNXFMCG"
+    else if str.contains(_ind, "oil") or str.contains(_ind, "gas") or str.contains(_ind, "energy") or str.contains(_ind, "power")
+        autoSector := "NSE:CNXENERGY"
+    else if str.contains(_ind, "realty") or str.contains(_ind, "real estate") or str.contains(_ind, "construction")
+        autoSector := "NSE:CNXREALTY"
+    else if str.contains(_ind, "finance") or str.contains(_ind, "insurance") or str.contains(_ind, "nbfc")
+        autoSector := "NSE:CNXFINANCE"
+    else if str.contains(_ind, "media") or str.contains(_ind, "entertainment")
+        autoSector := "NSE:CNXMEDIA"
+    else if str.contains(_ind, "capital") or str.contains(_ind, "engineering") or str.contains(_ind, "industrial")
+        autoSector := "NSE:CNXINFRA"
+    else if str.contains(_ind, "defence") or str.contains(_ind, "aerospace")
+        autoSector := "NSE:CNXINFRA"
+    else if str.contains(_ind, "chem")
+        autoSector := "NSE:CNXPSE"
+    else if str.contains(_ind, "telecom") or str.contains(_ind, "communication")
+        autoSector := "NSE:CNXIT"
+
+indexClose = request.security(rsSymbol, timeframe.period, close, lookahead=barmerge.lookahead_off)
+rs = not na(indexClose) and indexClose > 0 ? close / indexClose : na
+rsEMA = ta.ema(rs, rsMAPeriod)
+
+// RS Percentile Rank (0-100)
+rsRank = ta.percentrank(rs, p_percRank)
+
+// RS vs Sector
+sectorClose = request.security(autoSector, timeframe.period, close, lookahead=barmerge.lookahead_off)
+rsSec = not na(sectorClose) and sectorClose > 0 ? close / sectorClose : na
+rsSecEMA = ta.ema(rsSec, rsMAPeriod)
+
+// Mansfield RS = (RS / SMA(RS, 52w) - 1) × 100
+int mansfieldLen = p_percRank
+rsSMA = ta.sma(rs, mansfieldLen)
+mansfield = not na(rs) and not na(rsSMA) and rsSMA > 0 ? ((rs / rsSMA) - 1) * 100 : na
+
+// Weekly RS direction
+int rsLookback = timeframe.isweekly ? 1 : 5
+weeklyRSup = not na(rs) and bar_index >= rsLookback and rs > rs[rsLookback]
+
+//====================================================
+// MONTHLY TIMEFRAME CONFIRMATION
+//====================================================
+// F10: Compute monthly EMAs INSIDE security call to use monthly bars correctly
+f_monthly_check() =>
+    _m10 = ta.ema(close, 10)
+    _m30 = ta.ema(close, 30)
+    _m40 = ta.ema(close, 40)
+    _trendOk  = (_m10 > _m40)[1]
+    _stage2ok = (close > _m30 and _m30 > _m40)[1]
+    [_trendOk, _stage2ok]
+
+[mTrendOk, mStage2ok] = request.security(syminfo.tickerid, "M", f_monthly_check(), lookahead=barmerge.lookahead_off)
+
+monthlyAligned = not showMTF or (mTrendOk and mStage2ok)
+
+//====================================================
+// NIFTY MARKET REGIME FILTER
+//====================================================
+regimeClose = request.security(regimeSymbol, timeframe.period, close, lookahead=barmerge.lookahead_off)
+regimeVol   = request.security(regimeSymbol, timeframe.period, volume, lookahead=barmerge.lookahead_off)
+regimeEma50  = ta.ema(regimeClose, p_ema50)
+regimeEma200 = ta.ema(regimeClose, p_ema200)
+bool regimeBull = not na(regimeEma50) and not na(regimeEma200) and regimeEma50 > regimeEma200
+bool regimeOk = not useRegime or regimeBull
+bool regimeFlip = regimeBull != regimeBull[1]
+
+// F11: Use result-series indexing instead of redundant security calls
+float regimePrev    = regimeClose[1]
+float regimePrevVol = regimeVol[1]
+
+//====================================================
+// DISTRIBUTION DAY COUNTER (O'Neil 5-in-25 rule) — v6.0 fix
+//====================================================
+// F11+F12: Fixed double-shift bug, replaced O(n) loop with ta.sum
+bool isDistDay = not na(regimeClose) and not na(regimePrev) and regimePrev > 0 and not na(regimeVol) and not na(regimePrevVol) and ((regimeClose - regimePrev) / regimePrev * 100) <= -0.2 and regimeVol > regimePrevVol
+int ddWindow = timeframe.isweekly ? 5 : 25
+int ddCount = 0
+for i = 0 to ddWindow - 1
+    if nz(isDistDay[i] ? 1 : 0) == 1
+        ddCount += 1
+bool ddWarning = ddCount >= (timeframe.isweekly ? 2 : 5)
+bool ddJustHit = ddWarning and not ddWarning[1]
+
+//====================================================
+// FOLLOW-THROUGH DAY DETECTION (O'Neil IBD Market School)
+//====================================================
+// F29: FTD = after 4+ day correction on regime index, a rally day with ≥1.7% gain
+//       on volume higher than prior day, occurring on rally day 4-7 from low.
+// Tracks correction days, then looks for the follow-through confirmation.
+var int regimeCorrDays = 0
+var int regimeRallyDays = 0
+var float regimeCorrLow = na
+var bool ftdActive = false
+
+if barstate.isconfirmed and not na(regimeClose) and not na(regimePrev) and regimePrev > 0
+    float regimeChgPct = (regimeClose - regimePrev) / regimePrev * 100
+    // Detect correction start: 3+ consecutive down days on regime index
+    if regimeClose < regimePrev
+        regimeCorrDays := regimeCorrDays + 1
+        regimeRallyDays := 0
+        if na(regimeCorrLow) or regimeClose < regimeCorrLow
+            regimeCorrLow := regimeClose
+    else
+        regimeRallyDays := regimeRallyDays + 1
+    // FTD fires on rally day 4-7 after correction of 4+ days
+    bool isFTD = regimeCorrDays >= 4 and regimeRallyDays >= 4 and regimeRallyDays <= 7 and regimeChgPct >= 1.7 and not na(regimeVol) and not na(regimePrevVol) and regimeVol > regimePrevVol
+    if isFTD
+        ftdActive := true
+        regimeCorrDays := 0
+        regimeCorrLow := na
+    // Reset FTD flag after it's been active for 1 bar (so it's a trigger, not a state)
+    else if ftdActive
+        ftdActive := false
+    // Reset correction counter if market makes new high above correction start
+    if not na(regimeCorrLow) and regimeClose > regimeCorrLow * 1.03
+        regimeCorrDays := 0
+        regimeCorrLow := na
+
+bool ftdJustFired = ftdActive
+
+//====================================================
+// BACKGROUND COLOR (RS)
+//====================================================
+bgBull = rs > rsEMA
+bgcolor(bgBull ? color.new(#00E676, 82) : color.new(#FF1744, 82))
+
+//====================================================
+// MA CROSSOVER BAND
+//====================================================
+bullBand = ema20 > ema50
+pl_ema20 = plot(ema20, color=color.new(color.aqua, 60), linewidth=1, title="EMA 20")
+pl_ema50 = plot(ema50, color=color.new(color.orange, 60), linewidth=1, title="EMA 50")
+fill(pl_ema20, pl_ema50,
+     color = bullBand ? color.new(color.lime, 85) : color.new(color.red, 85),
+     title = "MA Band Fill")
+
+//====================================================
+// MINERVINI TREND TEMPLATE
+//====================================================
+trendTemplate = emasValid and (
+    close > ema50 and
+    close > ema150 and
+    close > ema200 and
+    ema50 > ema150 and
+    ema150 > ema200
+)
+
+//====================================================
+// TREND TEMPLATE SCORE (0/8 — Minervini checklist)
+//====================================================
+int ttScore = 0
+if close > ema50
+    ttScore := ttScore + 1
+if close > ema150
+    ttScore := ttScore + 1
+if close > ema200
+    ttScore := ttScore + 1
+if ema50 > ema150
+    ttScore := ttScore + 1
+if ema150 > ema200
+    ttScore := ttScore + 1
+// F06-LOGIC: Criterion 6 = 200d EMA rising for at least 1 month (was >30% above 52W low)
+bool ema200Rising1M = emasValid and ema200 > ema200[p_stageNet20]
+if ema200Rising1M
+    ttScore := ttScore + 1
+if not na(high52) and close >= high52 * 0.75
+    ttScore := ttScore + 1
+if not na(rs) and not na(rsEMA) and rs > rsEMA
+    ttScore := ttScore + 1
+
+//====================================================
+// STOCK BEHAVIOR TYPE CLASSIFIER
+//====================================================
+float rsBonus = not na(rs) and not na(rsEMA) and rs > rsEMA ? 20.0 : 0.0
+float bVol      = ta.stdev(close, p_bhvWindow) / close * 100
+float bMaxDD    = (ta.highest(close, p_high52) - ta.lowest(close, p_high52)) / ta.highest(close, p_high52) * 100
+float trendPersist = ta.sma(close > ema50 ? 1.0 : 0.0, p_bhvWindow) * 100
+float baseBreakHigh = ta.highest(close, p_bhvWindow * 6 / 10)
+float growthRate   = bar_index >= p_bhvWindow and not na(close[p_bhvWindow]) and close[p_bhvWindow] != 0 ? (close - close[p_bhvWindow]) / close[p_bhvWindow] * 100 : 0.0
+float slopeShort   = ta.linreg(close, p_slopeShort, 0)
+float slopeLong    = ta.linreg(close, p_slopeLong, 0)
+// F22: guard slopeChange division by atr
+float slopeChange  = slopeShort - slopeLong
+float baseBreak    = bar_index >= (p_bhvWindow * 6 / 10 + 1) and close > baseBreakHigh[1] ? 30.0 : 0.0
+float chartCyclical  = math.min(bVol * 3 + bMaxDD, 100)
+float chartGrowth    = math.min(trendPersist + rsBonus, 100)
+float chartDefensive = math.min(math.max(100 - bVol * 5 - math.abs(growthRate), 0), 100)
+float chartTurnaround = not na(atr) and atr > 0 ? math.min(math.max(slopeChange / atr * 10 + baseBreak, 0), 100) : 0.0
+
+// F-L5: removed unnecessary var — these are fully recalculated every bar
+float cyclicalScore  = 0.0
+float growthScore    = 0.0
+float defensiveScore = 0.0
+float turnaroundScore = 0.0
+string behavType = "--"
+color behavClr = color.gray
+float maxBehav = 0.0
+
+//====================================================
+// MARKET REGIME FILTER
+//====================================================
+trendOk = adx > 18 and ema50 > ema200
+var int lastBuyBar = 0
+cooldownOk = bar_index - lastBuyBar >= p_cooldown
+buyAllowed = trendOk and cooldownOk and regimeOk
+
+//====================================================
+// BUY CONDITIONS
+//====================================================
+// F30: Volume ≥40% above average required on BuyA (Minervini volume expansion)
+buyA_state = emasValid and (
+    close > ema20 and
+    ema20 > ema50 and
+    rsi > 55 and
+    adx > thresholdADX and
+    trendTemplate and
+    (not na(volMA) and volMA > 0 and volume >= volMA * 1.4)
+)
+buyA_raw = buyA_state and not buyA_state[1]
+
+buyB_raw = ta.crossover(close, donchHigh1) and volume > volMA
+
+// F31: Not-extended check — blocked if price >5% above pivot (52W high)
+buyC_state = (
+    close >= high52 and
+    (not na(high52) and high52 > 0 and close <= high52 * 1.05) and
+    not na(rs) and rs > rsEMA
+)
+buyC_raw = buyC_state and not buyC_state[1]
+
+// Pocket Pivot (O'Neil): up day on volume > max down-day volume in last 10 bars
+float downVol = close < close[1] ? volume : 0.0
+float maxDownVol10 = ta.highest(downVol, p_lowestStop)
+buyP_state = (
+    close > close[1] and
+    close > ema50 and
+    ema50 > ema200 and
+    volume > maxDownVol10 and
+    volume > volMA
+)
+buyP_raw = buyP_state and not buyP_state[1]
+buyP = buyP_raw and buyAllowed
+
+// F13: Hybrid regime model
+// signalA/B/C = regime-gated (for strategy execution + state machine)
+// showA/B/C   = always visible on chart (cooldown only, no regime gate)
+bool signalA = buyA_raw and buyAllowed
+bool signalB = buyB_raw and buyAllowed
+bool signalC = buyC_raw and buyAllowed
+
+//====================================================
+// WEIGHTED INSTITUTIONAL SCORING (0-100)
+//====================================================
+float wScore = (buyA_state ? 40.0 : 0.0) + (buyB_raw ? 30.0 : 0.0) + (buyC_state ? 30.0 : 0.0)
+
+if showMTF
+    float monthlyBonus = 0.0
+    if monthlyAligned
+        monthlyBonus += 10
+    if mTrendOk
+        monthlyBonus += 5
+    if mStage2ok
+        monthlyBonus += 5
+    wScore += monthlyBonus
+    if not monthlyAligned
+        wScore -= 10
+
+// F14: clamp wScore to 0-100 before threshold check
+wScore := math.max(math.min(wScore, 100.0), 0.0)
+
+// F32: rsRank ≥ 75 gate on strongBuy — sector RS rank threshold
+bool rsRankOk = na(rsRank) or rsRank >= 75
+strongBuy_state = wScore >= 70 and rsRankOk
+strongBuy_raw = strongBuy_state and not strongBuy_state[1]
+strongBuy = strongBuy_raw and buyAllowed
+
+// F15: update lastBuyBar for ALL buy signals
+if barstate.isconfirmed and (strongBuy or signalA or signalB or signalC or buyP)
+    lastBuyBar := bar_index
+
+// F13: Display signals (always visible, no regime gate) vs strategy signals
+showA = buyA_raw and cooldownOk and not strongBuy
+showB = buyB_raw and cooldownOk and not strongBuy
+showC = buyC_raw and cooldownOk and not strongBuy
+showP = buyP and not strongBuy and not timeframe.isweekly
+
+// Strategy-grade signals (regime-gated, used by FSM and backtest engine)
+bool stratA = signalA and not strongBuy
+bool stratB = signalB and not strongBuy
+bool stratC = signalC and not strongBuy
+
+//====================================================
+// SELL CONDITIONS
+//====================================================
+sellX_state = close < ema20 and rsi < 45
+sellX_raw = sellX_state and not sellX_state[1]
+
+sellY_state = close < ema50 and not na(rs) and rs < rsEMA
+sellY_raw = sellY_state and not sellY_state[1]
+
+sellZ_state = close < ema200 and adx > thresholdADX
+sellZ = sellZ_state and not sellZ_state[1]
+
+// F16: mutual exclusion — X is weakest, suppressed by Y and Z
+sellY = sellY_raw and not sellZ
+sellX = sellX_raw and not sellZ and not sellY
+
+//====================================================
+// STAGE ANALYSIS (v6.0 — with hysteresis)
+//====================================================
+// Raw stage classification
+bool raw_stage2 = emasValid and (
+    close > ema150 and
+    ema150 > ema200 and
+    ema200 > ema200[p_stageNet20]
+)
+bool raw_stage2early = emasValid and (
+    not raw_stage2 and
+    close > ema150 and
+    ema150 > ema200 and
+    ema200 > ema200[p_stageNet10]
+)
+bool raw_stage1 = emasValid and (
+    not raw_stage2 and not raw_stage2early and
+    close > ema200 and
+    math.abs(ema200 - ema200[p_stageNet10]) <= ema200 * 0.001
+)
+bool raw_stage3 = emasValid and (
+    not raw_stage2 and not raw_stage2early and not raw_stage1 and
+    close < ema150 and
+    close > ema200
+)
+bool raw_stage4 = not raw_stage2 and not raw_stage2early and not raw_stage1 and not raw_stage3
+
+// F17: Stage hysteresis — require p_stageHyst consecutive bars to confirm transition
+var string confirmedStage = "STAGE 4"
+var int stageConfirmBars = 0
+string rawStageText = raw_stage2 ? "STAGE 2" : raw_stage2early ? "STAGE 2E" : raw_stage1 ? "STAGE 1" : raw_stage3 ? "STAGE 3" : "STAGE 4"
+
+if barstate.isconfirmed
+    if rawStageText == confirmedStage
+        stageConfirmBars := stageConfirmBars + 1
+    else
+        stageConfirmBars := stageConfirmBars + 1
+        if stageConfirmBars >= p_stageHyst
+            confirmedStage := rawStageText
+            stageConfirmBars := 0
+
+// Derive stage booleans from confirmed stage
+bool stage2      = confirmedStage == "STAGE 2"
+bool stage2early = confirmedStage == "STAGE 2E"
+bool stage1      = confirmedStage == "STAGE 1"
+bool stage3      = confirmedStage == "STAGE 3"
+bool stage4      = confirmedStage == "STAGE 4"
+string stageText = confirmedStage
+
+stageColor =
+     stage2      ? color.green :
+     stage2early ? color.new(#66BB6A, 0) :
+     stage1      ? color.gray :
+     stage3      ? color.orange :
+     color.red
+
+string stageEmoji =
+     stage2      ? "●" :
+     stage2early ? "◐" :
+     stage1      ? "◐" :
+     stage3      ? "●" :
+     "●"
+
+//====================================================
+// VCP (VOLATILITY CONTRACTION PATTERN)
+//====================================================
+atrShort   = ta.atr(p_vcpShort)
+atrRef     = ta.atr(p_vcpShort)[p_vcpRef]
+vcpATR     = not na(atrRef) and atrRef > 0 and atrShort < atrRef * 0.6
+
+rangeShort = ta.highest(high, p_vcpShort) - ta.lowest(low, p_vcpShort)
+rangeLong  = ta.highest(high, p_vcpLong) - ta.lowest(low, p_vcpLong)
+vcpRange   = not na(rangeLong) and rangeLong > 0 and rangeShort < rangeLong * 0.5
+
+vcpSetup   = vcpATR and vcpRange and (stage2 or stage2early) and close > ema50
+vcpTrigger = vcpSetup and not vcpSetup[1]
+
+// True VCP base counting (v5.4 + F18: isconfirmed + F19: stage3 reset)
+var int   vcpBaseNum     = 0
+var float vcpBasePivot   = na
+var float vcpBaseLow     = na
+var float vcpLastDepth   = na
+var float vcpCurrDepth   = na
+var bool  vcpInBase      = false
+bool inAdvance = stage2 or stage2early
+float pullbackPct = not na(vcpBasePivot) and vcpBasePivot > 0 ? (vcpBasePivot - low) / vcpBasePivot * 100 : 0.0
+float _vcpRecentHigh = ta.highest(high, 20)
+bool vcpBreakout = false
+
+// F18: wrap all VCP var mutations in isconfirmed
+if barstate.isconfirmed
+    if inAdvance and not vcpInBase and bar_index > 20
+        float recentHigh = _vcpRecentHigh
+        if (recentHigh - low) / recentHigh * 100 >= 5
+            vcpInBase := true
+            vcpBaseNum := vcpBaseNum + 1
+            vcpBasePivot := recentHigh
+            vcpBaseLow := low
+    if vcpInBase
+        if high > vcpBasePivot
+            vcpBasePivot := high
+        if low < vcpBaseLow
+            vcpBaseLow := low
+        vcpCurrDepth := (vcpBasePivot - vcpBaseLow) / vcpBasePivot * 100
+    vcpBreakout := vcpInBase and not na(vcpBasePivot) and close > vcpBasePivot and volume > volMA
+    if vcpBreakout
+        vcpLastDepth := vcpCurrDepth
+        vcpInBase := false
+    // F19: reset on Stage 3 entry (not just Stage 4)
+    if stage3 and not stage3[1]
+        vcpInBase := false
+        vcpBaseNum := 0
+        vcpBasePivot := na
+        vcpBaseLow := na
+        vcpLastDepth := na
+        vcpCurrDepth := na
+    if stage4
+        vcpInBase := false
+        vcpBaseNum := 0
+        vcpBasePivot := na
+        vcpBaseLow := na
+        vcpLastDepth := na
+        vcpCurrDepth := na
+
+//====================================================
+// ANCHORED VWAP from last Stage 2 transition (v5.4 + F18/F19)
+//====================================================
+bool stage2Entered = (stage2 and not stage2[1] and not stage2early[1]) or (stage2early and not stage2[1] and not stage2early[1])
+var float avwapSumPV = 0.0
+var float avwapSumV  = 0.0
+
+// F18: wrap in isconfirmed
+if barstate.isconfirmed
+    if stage2Entered
+        avwapSumPV := hlc3 * volume
+        avwapSumV  := volume
+    else if (stage2 or stage2early) and avwapSumV > 0
+        avwapSumPV := avwapSumPV + hlc3 * volume
+        avwapSumV  := avwapSumV + volume
+    // F19: reset on Stage 3 entry (not just Stage 4)
+    else if stage3 or stage4
+        avwapSumPV := 0.0
+        avwapSumV  := 0.0
+
+float avwap = avwapSumV > 0 ? avwapSumPV / avwapSumV : na
+plot(showAVWAP and not na(avwap) ? avwap : na, "Anchored VWAP (S2)", color=color.new(#FFD700, 0), linewidth=2, style=plot.style_line)
+
+//====================================================
+// POSITION STATE MACHINE (with pyramid tracking)
+//====================================================
+var string posState = "NONE"
+var int stateStartBar = 0
+var int pyramidCount = 0
+
+bool anyStratSignal = strongBuy or stratA or stratB or stratC
+
+if barstate.isconfirmed
+    // F07: snapshot previous state for deferred EXIT reset
+    string _prevState = posState
+
+    if sellZ or sellY
+        posState := "EXIT"
+    else if posState != "NONE" and posState != "EXIT" and sellX
+        posState := "REDUCE"
+    else if strongBuy
+        posState := posState == "NONE" ? "ENTRY" : "ADD"
+    else if posState == "NONE" and (stratA or stratB or stratC)
+        posState := "ENTRY"
+    // F27: ENTRY state can transition to ADD on new signal
+    else if (posState == "HOLD" or posState == "TIGHTEN" or posState == "ENTRY") and (stratA or stratB or stratC)
+        posState := "ADD"
+    else if posState == "ENTRY" or posState == "ADD"
+        if bar_index - stateStartBar >= p_holdGrace
+            posState := "HOLD"
+    // F07: deferred EXIT reset — only if EXIT was set on a PRIOR bar
+    else if posState == "EXIT" and _prevState == "EXIT"
+        posState := "NONE"
+    else if posState == "REDUCE"
+        if close > ema50 and ema50 > ema200
+            posState := "HOLD"
+        else if bar_index - stateStartBar >= p_reduceGrace
+            posState := "EXIT"
+    else if posState == "HOLD"
+        bool shouldTighten = false
+        if close < ema20 and close > ema50
+            shouldTighten := true
+        if not na(rs) and not na(rsEMA) and rs < rsEMA and rs[1] >= rsEMA[1]
+            shouldTighten := true
+        if adx < 15 and adx[1] >= 15
+            shouldTighten := true
+        if shouldTighten
+            posState := "TIGHTEN"
+    else if posState == "TIGHTEN"
+        if close > ema20 and (na(rs) or rs > rsEMA)
+            posState := "HOLD"
+
+    // Track state transitions
+    if posState != posState[1]
+        stateStartBar := bar_index
+
+    // F08: Pyramid tracking INSIDE isconfirmed
+    if posState == "ADD" and posState[1] != "ADD"
+        pyramidCount := math.min(pyramidCount + 1, maxPyramidInput)
+    if posState == "NONE" and posState[1] != "NONE"
+        pyramidCount := 0
+
+// State colors
+color posClr = switch posState
+    "ENTRY"   => color.new(#00E676, 0)
+    "ADD"     => color.new(#00E676, 0)
+    "HOLD"    => color.new(#2196F3, 0)
+    "TIGHTEN" => color.new(#FFD740, 0)
+    "REDUCE"  => color.new(#FF9100, 0)
+    "EXIT"    => color.new(#FF1744, 0)
+    => color.new(#9E9E9E, 0)
+
+string posEmoji = switch posState
+    "ENTRY"   => "🟢"
+    "ADD"     => "🟢"
+    "HOLD"    => "🔵"
+    "TIGHTEN" => "🟡"
+    "REDUCE"  => "🟠"
+    "EXIT"    => "🔴"
+    => "⚪"
+
+//====================================================
+// RISK-REWARD TRACKING (with sizing — F03/F04/F05/F06/F09/F18)
+//====================================================
+var float entryPrice = na
+var float entryStop  = na
+
+bool freshEntry = (posState == "ENTRY" and posState[1] != "ENTRY") or (posState == "ADD" and na(entryPrice))
+
+// F18: wrap entry/stop tracking in isconfirmed
+if barstate.isconfirmed
+    if freshEntry
+        entryPrice := close
+        entryStop  := lowest10
+
+    // Fallback — back-fill if chart loaded mid-trade
+    if (posState == "HOLD" or posState == "TIGHTEN" or posState == "ADD") and na(entryPrice)
+        entryPrice := close
+        entryStop  := lowest10
+
+    // F09: update entryPrice on ADD from strategy avg price
+    if posState == "ADD" and posState[1] != "ADD" and strategy.position_size > 0
+        entryPrice := strategy.position_avg_price
+
+    // Trail the stop upward only — with F03 hard stop enforcement
+    if posState == "HOLD" or posState == "ADD" or posState == "TIGHTEN"
+        float swingStop = posState == "TIGHTEN" ? lowest5 : lowest10
+        // F03: Hard stop — never allow more than hardStopPct % loss from entry
+        float hardStopPrice = not na(entryPrice) ? entryPrice * (1 - hardStopPct / 100) : na
+        float newStop = not na(hardStopPrice) ? math.max(nz(swingStop, 0), hardStopPrice) : swingStop
+        if not na(entryStop) and not na(newStop) and newStop > entryStop
+            entryStop := newStop
+
+    // Reset on EXIT or NONE
+    if posState == "NONE" or posState == "EXIT"
+        entryPrice := na
+        entryStop  := na
+
+// F06: guard riskAmt against negative values
+float riskAmt  = not na(entryPrice) and not na(entryStop) and entryPrice > entryStop ? entryPrice - entryStop : na
+float riskPct  = not na(riskAmt) and entryPrice > 0 ? riskAmt / entryPrice * 100 : na
+float target2R = not na(entryPrice) and not na(riskAmt) and riskAmt > 0 ? entryPrice + riskAmt * 2 : na
+float target3R = not na(entryPrice) and not na(riskAmt) and riskAmt > 0 ? entryPrice + riskAmt * 3 : na
+float currentR = not na(riskAmt) and riskAmt > 0 ? (close - entryPrice) / riskAmt : na
+
+// F04: Position sizing with capital cap
+float maxCapital   = strategy.initial_capital * capitalMaxPct / 100
+float sharesByRisk = not na(riskAmt) and riskAmt > 0 ? math.floor(riskAmountInput / riskAmt) : na
+float sharesByCap  = close > 0 ? math.floor(maxCapital / close) : na
+float sharesSize   = not na(sharesByRisk) and not na(sharesByCap) ? math.min(sharesByRisk, sharesByCap) : not na(sharesByRisk) ? sharesByRisk : na
+float riskValueK = riskAmountInput / 1000
+
+//====================================================
+// STRUCTURE-BASED STOP
+//====================================================
+longStop = lowest10
+plot(longStop, color=color.new(color.red, 30), linewidth=1, style=plot.style_stepline, title="Swing Stop")
+
+//====================================================
+// PARABOLIC SAR
+//====================================================
+plot(showSAR ? psar : na, style=plot.style_cross, color=close > psar ? color.green : color.red, linewidth=1, title="Parabolic SAR")
+
+//====================================================
+// RS NEW HIGH
+//====================================================
+// F21: removed nz() — ta.highest handles na correctly
+rsHighestCached = ta.highest(rs[1], p_bhvWindow)
+rsHighPrev  = not na(rs) ? rsHighestCached : na
+rsHigh      = not na(rs) and not na(rsHighPrev) and not na(rsHighPrev[1]) and rs >= rsHighPrev and rs[1] < rsHighPrev[1]
+plotshape(rsHigh, title="RS High", style=shape.triangleup, location=location.belowbar, color=color.purple, size=size.small)
+
+//====================================================
+// BUY SHAPES (F13: showA/B/C always visible on chart)
+//====================================================
+plotshape(showA, title="BUY A", text="A", style=shape.labelup, location=location.belowbar, color=color.green, textcolor=color.white, size=size.small)
+plotshape(showB, title="BUY B", text="B", style=shape.labelup, location=location.belowbar, color=color.lime, textcolor=color.black, size=size.small)
+plotshape(showC, title="BUY C", text="C", style=shape.labelup, location=location.belowbar, color=color.teal, textcolor=color.white, size=size.small)
+plotshape(strongBuy, title="STRONG BUY", text="STRONG", style=shape.labelup, location=location.belowbar, color=color.blue, textcolor=color.white, size=size.normal)
+plotshape(showPocket and showP, title="BUY P", text="P", style=shape.labelup, location=location.belowbar, color=color.new(#7C4DFF, 0), textcolor=color.white, size=size.small)
+
+//====================================================
+// SELL SHAPES
+//====================================================
+plotshape(sellX, title="SELL X", text="X", style=shape.labeldown, location=location.abovebar, color=color.red, textcolor=color.white, size=size.small)
+plotshape(sellY, title="SELL Y", text="Y", style=shape.labeldown, location=location.abovebar, color=color.maroon, textcolor=color.white, size=size.small)
+plotshape(sellZ, title="SELL Z", text="Z", style=shape.labeldown, location=location.abovebar, color=color.orange, textcolor=color.white, size=size.small)
+
+//====================================================
+// VCP SHAPE
+//====================================================
+plotshape(showVCP and vcpTrigger, title="VCP Setup", text="VCP\n🔷", style=shape.labelup, location=location.belowbar, color=color.new(#2196F3, 0), textcolor=color.white, size=size.small)
+
+//====================================================
+// DONCHIAN DOT
+//====================================================
+donBreak = ta.crossover(close, donchHigh1)
+plotshape(donBreak, title="Donchian", style=shape.diamond, location=location.abovebar, color=color.orange, size=size.small)
+
+//====================================================
+// 52W HIGH FLAG (unified with buyC reference)
+//====================================================
+newHigh52 = close >= high52 and close[1] < high52
+plotshape(newHigh52, title="52W High", text="52W\n🔥", style=shape.labeldown, location=location.abovebar, color=color.new(#FFD700, 0), textcolor=color.black, size=size.normal)
+
+//====================================================
+// RISK-REWARD BOX
+//====================================================
+var box  rrBox     = na
+var line t2rLine   = na
+var line t3rLine   = na
+var label t2rLabel = na
+var label t3rLabel = na
+var label entLabel = na
+
+if barstate.islast
+    box.delete(rrBox)
+    line.delete(t2rLine)
+    line.delete(t3rLine)
+    label.delete(t2rLabel)
+    label.delete(t3rLabel)
+    label.delete(entLabel)
+
+    if showRR and posState != "NONE" and not na(entryPrice) and not na(entryStop) and entryPrice > entryStop
+        int boxLeft  = bar_index - 10
+        int boxRight = bar_index + 5
+
+        rrBox := box.new(boxLeft, entryPrice, boxRight, entryStop,
+            bgcolor=color.new(color.red, 88), border_color=color.new(color.red, 50), border_width=1)
+        entLabel := label.new(boxRight, entryPrice, "Entry " + str.tostring(entryPrice, "#.##"),
+            style=label.style_label_left, color=color.new(#2196F3, 70), textcolor=color.white, size=size.tiny)
+
+        if not na(target2R)
+            t2rLine := line.new(boxLeft, target2R, boxRight, target2R,
+                color=color.new(color.green, 30), style=line.style_dashed, width=1)
+            t2rLabel := label.new(boxRight, target2R, "2R " + str.tostring(target2R, "#.##"),
+                style=label.style_label_left, color=color.new(color.green, 70), textcolor=color.white, size=size.tiny)
+
+        if not na(target3R)
+            t3rLine := line.new(boxLeft, target3R, boxRight, target3R,
+                color=color.new(#00E676, 30), style=line.style_dashed, width=1)
+            t3rLabel := label.new(boxRight, target3R, "3R " + str.tostring(target3R, "#.##"),
+                style=label.style_label_left, color=color.new(#00E676, 70), textcolor=color.white, size=size.tiny)
+
+//====================================================
+// STAGE LABEL
+//====================================================
+var label stageLabel = na
+if barstate.islast
+    label.delete(stageLabel)
+    stageLabel := label.new(bar_index, high + atr * 3, stageText,
+         style=label.style_label_down, color=stageColor, textcolor=color.white, size=size.normal)
+
+//====================================================
+// FINANCIAL DATA
+//====================================================
+string cleanTicker = ticker.standard(syminfo.tickerid)
+
+revenue = request.financial(cleanTicker, "TOTAL_REVENUE", "FQ", ignore_invalid_symbol=true)
+profit = request.financial(cleanTicker, "NET_INCOME", "FQ", ignore_invalid_symbol=true)
+totalShares = request.financial(cleanTicker, "TOTAL_SHARES_OUTSTANDING", "FQ", ignore_invalid_symbol=true)
+floatShares = request.financial(cleanTicker, "FLOAT_SHARES_OUTSTANDING", "FQ", ignore_invalid_symbol=true)
+operIncome = request.financial(cleanTicker, "OPER_INCOME", "FQ", ignore_invalid_symbol=true)
+
+float marketCap = not na(totalShares) ? close * totalShares : na
+float freeFloat = not na(floatShares) ? close * floatShares : na
+
+//====================================================
+// QUARTERLY DATA TRACKING (9 quarters)
+//====================================================
+CRORE = 10000000.0
+
+var float[] q_np    = array.new_float(9, na)
+var float[] q_sales = array.new_float(9, na)
+var float[] q_oi    = array.new_float(9, na)
+var string[] q_lbl  = array.new_string(9, "")
+var float prevRev   = na
+var int lastQtrBar  = 0
+
+if not na(revenue) and (na(prevRev) or revenue != prevRev)
+    array.unshift(q_np, profit)
+    array.pop(q_np)
+    array.unshift(q_sales, revenue)
+    array.pop(q_sales)
+    array.unshift(q_oi, operIncome)
+    array.pop(q_oi)
+    int m = month
+    int y = year
+    int fqM = m <= 2 ? 12 : m <= 5 ? 3 : m <= 8 ? 6 : m <= 11 ? 9 : 12
+    int fqY = fqM == 12 and m <= 2 ? y - 1 : y
+    string ms = fqM == 3 ? "Mar" : fqM == 6 ? "Jun" : fqM == 9 ? "Sep" : "Dec"
+    array.unshift(q_lbl, ms + "-" + str.tostring(fqY % 100))
+    array.pop(q_lbl)
+    prevRev := revenue
+    lastQtrBar := bar_index
+
+//====================================================
+// EARNINGS PROXIMITY WARNING
+//====================================================
+int barsSinceQtr = bar_index - lastQtrBar
+bool isWeeklyTF = timeframe.isweekly
+int earningsThreshLo = isWeeklyTF ? 8 : 40
+int earningsThreshHi = isWeeklyTF ? 12 : 60
+bool dataFresh = lastQtrBar > 0 and barsSinceQtr < (isWeeklyTF ? 65 : 325)
+bool earningsSoon = dataFresh and barsSinceQtr >= earningsThreshLo and barsSinceQtr <= earningsThreshHi
+
+// QoQ growth
+float salesGrowth = na
+float profitGrowth = na
+if not na(array.get(q_sales, 0)) and not na(array.get(q_sales, 1)) and array.get(q_sales, 1) != 0
+    salesGrowth := ((array.get(q_sales, 0) - array.get(q_sales, 1)) / math.abs(array.get(q_sales, 1))) * 100
+if not na(array.get(q_np, 0)) and not na(array.get(q_np, 1)) and array.get(q_np, 1) != 0
+    profitGrowth := ((array.get(q_np, 0) - array.get(q_np, 1)) / math.abs(array.get(q_np, 1))) * 100
+
+//====================================================
+// EPS YoY & Revenue YoY
+//====================================================
+float epsYoY = na
+float revYoY = na
+float _np0  = array.get(q_np, 0)
+float _np4  = array.size(q_np) > 4 ? array.get(q_np, 4) : na
+float _sal0 = array.get(q_sales, 0)
+float _sal4 = array.size(q_sales) > 4 ? array.get(q_sales, 4) : na
+if not na(_np0) and not na(_np4) and _np4 != 0
+    epsYoY := ((_np0 - _np4) / math.abs(_np4)) * 100
+if not na(_sal0) and not na(_sal4) and _sal4 != 0
+    revYoY := ((_sal0 - _sal4) / math.abs(_sal4)) * 100
+
+//====================================================
+// FINANCIAL VALIDATION FOR BEHAVIOR TYPE
+//====================================================
+float finGrowthBonus    = 0.0
+float finCyclicalBonus  = 0.0
+float finDefensiveBonus = 0.0
+float finTurnaroundBonus = 0.0
+
+int npRising  = 0
+int npFalling = 0
+int npSwings  = 0
+bool npRecovery = false
+
+for i = 0 to 3
+    float curr = array.get(q_np, i)
+    float prev = array.get(q_np, i + 1)
+    if not na(curr) and not na(prev)
+        if curr > prev
+            npRising += 1
+        else
+            npFalling += 1
+        if (curr > 0 and prev < 0) or (curr < 0 and prev > 0)
+            npSwings += 1
+
+float npLatest = array.get(q_np, 0)
+float npOldest = array.get(q_np, 4)
+if not na(npLatest) and not na(npOldest) and npLatest > 0 and npOldest < 0
+    npRecovery := true
+
+int salesRising = 0
+for i = 0 to 3
+    float curr = array.get(q_sales, i)
+    float prev = array.get(q_sales, i + 1)
+    if not na(curr) and not na(prev) and curr > prev
+        salesRising += 1
+
+finGrowthBonus := (npRising >= 3 ? 25.0 : npRising >= 2 ? 15.0 : 0.0) + (salesRising >= 3 ? 15.0 : 0.0)
+finCyclicalBonus := npSwings >= 2 ? 30.0 : npSwings >= 1 ? 15.0 : 0.0
+float npStability = npSwings == 0 and npFalling <= 1 ? 20.0 : 0.0
+finDefensiveBonus := npStability + (salesRising <= 2 and salesRising >= 1 ? 10.0 : 0.0)
+finTurnaroundBonus := npRecovery ? 35.0 : 0.0
+
+cyclicalScore  := chartCyclical  * 0.6 + math.min(finCyclicalBonus  * 1.33, 40)
+growthScore    := chartGrowth    * 0.6 + math.min(finGrowthBonus    * 1.0, 40)
+defensiveScore := chartDefensive * 0.6 + math.min(finDefensiveBonus * 1.33, 40)
+turnaroundScore := chartTurnaround * 0.6 + math.min(finTurnaroundBonus * 1.14, 40)
+
+maxBehav := math.max(cyclicalScore, math.max(growthScore, math.max(defensiveScore, turnaroundScore)))
+behavType := maxBehav == growthScore ? "GROWTH" : maxBehav == cyclicalScore ? "CYCLICAL" : maxBehav == turnaroundScore ? "TURNAROUND" : "DEFENSIVE"
+behavClr := maxBehav == growthScore ? color.new(#00E676, 0) : maxBehav == cyclicalScore ? color.new(#2196F3, 0) : maxBehav == turnaroundScore ? color.new(#AA00FF, 0) : color.new(#9E9E9E, 0)
+
+//====================================================
+// INVESTMENT DECISION SCORE (composite 0-100)
+//====================================================
+float investScore = 0.0
+investScore += stage2 ? 30.0 : stage2early ? 22.0 : stage1 ? 15.0 : stage3 ? 5.0 : 0.0
+investScore += ttScore * 3.125
+investScore += not na(rsRank) ? rsRank * 0.2 : 0.0
+investScore += maxBehav * 0.25
+
+string investDecision = investScore >= 60 ? "BUY" : investScore >= 30 ? "HOLD" : "AVOID"
+color investClr = investScore >= 60 ? color.new(#00E676, 0) : investScore >= 30 ? color.new(#FFD740, 0) : color.new(#FF1744, 0)
+string investEmoji = investScore >= 60 ? "●" : investScore >= 30 ? "◐" : "⊙"
+
+//====================================================
+// 52W HIGH / LOW PERCENTAGES
+//====================================================
+float pctFrom52H = not na(high52) and high52 > 0 ? ((close - high52) / high52) * 100 : na
+float pctFrom52L = not na(low52) and low52 > 0 ? ((close - low52) / low52) * 100 : na
+
+//====================================================
+// v5.6 — FINAL CALL DECISION ENGINE
+//====================================================
+int conviction10 = math.round(investScore / 10)
+conviction10 := conviction10 < 1 ? 1 : conviction10 > 10 ? 10 : conviction10
+
+string convLabel = conviction10 >= 9 ? "VERY HIGH" : conviction10 >= 7 ? "HIGH" : conviction10 >= 5 ? "MODERATE" : conviction10 >= 3 ? "LOW" : "VERY LOW"
+color convClr = conviction10 >= 9 ? color.new(#00E676, 0) : conviction10 >= 7 ? color.new(#00C853, 20) : conviction10 >= 5 ? color.new(#FFD740, 20) : conviction10 >= 3 ? color.new(#FF9100, 20) : color.new(#FF1744, 20)
+
+string finalCall = "WAIT"
+color  finalCallClr = color.new(color.gray, 60)
+if posState == "REDUCE" or posState == "EXIT"
+    finalCall := "SELL"
+    finalCallClr := color.new(#FF1744, 0)
+else if conviction10 <= 2 or stage4
+    finalCall := "AVOID"
+    finalCallClr := color.new(#FF1744, 20)
+else if posState == "HOLD" or posState == "ADD" or posState == "TIGHTEN"
+    finalCall := "HOLD"
+    finalCallClr := color.new(#2196F3, 0)
+else if conviction10 >= 7 and (stage2 or stage2early) and posState == "NONE"
+    finalCall := "STRONG BUY"
+    finalCallClr := color.new(#00E676, 0)
+else if conviction10 >= 5 and (stage2 or stage2early) and posState == "NONE"
+    finalCall := "BUY"
+    finalCallClr := color.new(#00C853, 20)
+else if conviction10 >= 3
+    finalCall := "WAIT"
+    finalCallClr := color.new(#FFD740, 20)
+else
+    finalCall := "AVOID"
+    finalCallClr := color.new(#FF1744, 20)
+
+// Target & Stop math
+float fcEntry  = not na(entryPrice) ? entryPrice : close
+float fcStop   = not na(entryStop)  ? entryStop  : lowest10
+float fcRisk   = fcEntry > fcStop ? fcEntry - fcStop : na
+float fcTarget = not na(fcRisk) and fcRisk > 0 ? fcEntry + 2.0 * fcRisk : na
+float fcRR     = not na(fcRisk) and fcRisk > 0 and not na(fcTarget) ? (fcTarget - fcEntry) / fcRisk : na
+float fcTgtPct = not na(fcRisk) and fcRisk > 0 and not na(fcTarget) ? (fcTarget - fcEntry) / fcEntry * 100 : na
+float fcStopPct = not na(fcRisk) and fcRisk > 0 ? fcRisk / fcEntry * 100 : na
+
+// Expected Range (1-sigma ATR over horizon)
+int fcHorizonBars = timeframe.isweekly ? 3 : 15
+float fcExpMove = not na(atr) ? atr * math.sqrt(fcHorizonBars) : na
+float fcRangeLo = not na(fcExpMove) ? close - fcExpMove : na
+float fcRangeHi = not na(fcExpMove) ? close + fcExpMove : na
+
+string fcHorizon = timeframe.isweekly ? ((stage2 or stage2early) ? "1-3 months" : "Reassess 2 wks") : ((stage2 or stage2early) ? "2-4 weeks" : "Reassess 1 wk")
+
+string fcCaveat = "—"
+color fcCaveatClr = color.new(color.gray, 70)
+if useRegime and not regimeBull
+    fcCaveat := "Bear regime - reduce size"
+    fcCaveatClr := color.new(#FF1744, 30)
+else if earningsSoon
+    fcCaveat := "~Earnings window (est.)"
+    fcCaveatClr := color.new(#FF9100, 30)
+else if ddWarning
+    fcCaveat := "5+ Distribution Days"
+    fcCaveatClr := color.new(#FF9100, 30)
+else if stage2early
+    fcCaveat := "Stage 2E - smaller size"
+    fcCaveatClr := color.new(#FFD740, 30)
+
+//====================================================
+// FINAL CALL TABLE (v5.6)
+//====================================================
+var table fct = table.new(f_pos(finalCallPos), 2, 9, border_width=1)
+
+if barstate.islast and showFinalCall
+    color fcHdrBg = color.new(#0d1117, 0)
+    color fcLblBg = color.new(#16213e, 0)
+    color fcTxtW  = color.white
+
+    table.cell(fct, 0, 0, "🎯 FINAL CALL", text_color=color.new(#FFD740, 0), bgcolor=fcHdrBg, text_size=fontSize, text_halign=text.align_center)
+    table.cell(fct, 1, 0, syminfo.ticker, text_color=color.new(#FFD740, 0), bgcolor=fcHdrBg, text_size=fontSize, text_halign=text.align_center)
+
+    table.cell(fct, 0, 1, "Decision", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 1, finalCall, text_color=color.white, bgcolor=finalCallClr, text_size=fontSize)
+
+    table.cell(fct, 0, 2, "Conviction", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 2, str.tostring(conviction10) + "/10 · " + convLabel, text_color=color.white, bgcolor=convClr, text_size=fontSize)
+
+    string tgtText = na(fcTarget) ? "—" : "₹" + str.tostring(fcTarget, "#.##") + " (" + str.tostring(fcTgtPct, "#.#") + "%, 2R)"
+    color  tgtClr  = na(fcTarget) ? color.new(color.gray, 70) : color.new(#00E676, 40)
+    table.cell(fct, 0, 3, "Target", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 3, tgtText, text_color=fcTxtW, bgcolor=tgtClr, text_size=fontSize)
+
+    string stpText = na(fcStop) or na(fcStopPct) ? "—" : "₹" + str.tostring(fcStop, "#.##") + " (-" + str.tostring(fcStopPct, "#.#") + "%)"
+    color  stpClr  = na(fcStop) ? color.new(color.gray, 70) : color.new(#FF1744, 40)
+    table.cell(fct, 0, 4, "Stop Loss", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 4, stpText, text_color=fcTxtW, bgcolor=stpClr, text_size=fontSize)
+
+    string rngText = na(fcRangeLo) or na(fcRangeHi) ? "—" : "₹" + str.tostring(fcRangeLo, "#.##") + " – ₹" + str.tostring(fcRangeHi, "#.##")
+    table.cell(fct, 0, 5, "Range 1σ", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 5, rngText, text_color=fcTxtW, bgcolor=color.new(#2196F3, 50), text_size=fontSize)
+
+    table.cell(fct, 0, 6, "Horizon", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 6, fcHorizon, text_color=fcTxtW, bgcolor=color.new(#7C4DFF, 40), text_size=fontSize)
+
+    string rrText2 = na(fcRR) ? "—" : "1 : " + str.tostring(fcRR, "#.#")
+    color  rrClr2  = na(fcRR) ? color.new(color.gray, 70) : fcRR >= 2 ? color.new(#00E676, 40) : fcRR >= 1 ? color.new(#FFD740, 40) : color.new(#FF1744, 40)
+    table.cell(fct, 0, 7, "Risk:Reward", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 7, rrText2, text_color=fcTxtW, bgcolor=rrClr2, text_size=fontSize)
+
+    table.cell(fct, 0, 8, "Caveat", text_color=fcTxtW, bgcolor=fcLblBg, text_size=fontSize)
+    table.cell(fct, 1, 8, fcCaveat, text_color=fcTxtW, bgcolor=fcCaveatClr, text_size=fontSize)
+
+//====================================================
+// ENHANCED SUMMARY TABLE (26 rows)
+//====================================================
+var table t = table.new(f_pos(summaryPos), 2, 28, border_width=1)  // v6.1: +2 rows for FTD + RS Rank
+
+if barstate.islast
+    color hdrBg = color.new(#1a1a2e, 0)
+    color lblBg = color.new(#16213e, 0)
+    color txtW  = color.white
+
+    table.cell(t, 0, 0, "Ticker", text_color=color.gray, bgcolor=hdrBg, text_size=fontSize)
+    table.cell(t, 1, 0, syminfo.ticker, text_color=color.new(#FFD740, 0), bgcolor=hdrBg, text_size=fontSize)
+
+    table.cell(t, 0, 1, "Stage", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 1, stageText + " " + stageEmoji, text_color=txtW, bgcolor=stageColor, text_size=fontSize)
+
+    color ttClr = ttScore >= 7 ? color.new(#00E676, 20) : ttScore >= 5 ? color.new(color.green, 60) : ttScore >= 3 ? color.new(#FF9100, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 2, "Trend Tmpl", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 2, str.tostring(ttScore) + "/8", text_color=txtW, bgcolor=ttClr, text_size=fontSize)
+
+    bool rsUp = not na(rs) and not na(rsEMA) and rs > rsEMA
+    string rsDir = rsUp ? "▲" : "▼"
+    color rsIdxClr = rsUp ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 3, "RS vs Idx", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 3, na(rs) ? "N/A" : rsDir + " " + str.tostring(rs, "#.##"), text_color=txtW, bgcolor=na(rs) ? color.new(color.gray, 80) : rsIdxClr, text_size=fontSize)
+
+    bool rsSecUp = not na(rsSec) and not na(rsSecEMA) and rsSec > rsSecEMA
+    string rsSecDir = rsSecUp ? "▲" : "▼"
+    color rsSecClr = rsSecUp ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 4, "RS vs Sec", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 4, na(rsSec) ? "N/A" : rsSecDir + " " + str.tostring(rsSec, "#.##"), text_color=txtW, bgcolor=na(rsSec) ? color.new(color.gray, 80) : rsSecClr, text_size=fontSize)
+
+    color mfClr = na(mansfield) ? color.new(color.gray, 80) : mansfield > 0 ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 5, "Mansfield", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 5, na(mansfield) ? "N/A" : str.tostring(mansfield, "#.#") + "%", text_color=txtW, bgcolor=mfClr, text_size=fontSize)
+
+    color wrsClr = weeklyRSup ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 6, "Weekly RS", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 6, na(rs) ? "N/A" : weeklyRSup ? "▲ rising" : "▼ falling", text_color=txtW, bgcolor=na(rs) ? color.new(color.gray, 80) : wrsClr, text_size=fontSize)
+
+    string h52Str = na(pctFrom52H) ? "NaN%" : str.tostring(pctFrom52H, "#") + "%"
+    string l52Str = na(pctFrom52L) ? "NaN%" : str.tostring(pctFrom52L, "#") + "%"
+    color hl52Clr = not na(pctFrom52H) and pctFrom52H >= 0 ? color.new(#00E676, 40) : color.new(color.gray, 70)
+    table.cell(t, 0, 7, "52W H/L", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 7, "|" + h52Str + " |" + l52Str, text_color=txtW, bgcolor=hl52Clr, text_size=fontSize)
+
+    table.cell(t, 0, 8, "Behavior", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 8, investEmoji + " " + investDecision + " " + str.tostring(investScore, "#") + "/100", text_color=txtW, bgcolor=investClr, text_size=fontSize)
+
+    table.cell(t, 0, 9, "Type", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 9, behavType + " " + str.tostring(maxBehav, "#") + "/100", text_color=txtW, bgcolor=behavClr, text_size=fontSize)
+
+    table.cell(t, 0, 10, "Position", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 10, posEmoji + " " + posState, text_color=txtW, bgcolor=posClr, text_size=fontSize)
+
+    string esText = posState == "NONE" ? "—" : not na(entryPrice) and not na(entryStop) ? str.tostring(entryPrice, "#.##") + " / " + str.tostring(entryStop, "#.##") : "—"
+    color esClr = posState == "NONE" ? color.new(color.gray, 80) : color.new(#2196F3, 60)
+    table.cell(t, 0, 11, "Entry/Stop", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 11, esText, text_color=txtW, bgcolor=esClr, text_size=fontSize)
+
+    string rrText = posState == "NONE" ? "—" : na(riskPct) ? "N/A" : "Risk " + str.tostring(riskPct, "#.#") + "%" + (not na(currentR) ? " | " + str.tostring(currentR, "#.#") + "R" : "")
+    color rrClr = posState == "NONE" ? color.new(color.gray, 80) : not na(currentR) and currentR >= 2 ? color.new(#00E676, 40) : not na(currentR) and currentR >= 1 ? color.new(color.green, 60) : not na(currentR) and currentR >= 0 ? color.new(color.gray, 70) : color.new(color.red, 60)
+    table.cell(t, 0, 12, "Risk/R", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 12, rrText, text_color=txtW, bgcolor=rrClr, text_size=fontSize)
+
+    string sizText = posState == "NONE" or na(sharesSize) ? "—" : str.tostring(sharesSize, "#") + " sh · ₹" + str.tostring(riskValueK, "#.#") + "k risk"
+    color sizClr = posState == "NONE" or na(sharesSize) ? color.new(color.gray, 80) : color.new(#2196F3, 60)
+    table.cell(t, 0, 13, "Sizing", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 13, sizText, text_color=txtW, bgcolor=sizClr, text_size=fontSize)
+
+    table.cell(t, 0, 14, "Pyramid", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 14, str.tostring(pyramidCount) + "/" + str.tostring(maxPyramidInput) + " adds", text_color=txtW, bgcolor=color.new(color.gray, 80), text_size=fontSize)
+
+    color atrClr = na(atrPct) ? color.new(color.gray, 80) : atrPct > 6 ? color.new(#FF9100, 40) : atrPct > 3 ? color.new(#FFD740, 50) : color.new(color.green, 60)
+    table.cell(t, 0, 15, "ATR %", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 15, na(atrPct) ? "N/A" : str.tostring(atrPct, "#.#") + "%", text_color=txtW, bgcolor=atrClr, text_size=fontSize)
+
+    bool hasVolSurge = not na(volSurgeRatio) and volSurgeRatio >= 1.5
+    string vsText = hasVolSurge ? str.tostring(volSurgeRatio, "#.#") + "x" : "—"
+    color vsClr = hasVolSurge ? color.new(#00E676, 40) : color.new(color.gray, 80)
+    table.cell(t, 0, 16, "Vol Surge", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 16, vsText, text_color=txtW, bgcolor=vsClr, text_size=fontSize)
+
+    color epsClr = na(epsYoY) ? color.new(color.gray, 80) : epsYoY > 0 ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 17, "EPS YoY", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 17, na(epsYoY) ? "N/A" : str.tostring(epsYoY, "#") + "%", text_color=txtW, bgcolor=epsClr, text_size=fontSize)
+
+    color revClr = na(revYoY) ? color.new(color.gray, 80) : revYoY > 0 ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 18, "Rev YoY", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 18, na(revYoY) ? "N/A" : str.tostring(revYoY, "#") + "%", text_color=txtW, bgcolor=revClr, text_size=fontSize)
+
+    string earnText = earningsSoon ? "⚠ ~soon" : lastQtrBar > 0 ? "ok" : "—"
+    color earnClr = earningsSoon ? color.new(#FF9100, 40) : lastQtrBar > 0 ? color.new(color.green, 60) : color.new(color.gray, 80)
+    table.cell(t, 0, 19, "Est. Earnings", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 19, earnText, text_color=txtW, bgcolor=earnClr, text_size=fontSize)
+
+    string regText = na(regimeEma50) or na(regimeEma200) ? "N/A" : regimeBull ? "▲ BULL" : "▼ BEAR"
+    color regClr = na(regimeEma50) or na(regimeEma200) ? color.new(color.gray, 80) : regimeBull ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 20, "Regime", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 20, regText, text_color=txtW, bgcolor=regClr, text_size=fontSize)
+
+    string tfModeText = timeframe.isweekly ? "Weekly" : timeframe.isdaily ? "Daily" : timeframe.ismonthly ? "Monthly" : "Other"
+    color tfModeClr = timeframe.isweekly ? color.new(#7C4DFF, 30) : timeframe.isdaily ? color.new(#00B8D4, 30) : color.new(color.gray, 60)
+    table.cell(t, 0, 21, "TF Mode", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 21, tfModeText, text_color=txtW, bgcolor=tfModeClr, text_size=fontSize)
+
+    if showDD
+        string ddText = str.tostring(ddCount) + " in " + str.tostring(ddWindow)
+        color ddClr = ddWarning ? color.new(#FF1744, 30) : ddCount >= (timeframe.isweekly ? 1 : 3) ? color.new(#FF9100, 40) : color.new(#00E676, 60)
+        table.cell(t, 0, 22, "Dist Days", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+        table.cell(t, 1, 22, ddText, text_color=txtW, bgcolor=ddClr, text_size=fontSize)
+
+    if showVCPBase
+        string vcpText = vcpBaseNum == 0 ? "—" : "B#" + str.tostring(vcpBaseNum) + (not na(vcpCurrDepth) ? " | " + str.tostring(vcpCurrDepth, "#.#") + "%" : "") + (not na(vcpBasePivot) ? " @" + str.tostring(vcpBasePivot, "#.#") : "")
+        color vcpBClr = vcpInBase ? color.new(#2196F3, 40) : vcpBaseNum > 0 ? color.new(color.green, 60) : color.new(color.gray, 80)
+        table.cell(t, 0, 23, "VCP Base", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+        table.cell(t, 1, 23, vcpText, text_color=txtW, bgcolor=vcpBClr, text_size=fontSize)
+
+    if showAVWAP
+        string avwapText = na(avwap) ? "—" : (close > avwap ? "▲ " : "▼ ") + str.tostring(avwap, "#.##")
+        color avwapClr = na(avwap) ? color.new(color.gray, 80) : close > avwap ? color.new(#00E676, 40) : color.new(#FF1744, 40)
+        table.cell(t, 0, 24, "AVWAP", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+        table.cell(t, 1, 24, avwapText, text_color=txtW, bgcolor=avwapClr, text_size=fontSize)
+
+    // v6.1: FTD row
+    string ftdText = ftdJustFired ? "✅ CONFIRMED" : regimeCorrDays >= 4 ? "⏳ Watching (" + str.tostring(regimeRallyDays) + "/4-7)" : regimeCorrDays >= 2 ? "📉 Correction D" + str.tostring(regimeCorrDays) : "—"
+    color ftdClr = ftdJustFired ? color.new(#00E676, 20) : regimeCorrDays >= 4 ? color.new(#FFD740, 40) : regimeCorrDays >= 2 ? color.new(#FF9100, 40) : color.new(color.gray, 80)
+    table.cell(t, 0, 25, "FTD", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 25, ftdText, text_color=txtW, bgcolor=ftdClr, text_size=fontSize)
+
+    // v6.1: RS Rank row
+    string rrankText = na(rsRank) ? "N/A" : str.tostring(rsRank, "#") + "/100"
+    color rrankClr = na(rsRank) ? color.new(color.gray, 80) : rsRank >= 75 ? color.new(#00E676, 40) : rsRank >= 50 ? color.new(#FFD740, 40) : color.new(#FF1744, 40)
+    table.cell(t, 0, 26, "RS Rank", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 26, rrankText, text_color=txtW, bgcolor=rrankClr, text_size=fontSize)
+
+    table.cell(t, 0, 27, "Sector", text_color=txtW, bgcolor=lblBg, text_size=fontSize)
+    table.cell(t, 1, 27, useAutoSector ? autoSector : rsSectorSymbol, text_color=txtW, bgcolor=color.new(#16213e, 40), text_size=fontSize)
+
+//====================================================
+// FUNDAMENTALS TABLE
+//====================================================
+var table ft = table.new(f_pos(fundPos), 8, 9, border_width=0)
+
+if barstate.islast
+    color hdrBg2  = color.new(#1a1a2e, 0)
+    color rowBg1 = color.new(#16213e, 0)
+    color rowBg2 = color.new(#0f3460, 0)
+    color txtW2   = color.white
+
+    float mcCr = na(marketCap) ? na : marketCap / CRORE
+    string capType = na(mcCr) ? " · Unknown" : mcCr >= 40000 ? " · Large Cap" : mcCr >= 8000 ? " · Mid Cap" : mcCr >= 500 ? " · Small Cap" : " · Micro Cap"
+    color capClr   = na(mcCr) ? color.yellow : mcCr >= 40000 ? color.new(#00E676, 0) : mcCr >= 8000 ? color.new(#FFD740, 0) : mcCr >= 500 ? color.new(#FF9100, 0) : color.new(#FF1744, 0)
+    string mcStr = na(marketCap) ? "N/A" : str.tostring(marketCap / CRORE, "#,###") + " Cr"
+    table.cell(ft, 0, 0, "Mkt Cap: " + mcStr + capType, text_color=capClr, bgcolor=hdrBg2, text_size=fontSize, text_halign=text.align_center)
+    for c = 1 to 7
+        table.cell(ft, c, 0, "", bgcolor=hdrBg2)
+    table.merge_cells(ft, 0, 0, 7, 0)
+
+    table.cell(ft, 0, 1, syminfo.sector, text_color=color.new(color.aqua, 0), bgcolor=hdrBg2, text_size=fontSize, text_halign=text.align_center)
+    table.cell(ft, 1, 1, "", bgcolor=hdrBg2)
+    table.cell(ft, 2, 1, "", bgcolor=hdrBg2)
+    table.cell(ft, 3, 1, "", bgcolor=hdrBg2)
+    table.cell(ft, 4, 1, syminfo.industry, text_color=color.new(color.aqua, 0), bgcolor=hdrBg2, text_size=fontSize, text_halign=text.align_center)
+    table.cell(ft, 5, 1, "", bgcolor=hdrBg2)
+    table.cell(ft, 6, 1, "", bgcolor=hdrBg2)
+    table.cell(ft, 7, 1, "", bgcolor=hdrBg2)
+    table.merge_cells(ft, 0, 1, 3, 1)
+    table.merge_cells(ft, 4, 1, 7, 1)
+
+    var array<string> hdrs = array.from("FQ", "NP", "YoY", "QoQ", "Sales", "YoY", "QoQ", "OPM")
+    for c = 0 to 7
+        table.cell(ft, c, 2, array.get(hdrs, c), text_color=txtW2, bgcolor=color.new(#533483, 0), text_size=fontSize)
+
+    for row = 0 to 4
+        int r = row + 3
+        color rBg = row % 2 == 0 ? rowBg1 : rowBg2
+        string lbl = array.get(q_lbl, row)
+        float np   = array.get(q_np, row)
+        float sal  = array.get(q_sales, row)
+        float oi   = array.get(q_oi, row)
+        float np4  = row + 4 < 9 ? array.get(q_np, row + 4) : na
+        float sal4 = row + 4 < 9 ? array.get(q_sales, row + 4) : na
+        float np1  = row + 1 < 9 ? array.get(q_np, row + 1) : na
+        float sal1 = row + 1 < 9 ? array.get(q_sales, row + 1) : na
+        float npYoY  = not na(np) and not na(np4) and np4 != 0 ? ((np - np4) / math.abs(np4)) * 100 : na
+        float npQoQ  = not na(np) and not na(np1) and np1 != 0 ? ((np - np1) / math.abs(np1)) * 100 : na
+        float salYoY = not na(sal) and not na(sal4) and sal4 != 0 ? ((sal - sal4) / math.abs(sal4)) * 100 : na
+        float salQoQ = not na(sal) and not na(sal1) and sal1 != 0 ? ((sal - sal1) / math.abs(sal1)) * 100 : na
+        float opm    = not na(oi) and not na(sal) and sal != 0 ? (oi / sal) * 100 : na
+        color npYoYbg  = na(npYoY)  ? rBg : npYoY  > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+        color npQoQbg  = na(npQoQ)  ? rBg : npQoQ  > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+        color salYoYbg = na(salYoY) ? rBg : salYoY > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+        color salQoQbg = na(salQoQ) ? rBg : salQoQ > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+        table.cell(ft, 0, r, lbl != "" ? lbl : "--", text_color=txtW2, bgcolor=rBg, text_size=fontSize)
+        table.cell(ft, 1, r, na(np) ? "--" : str.tostring(np / CRORE, "#"), text_color=txtW2, bgcolor=rBg, text_size=fontSize)
+        table.cell(ft, 2, r, na(npYoY) ? "--" : str.tostring(npYoY, "#") + "%", text_color=txtW2, bgcolor=npYoYbg, text_size=fontSize)
+        table.cell(ft, 3, r, na(npQoQ) ? "--" : str.tostring(npQoQ, "#") + "%", text_color=txtW2, bgcolor=npQoQbg, text_size=fontSize)
+        table.cell(ft, 4, r, na(sal) ? "--" : str.tostring(sal / CRORE, "#"), text_color=txtW2, bgcolor=rBg, text_size=fontSize)
+        table.cell(ft, 5, r, na(salYoY) ? "--" : str.tostring(salYoY, "#") + "%", text_color=txtW2, bgcolor=salYoYbg, text_size=fontSize)
+        table.cell(ft, 6, r, na(salQoQ) ? "--" : str.tostring(salQoQ, "#") + "%", text_color=txtW2, bgcolor=salQoQbg, text_size=fontSize)
+        table.cell(ft, 7, r, na(opm) ? "--" : str.tostring(opm, "#.#") + "%", text_color=txtW2, bgcolor=rBg, text_size=fontSize)
+
+//====================================================
+// INSIDER / INSTITUTIONAL ACTIVITY DETECTOR
+//====================================================
+volRatio     = volume / volMA
+priceRange   = high - low
+closePos     = priceRange > 0 ? (close - low) / priceRange : 0.5
+
+accumulation = not na(volSurgeRatio) and volSurgeRatio > 2.0 and closePos > 0.6 and close > close[1]
+distribution = not na(volSurgeRatio) and volSurgeRatio > 2.0 and closePos < 0.4 and close < close[1]
+// F20: Fixed stealth — was always false (SMA vs SMA identical). Use 5-bar short SMA vs baseline.
+float volShortSMA = ta.sma(volume, 5)
+stealth      = not na(volMA) and volMA > 0 and volShortSMA > volMA * 1.5 and not na(atr) and atr > 0 and math.abs(close - close[p_volMA]) / atr < 0.5 and close > ema50
+
+accum_trigger = accumulation and not accumulation[1]
+dist_trigger  = distribution and not distribution[1]
+stealth_trigger = stealth and not stealth[1]
+
+plotshape(showInsider and accum_trigger and trendOk, title="Accumulation", text="ACC", style=shape.labelup, location=location.belowbar, color=color.new(#00E676, 0), textcolor=color.black, size=size.small)
+plotshape(showInsider and dist_trigger, title="Distribution", text="DIST", style=shape.labeldown, location=location.abovebar, color=color.new(#FF1744, 0), textcolor=color.white, size=size.small)
+plotshape(showInsider and stealth_trigger and trendOk, title="Stealth Accumulation", text="🕵", style=shape.labelup, location=location.belowbar, color=color.new(#7C4DFF, 0), textcolor=color.white, size=size.small)
+
+//====================================================
+// SIGNAL LEGEND TABLE (F23: fixed creation leak)
+//====================================================
+var table legend = na
+
+if showLegend and barstate.islast
+    // F23: only create table once, not every tick
+    if na(legend)
+        legend := table.new(f_pos(legendPos), 2, 41, border_width=1)
+    color lBg  = color.new(#1a1a2e, 10)
+    color lBg2 = color.new(#0f3460, 10)
+    color lHdr = color.new(#533483, 0)
+    color lSec = color.new(#1B5E20, 0)
+    color lNew = color.new(#0D47A1, 0)
+
+    table.cell(legend, 0, 0, "Signal", text_color=color.white, bgcolor=lHdr, text_size=legendSize)
+    table.cell(legend, 1, 0, "How to Read", text_color=color.white, bgcolor=lHdr, text_size=legendSize)
+
+    table.cell(legend, 0, 1, "🟢 A", text_color=color.green, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 1, "Trend breakout — EMA aligned + RSI > 55 + ADX (40pts)", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 2, "🟢 B", text_color=color.lime, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 2, "Donchian breakout — channel high + volume surge (30pts)", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 3, "🟢 C", text_color=color.teal, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 3, "52W breakout — Yearly high + RS outperforming (30pts)", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 4, "🔵 STRONG", text_color=color.blue, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 4, "Score ≥70 — Highest conviction, suppresses A/B/C", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 5, "🟣 P", text_color=color.new(#7C4DFF, 0), bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 5, "Pocket Pivot — up day vol > max down-vol (Daily only)", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 6, "🔴 X", text_color=color.red, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 6, "Momentum loss — Below EMA20 + RSI < 45 → REDUCE 50%", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 7, "🔴 Y", text_color=color.maroon, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 7, "Trend weakness — Below EMA50 + RS < RS EMA → EXIT", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 8, "🟠 Z", text_color=color.orange, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 8, "Trend breakdown — Below EMA200 + strong ADX → EXIT", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 9, "◆", text_color=color.orange, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 9, "Donchian — Close crosses channel high (20D / 10W)", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 10, "🔥 52W", text_color=color.yellow, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 10, "52-week high — Major breakout level", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 11, "▲", text_color=color.purple, bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 11, "RS high — Relative Strength at multi-month peak", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 12, "ACC", text_color=color.new(#00E676, 0), bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 12, "Accumulation — 2x vol + close in upper 60%", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 13, "DIST", text_color=color.new(#FF1744, 0), bgcolor=lBg, text_size=legendSize)
+    table.cell(legend, 1, 13, "Distribution — 2x vol + close in lower 40%", text_color=color.white, bgcolor=lBg, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 14, "v6.0", text_color=color.white, bgcolor=lNew, text_size=legendSize)
+    table.cell(legend, 1, 14, "DD + VCP Base + AVWAP + Auto-Sector + Regime Hybrid", text_color=color.white, bgcolor=lNew, text_size=legendSize)
+    table.cell(legend, 0, 15, "🟢 ENTRY", text_color=color.new(#00E676, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 15, "Buy signal — initiate new position", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 16, "🔵 HOLD", text_color=color.new(#2196F3, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 16, "In trend, above stop — maintain position", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 17, "🟢 ADD", text_color=color.new(#00E676, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 17, "New signal while holding — pyramid opportunity", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 18, "🟡 TIGHTEN", text_color=color.new(#FFD740, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 18, "Early warning — RS weakening, tighten stop", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 19, "🟠 REDUCE", text_color=color.new(#FF9100, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 19, "Sell X fired — 50% partial exit executed", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 20, "🔴 EXIT", text_color=color.new(#FF1744, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 20, "Sell Y/Z fired — full exit", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 21, "🔷 VCP", text_color=color.new(#2196F3, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 21, "Volatility Contraction — base in Stage 2 or 2E", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 22, "STAGES", text_color=color.white, bgcolor=lSec, text_size=legendSize)
+    table.cell(legend, 1, 22, "Stan Weinstein Stage Analysis (w/ hysteresis)", text_color=color.white, bgcolor=lSec, text_size=legendSize)
+    table.cell(legend, 0, 23, "STAGE 1", text_color=color.gray, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 23, "Basing — EMA200 flat, price above it", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 24, "STAGE 2E", text_color=color.new(#66BB6A, 0), bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 24, "Early advance — EMA200 recently turned up (22pts)", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 25, "STAGE 2", text_color=color.green, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 25, "Confirmed advance — EMA200 net-rising (30pts)", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 26, "STAGE 3", text_color=color.orange, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 26, "Distribution — price below EMA150, above EMA200", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 27, "STAGE 4", text_color=color.red, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 27, "Decline — everything else (0pts)", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 28, "MARKET", text_color=color.white, bgcolor=lSec, text_size=legendSize)
+    table.cell(legend, 1, 28, "Macro Context & v6.0 Fixes", text_color=color.white, bgcolor=lSec, text_size=legendSize)
+    table.cell(legend, 0, 29, "Regime", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 29, "Nifty EMA50 vs EMA200 — buys blocked in BEAR", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 30, "Dist Days", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 30, "O'Neil 5-in-25 — ≥5 distribution days = caution", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 31, "VCP Base", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 31, "Base # + pivot + contraction depth (Minervini)", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 32, "AVWAP", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 32, "Anchored VWAP from last Stage 2 transition (gold)", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 33, "Sector", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 33, "Auto-detected from syminfo.industry (Bank/IT/Pharma...)", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 34, "TF Mode", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 34, "Daily / Weekly — shows which lookback profile is active", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 35, "TABLE", text_color=color.white, bgcolor=lSec, text_size=legendSize)
+    table.cell(legend, 1, 35, "Summary Row Guide", text_color=color.white, bgcolor=lSec, text_size=legendSize)
+    table.cell(legend, 0, 36, "Trend Tmpl", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 36, "0-8 Minervini criteria: EMAs, 52W range, RS", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 37, "Behavior", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 37, "Composite score: Stage(30)+TT(25)+RS(20)+Type(25)", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 38, "Type", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 38, "GROWTH / CYCLICAL / DEFENSIVE / TURNAROUND classifier", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 39, "ATR %", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 39, "ATR/Price × 100 — <3% low, 3-6% med, >6% high vol", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+    table.cell(legend, 0, 40, "Position", text_color=color.aqua, bgcolor=lBg2, text_size=legendSize)
+    table.cell(legend, 1, 40, "State machine: ENTRY→HOLD→TIGHTEN/REDUCE→EXIT", text_color=color.white, bgcolor=lBg2, text_size=legendSize, text_halign=text.align_left)
+
+else if not showLegend and not na(legend)
+    table.delete(legend)
+    legend := na
+
+//====================================================
+// ALERTS (F24: standardized isconfirmed gating)
+//====================================================
+alertcondition(strongBuy and barstate.isconfirmed, title="STRONG BUY", message="🚀 STRONG BUY — {{ticker}} score 70+ in trending regime")
+alertcondition(showA and barstate.isconfirmed, title="BUY A", message="BUY A — {{ticker}} trend breakout")
+alertcondition(showB and barstate.isconfirmed, title="BUY B", message="BUY B — {{ticker}} Donchian breakout")
+alertcondition(showC and barstate.isconfirmed, title="BUY C", message="BUY C — {{ticker}} 52W high breakout")
+alertcondition(sellX and barstate.isconfirmed, title="SELL X", message="SELL X — {{ticker}} below EMA20 + weak RSI → REDUCE 50%")
+alertcondition(sellY and barstate.isconfirmed, title="SELL Y", message="SELL Y — {{ticker}} below EMA50 + RS weakness → EXIT")
+alertcondition(sellZ and barstate.isconfirmed, title="SELL Z", message="SELL Z — {{ticker}} below EMA200 + strong ADX → EXIT")
+
+alertcondition(posState == "ENTRY" and posState[1] == "NONE" and barstate.isconfirmed, title="POSITION: ENTRY", message="🟢 ENTRY — {{ticker}} new position")
+alertcondition(posState == "ADD" and posState[1] != "ADD" and barstate.isconfirmed, title="POSITION: ADD", message="🟢 ADD — {{ticker}} pyramid add")
+alertcondition(posState == "TIGHTEN" and posState[1] != "TIGHTEN" and barstate.isconfirmed, title="POSITION: TIGHTEN", message="🟡 TIGHTEN — {{ticker}} tighten stops")
+alertcondition(posState == "REDUCE" and posState[1] != "REDUCE" and barstate.isconfirmed, title="POSITION: REDUCE", message="🟠 REDUCE — {{ticker}} 50% partial exit")
+alertcondition(posState == "EXIT" and posState[1] != "EXIT" and barstate.isconfirmed, title="POSITION: EXIT", message="🔴 EXIT — {{ticker}} exit position")
+alertcondition(showVCP and vcpTrigger and barstate.isconfirmed, title="VCP SETUP", message="🔷 VCP — {{ticker}} Volatility Contraction in Stage 2/2E")
+alertcondition(earningsSoon and not earningsSoon[1] and barstate.isconfirmed, title="EARNINGS WARNING", message="⚠ EARNINGS — {{ticker}} results estimated soon")
+alertcondition(stage2early and not stage2early[1] and barstate.isconfirmed, title="STAGE 2E ENTRY", message="◐ STAGE 2E — {{ticker}} EMA200 turning up, early advance")
+alertcondition(showPocket and showP and barstate.isconfirmed, title="BUY P (Pocket Pivot)", message="🟣 POCKET PIVOT — {{ticker}} O'Neil pocket pivot inside base")
+alertcondition(regimeFlip and regimeBull and barstate.isconfirmed, title="REGIME: BULL", message="🟢 REGIME ON — Market index turned bullish; buys re-enabled")
+alertcondition(regimeFlip and not regimeBull and barstate.isconfirmed, title="REGIME: BEAR", message="🔴 REGIME OFF — Market index turned bearish; buys blocked")
+alertcondition(newHigh52 and barstate.isconfirmed, title="52W HIGH", message="🔥 52W HIGH — {{ticker}} new 52-week high breakout")
+alertcondition(rsHigh and barstate.isconfirmed, title="RS NEW HIGH", message="▲ RS HIGH — {{ticker}} Relative Strength at new high")
+alertcondition(showInsider and accum_trigger and trendOk and barstate.isconfirmed, title="ACCUMULATION", message="ACC — {{ticker}} institutional accumulation detected")
+alertcondition(showInsider and dist_trigger and barstate.isconfirmed, title="DISTRIBUTION", message="DIST — {{ticker}} institutional distribution detected")
+alertcondition(showInsider and stealth_trigger and trendOk and barstate.isconfirmed, title="STEALTH ACCUMULATION", message="🕵 STEALTH — {{ticker}} stealth accumulation detected")
+alertcondition(ddJustHit and barstate.isconfirmed, title="DISTRIBUTION DAY WARNING", message="⚠ DIST DAYS — Regime index has 5+ distribution days in 25 sessions; reduce risk")
+alertcondition(vcpBreakout and barstate.isconfirmed, title="VCP BASE BREAKOUT", message="🔷 VCP B# — {{ticker}} base breakout above pivot on volume")
+alertcondition(ftdJustFired and barstate.isconfirmed, title="FOLLOW-THROUGH DAY", message="✅ FTD — Market index confirmed follow-through day; rally attempt validated")
+
+//====================================================
+// v6.0 BACKTEST ENGINE (F01/F02/F05/F25/F26)
+//====================================================
+// F26: bt_autoStart uses float to prevent integer overflow
+bool bt_useAuto      = input.bool(false, "Auto Backtest Window", group="Backtest Window", tooltip="When ON, backtests only trailing window. Unreliable for historical analysis — prefer manual dates.")
+int  bt_fromYear     = input.int(2020, "From Year",  group="Backtest Window")
+int  bt_fromMonth    = input.int(1,    "From Month", minval=1, maxval=12, group="Backtest Window")
+int  bt_fromDay      = input.int(1,    "From Day",   minval=1, maxval=31, group="Backtest Window")
+int  bt_lookbackBars = timeframe.isweekly ? 52 : 252   // 1 year default for auto mode
+float bt_autoStart   = float(time) - float(bt_lookbackBars) * float(timeframe.in_seconds(timeframe.period)) * 1000.0
+int  bt_manualStart  = timestamp(bt_fromYear, bt_fromMonth, bt_fromDay, 0, 0)
+bool inWindow        = bt_useAuto ? (float(time) >= bt_autoStart) : (time >= bt_manualStart)
+bool bt_enable       = input.bool(true, "Enable Backtest Orders", group="Backtest Window", tooltip="Turn OFF to run as pure indicator (tables only, no strategy orders).")
+
+//====================================================
+// F02: Unified entry ID — F05: Pyramid sizing reduction
+//====================================================
+int bt_qty = na(sharesSize) or sharesSize < 1 ? 1 : int(sharesSize)
+
+// F05: Pyramid sizing: 100% initial, 50% add1, 25% add2+
+f_pyramidQty(baseQty, pyrCount) =>
+    pyrCount == 0 ? baseQty : pyrCount == 1 ? math.max(int(baseQty * 0.5), 1) : math.max(int(baseQty * 0.25), 1)
+
+if bt_enable and barstate.isconfirmed
+    // F02+F13: Use unified "Long" entry ID. Strategy signals (regime-gated) for entries.
+    if (strongBuy or stratA or stratB or stratC) and strategy.position_size == 0 and inWindow
+        strategy.entry("Long", strategy.long, qty=f_pyramidQty(bt_qty, 0))
+
+    // Pyramid adds — F02: same "Long" ID, F05: reduced sizing
+    if (stratA or stratB or stratC) and strategy.position_size > 0 and pyramidCount < maxPyramidInput and inWindow
+        strategy.entry("Long", strategy.long, qty=f_pyramidQty(bt_qty, pyramidCount + 1))
+
+    // Protective bracket: stop = entryStop (includes hard stop), target = 2R
+    if strategy.position_size > 0 and not na(entryStop) and not na(target2R) and target2R > entryStop
+        strategy.exit("Bracket", from_entry="Long", stop=entryStop, limit=target2R)
+
+    // F25: REDUCE triggers real 50% partial exit
+    if posState == "REDUCE" and posState[1] != "REDUCE" and strategy.position_size > 0
+        strategy.close("Long", qty_percent=50, comment="REDUCE 50%")
+
+    // Hard exits from sell logic
+    if sellZ or sellY
+        strategy.close_all(comment="EXIT Y/Z")
+
+// ══════════════════════════════════════════════════════════════════════
+// END ISME v6.1
+// VALIDATE in Strategy Tester + walk-forward before trusting panel metrics.
+// ══════════════════════════════════════════════════════════════════════

@@ -1,0 +1,948 @@
+//@version=6
+// ══════════════════════════════════════════════════════════════════════
+// ██╗███████╗███╗   ███╗███████╗
+// ██║██╔════╝████╗ ████║██╔════╝
+// ██║███████╗██╔████╔██║█████╗
+// ██║╚════██║██║╚██╔╝██║██╔══╝
+// ██║███████║██║ ╚═╝ ██║███████╗
+// ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
+//
+// Institutional Stage Momentum Engine (ISME)
+// A multi-factor swing-trading indicator combining Minervini-style
+// stage analysis, institutional activity detection, relative strength
+// ranking, and quarterly financial validation.
+//
+// ── HOW TO USE ──────────────────────────────────────────────────────
+// • Apply to any NSE/BSE equity on Daily or Weekly timeframe.
+// • The background color (green/red) shows whether the stock is
+//   outperforming or underperforming the benchmark (RS vs RS EMA).
+// • Use the Summary Table (top-right) for an at-a-glance scorecard.
+// • Use the Fundamentals Table (bottom-right) for quarterly NP/Sales.
+// • Enable "Show Signal Legend" to see what every marker means.
+//
+// ── SIGNAL REFERENCE ────────────────────────────────────────────────
+//  BUY A  — Trend alignment breakout (EMA stack + RSI + ADX)  [40 pts]
+//  BUY B  — Donchian 20-day channel breakout + volume surge   [30 pts]
+//  BUY C  — 52-week high breakout + RS outperformance         [30 pts]
+//  STRONG — Combined score ≥ 70, highest-conviction signal
+//  SELL X — Momentum loss (below EMA20 + RSI < 45)
+//  SELL Y — Trend weakness (below EMA50 + RS < RS EMA)
+//  SELL Z — Trend breakdown (below EMA200 + strong ADX)
+//
+// ── STAGE ANALYSIS ──────────────────────────────────────────────────
+//  Stage 1 — Basing: price above EMA200, flat 200-day MA
+//  Stage 2 — Advancing: price above EMA150, EMA150 > EMA200, rising
+//  Stage 3 — Distribution: price below EMA150 but above EMA200
+//  Stage 4 — Declining: everything else
+//
+// ── NON-REPAINTING ──────────────────────────────────────────────────
+// All signals use confirmed bar data only. request.security calls use
+// lookahead=barmerge.lookahead_off. The 52-week high excludes the
+// current bar (high[1]). All triggers are state-transition based
+// (fire once on the bar the condition first becomes true).
+//
+// ── DISCLAIMER ──────────────────────────────────────────────────────
+// This indicator is for educational and informational purposes only.
+// It does not constitute financial advice. Past performance is not
+// indicative of future results. Always do your own research before
+// making trading decisions.
+//
+// @author @shaktimaan
+// ══════════════════════════════════════════════════════════════════════
+
+indicator("Institutional Stage Momentum Engine (ISME)", shorttitle="ISME", overlay=true, max_labels_count=500, max_bars_back=500)
+
+//====================================================
+// INPUTS
+//====================================================
+lengthADX     = input.int(14, "Length ADX", group="Trend & Momentum", tooltip="Period for Average Directional Index calculation. Higher values smooth the trend strength reading.")
+thresholdADX  = input.int(14, "Threshold ADX", group="Trend & Momentum", tooltip="Minimum ADX value required for trend confirmation. Signals below this are considered choppy.")
+
+lengthRSI     = input.int(14, "Length RSI", group="Trend & Momentum", tooltip="Period for Relative Strength Index. Standard is 14.")
+
+sarStart      = input.float(0.02, "SAR Start", group="Parabolic SAR", tooltip="Initial acceleration factor for Parabolic SAR. Lower values create a tighter trailing stop.")
+sarInc        = input.float(0.02, "SAR Increment", group="Parabolic SAR", tooltip="Increment added to SAR acceleration factor after each new extreme. Controls how quickly SAR catches up.")
+sarMax        = input.float(0.2, "SAR Max Value", group="Parabolic SAR", tooltip="Maximum acceleration factor for SAR. Caps how aggressively the stop tightens.")
+
+rsSymbol      = input.symbol("NSE:NIFTY", "RS Index", group="Relative Strength", tooltip="Benchmark index for Relative Strength calculation. Default is NSE:NIFTY for Indian markets. Change to SPX for US markets.")
+rsMAPeriod    = input.int(10, "RS MA Period", group="Relative Strength", tooltip="EMA period applied to the RS ratio line. Shorter periods react faster to RS changes.")
+
+showSAR       = input.bool(true, "Show Parabolic SAR", group="Display", tooltip="Toggle Parabolic SAR dots on the chart.")
+showInsider   = input.bool(true, "Show Insider Activity", group="Display", tooltip="Toggle insider/institutional activity detection labels (ACC, DIST, Stealth).")
+showLegend    = input.bool(false, "Show Signal Legend", group="Display", tooltip="Show a detailed signal legend table explaining all markers and signals.")
+tableFontSize = input.string("Normal", "Table Font Size", options=["Small", "Normal", "Large"], group="Display", tooltip="Font size for all on-chart tables.")
+
+// Table position settings
+summaryPos    = input.string("Top Right", "Summary Table Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Table Positions", tooltip="Position of the main summary table showing Stage, Score, RS, ADX, RSI, and financials.")
+fundPos       = input.string("Bottom Right", "Fundamentals Table Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Table Positions", tooltip="Position of the quarterly fundamentals table showing NP, Sales, OPM data.")
+legendPos     = input.string("Bottom Left", "Legend Table Position", options=["Top Left", "Top Right", "Bottom Left", "Bottom Right"], group="Table Positions", tooltip="Position of the signal legend reference table.")
+
+fontSize = tableFontSize == "Small" ? size.small : tableFontSize == "Large" ? size.large : size.normal
+
+// Helper: convert position string to Pine position constant
+f_pos(string p) =>
+    p == "Top Left" ? position.top_left : p == "Top Right" ? position.top_right : p == "Bottom Left" ? position.bottom_left : position.bottom_right
+
+//====================================================
+// CORE CALCULATIONS
+//====================================================
+
+// EMAs
+ema20  = ta.ema(close, 20)
+ema50  = ta.ema(close, 50)
+ema150 = ta.ema(close, 150)
+ema200 = ta.ema(close, 200)
+
+// RSI
+rsi = ta.rsi(close, lengthRSI)
+
+// ADX — extracted to global scope to avoid Pine v6 lazy-eval issues
+[diplus, diminus, adx] = ta.dmi(lengthADX, lengthADX)
+
+// ATR
+atr = ta.atr(14)
+
+// SAR — now actually plotted (was computed but wasted before)
+psar = ta.sar(sarStart, sarInc, sarMax)
+
+// Donchian
+donHigh = ta.highest(high, 20)
+donLow  = ta.lowest(low, 20)
+
+// 52 Week High (NO REPAINT — uses high[1] to exclude current bar)
+high52 = ta.highest(high[1], 252)
+
+// Volume Average
+volMA = ta.sma(volume, 20)
+
+//====================================================
+// RELATIVE STRENGTH
+//====================================================
+indexClose = request.security(rsSymbol, timeframe.period, close, lookahead=barmerge.lookahead_off)
+
+rs = not na(indexClose) and indexClose > 0 ? close / indexClose : na
+
+rsEMA = ta.ema(rs, rsMAPeriod)
+
+//====================================================
+// BACKGROUND COLOR (RS)
+//====================================================
+bgBull = rs > rsEMA
+
+bgcolor(bgBull ? color.new(#00E676, 82) : color.new(#FF1744, 82))
+
+//====================================================
+// MA CROSSOVER BAND (fill between EMAs — no Y-axis stretch)
+//====================================================
+bullBand = ema20 > ema50
+
+p_ema20 = plot(ema20, color=color.new(color.aqua, 60), linewidth=1, title="EMA 20")
+p_ema50 = plot(ema50, color=color.new(color.orange, 60), linewidth=1, title="EMA 50")
+
+fill(p_ema20, p_ema50,
+     color = bullBand ? color.new(color.lime, 85) : color.new(color.red, 85),
+     title = "MA Band Fill"
+)
+
+//====================================================
+// MINERVINI TREND TEMPLATE
+//====================================================
+trendTemplate = (
+    close > ema50 and
+    close > ema150 and
+    close > ema200 and
+    ema50 > ema150 and
+    ema150 > ema200
+)
+
+//====================================================
+// STOCK BEHAVIOR TYPE CLASSIFIER (chart-based component)
+//====================================================
+// Chart metrics (computed early, financial blend added after quarterly data)
+float bVol      = ta.stdev(close, 100) / close * 100
+float bMaxDD    = (ta.highest(close, 252) - ta.lowest(close, 252)) / ta.highest(close, 252) * 100
+float trendPersist = ta.sma(close > ema50 ? 1.0 : 0.0, 100) * 100
+float rsBonus      = not na(rs) and not na(rsEMA) and rs > rsEMA ? 20.0 : 0.0
+float growthRate   = (close - close[100]) / close[100] * 100
+float slopeShort   = ta.linreg(close, 20, 0)
+float slopeLong    = ta.linreg(close, 100, 0)
+float slopeChange  = slopeShort - slopeLong
+float baseBreak    = close > ta.highest(close, 60)[1] ? 30.0 : 0.0
+
+// Chart-only raw scores (0-100)
+float chartCyclical  = math.min(bVol * 3 + bMaxDD, 100)
+float chartGrowth    = math.min(trendPersist + rsBonus, 100)
+float chartDefensive = math.min(math.max(100 - bVol * 5 - math.abs(growthRate), 0), 100)
+float chartTurnaround = math.min(math.max(slopeChange / atr * 10 + baseBreak, 0), 100)
+
+// Final blended scores (updated after financial data)
+var float cyclicalScore  = 0.0
+var float growthScore    = 0.0
+var float defensiveScore = 0.0
+var float turnaroundScore = 0.0
+var string behavType = "--"
+var color behavClr = color.gray
+var float maxBehav = 0.0
+
+//====================================================
+// MARKET REGIME FILTER
+//====================================================
+trendOk = adx > 18 and ema50 > ema200
+
+// Cooldown: prevent signal spam (5-bar minimum gap)
+var int lastBuyBar = 0
+cooldownOk = bar_index - lastBuyBar >= 5
+buyAllowed = trendOk and cooldownOk
+
+//====================================================
+// BUY CONDITIONS (STATE → TRIGGER, regime-gated)
+//====================================================
+buyA_state = (
+    close > ema20 and
+    ema20 > ema50 and
+    rsi > 55 and
+    adx > thresholdADX and
+    trendTemplate
+)
+buyA_raw = buyA_state and not buyA_state[1]
+buyA = buyA_raw and buyAllowed
+
+// B = Donchian breakout (clean crossover)
+buyB_raw = ta.crossover(close, ta.highest(high, 20)[1]) and volume > volMA
+buyB = buyB_raw and buyAllowed
+
+// C = 52W High breakout
+buyC_state = (
+    close >= high52 and
+    not na(rs) and rs > rsEMA
+)
+buyC_raw = buyC_state and not buyC_state[1]
+buyC = buyC_raw and buyAllowed
+
+//====================================================
+// WEIGHTED INSTITUTIONAL SCORING (0-100)
+//====================================================
+wScore = (buyA_state ? 40.0 : 0.0) + (buyB_raw ? 30.0 : 0.0) + (buyC_state ? 30.0 : 0.0)
+
+strongBuy_state = wScore >= 70
+strongBuy_raw = strongBuy_state and not strongBuy_state[1]
+strongBuy = strongBuy_raw and buyAllowed
+
+// Update cooldown on STRONG BUY
+if strongBuy
+    lastBuyBar := bar_index
+
+// Signal hierarchy: suppress A/B/C when STRONG fires
+showA = buyA and not strongBuy
+showB = buyB and not strongBuy
+showC = buyC and not strongBuy
+
+//====================================================
+// SELL CONDITIONS (always fire — never suppress risk signals)
+//====================================================
+sellX_state = close < ema20 and rsi < 45
+sellX_raw = sellX_state and not sellX_state[1]
+
+sellY_state = close < ema50 and not na(rs) and rs < rsEMA
+sellY_raw = sellY_state and not sellY_state[1]
+
+sellZ_state = close < ema200 and adx > thresholdADX
+sellZ = sellZ_state and not sellZ_state[1]
+
+// Sell hierarchy: suppress X/Y when Z fires
+sellX = sellX_raw and not sellZ
+sellY = sellY_raw and not sellZ
+
+//====================================================
+// STRUCTURE-BASED STOP (swing low — more institutional than ATR)
+//====================================================
+longStop = ta.lowest(low, 10)
+
+plot(
+     longStop,
+     color=color.new(color.red, 30),
+     linewidth=1,
+     style=plot.style_stepline,
+     title="Swing Stop"
+)
+
+//====================================================
+// PARABOLIC SAR (now actually plotted)
+//====================================================
+plot(
+     showSAR ? psar : na,
+     style=plot.style_cross,
+     color=close > psar ? color.green : color.red,
+     linewidth=1,
+     title="Parabolic SAR"
+)
+
+//====================================================
+// RS NEW HIGH (FIX: exclude current bar + first-occurrence only)
+//====================================================
+rsHighPrev  = ta.highest(rs[1], 100)
+rsHigh      = rs >= rsHighPrev and rs[1] < rsHighPrev[1]
+
+plotshape(
+     rsHigh,
+     title="RS High",
+     style=shape.triangleup,
+     location=location.belowbar,
+     color=color.purple,
+     size=size.small
+)
+
+//====================================================
+// BUY SHAPES (now trigger-based — fire once, not every bar)
+//====================================================
+plotshape(
+     showA,
+     title="BUY A",
+     text="A",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.green,
+     textcolor=color.white,
+     size=size.small
+)
+
+plotshape(
+     showB,
+     title="BUY B",
+     text="B",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.lime,
+     textcolor=color.black,
+     size=size.small
+)
+
+plotshape(
+     showC,
+     title="BUY C",
+     text="C",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.teal,
+     textcolor=color.white,
+     size=size.small
+)
+
+plotshape(
+     strongBuy,
+     title="STRONG BUY",
+     text="STRONG",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.blue,
+     textcolor=color.white,
+     size=size.normal
+)
+
+//====================================================
+// SELL SHAPES (now trigger-based)
+//====================================================
+plotshape(
+     sellX,
+     title="SELL X",
+     text="X",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.red,
+     textcolor=color.white,
+     size=size.small
+)
+
+plotshape(
+     sellY,
+     title="SELL Y",
+     text="Y",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.maroon,
+     textcolor=color.white,
+     size=size.small
+)
+
+plotshape(
+     sellZ,
+     title="SELL Z",
+     text="Z",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.orange,
+     textcolor=color.white,
+     size=size.small
+)
+
+//====================================================
+// DONCHIAN DOT (FIX: first-occurrence trigger only)
+//====================================================
+donBreak = ta.crossover(close, ta.highest(high, 20)[1])
+
+plotshape(
+     donBreak,
+     title="Donchian",
+     style=shape.diamond,
+     location=location.abovebar,
+     color=color.orange,
+     size=size.small
+)
+
+//====================================================
+// 52W HIGH FLAG (FIX: first-occurrence trigger only)
+//====================================================
+newHigh52 = close >= high52 and close[1] < ta.highest(high[2], 252)
+
+plotshape(
+     newHigh52,
+     title="52W High",
+     text="52W\n🔥",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.new(#FFD700, 0),
+     textcolor=color.black,
+     size=size.normal
+)
+
+//====================================================
+// STAGE ANALYSIS
+//====================================================
+
+// Stage 2 = Advancing (most specific — checked first)
+stage2 = (
+    close > ema150 and
+    ema150 > ema200 and
+    ta.rising(ema200, 20)
+)
+
+// Stage 1 = Base (explicitly NOT Stage 2)
+stage1 = (
+    not stage2 and
+    close > ema200 and
+    not ta.rising(ema200, 10) and
+    not ta.falling(ema200, 10)
+)
+
+// Stage 3 = Distribution (explicitly NOT Stage 1 or 2)
+stage3 = (
+    not stage2 and not stage1 and
+    close < ema150 and
+    close > ema200
+)
+
+// Stage 4 = Everything else (declining)
+stage4 = not stage2 and not stage1 and not stage3
+
+// FIX: Check Stage 2 FIRST (most specific/actionable), then Stage 1
+// Original had Stage 1 first which masked Stage 2 due to overlap
+stageText =
+     stage2 ? "STAGE 2 - ADVANCING" :
+     stage1 ? "STAGE 1 - BASE" :
+     stage3 ? "STAGE 3 - DISTRIBUTION" :
+     "STAGE 4 - DECLINING"
+
+stageColor =
+     stage2 ? color.green :
+     stage1 ? color.gray :
+     stage3 ? color.orange :
+     color.red
+
+//====================================================
+// STAGE LABEL
+//====================================================
+var label stageLabel = na
+
+if barstate.islast
+    label.delete(stageLabel)
+
+    stageLabel := label.new(
+         bar_index,
+         high + atr * 3,
+         stageText,
+         style=label.style_label_down,
+         color=stageColor,
+         textcolor=color.white,
+         size=size.normal
+    )
+
+//====================================================
+// FINANCIAL DATA (FIX: use ticker.standard + ignore_invalid_symbol)
+//====================================================
+string cleanTicker = ticker.standard(syminfo.tickerid)
+
+revenue = request.financial(
+     cleanTicker,
+     "TOTAL_REVENUE",
+     "FQ",
+     ignore_invalid_symbol=true
+)
+
+profit = request.financial(
+     cleanTicker,
+     "NET_INCOME",
+     "FQ",
+     ignore_invalid_symbol=true
+)
+
+// Shares outstanding for Market Cap & Free Float (more reliable than MARKET_CAP for NSE)
+totalShares = request.financial(
+     cleanTicker,
+     "TOTAL_SHARES_OUTSTANDING",
+     "FQ",
+     ignore_invalid_symbol=true
+)
+
+floatShares = request.financial(
+     cleanTicker,
+     "FLOAT_SHARES_OUTSTANDING",
+     "FQ",
+     ignore_invalid_symbol=true
+)
+
+operIncome = request.financial(
+     cleanTicker,
+     "OPER_INCOME",
+     "FQ",
+     ignore_invalid_symbol=true
+)
+
+// Compute Market Cap & Free Float from price × shares (always up-to-date)
+float marketCap = not na(totalShares) ? close * totalShares : na
+float freeFloat = not na(floatShares) ? close * floatShares : na
+
+//====================================================
+// QUARTERLY DATA TRACKING (9 quarters for full YoY on all 5 rows)
+//====================================================
+CRORE = 10000000.0
+
+var float[] q_np    = array.new_float(9, na)
+var float[] q_sales = array.new_float(9, na)
+var float[] q_oi    = array.new_float(9, na)
+var string[] q_lbl  = array.new_string(9, "")
+var float prevRev   = na
+
+// Detect quarter boundary: revenue changes or first non-na value
+if not na(revenue) and (na(prevRev) or revenue != prevRev)
+    array.unshift(q_np, profit)
+    array.pop(q_np)
+    array.unshift(q_sales, revenue)
+    array.pop(q_sales)
+    array.unshift(q_oi, operIncome)
+    array.pop(q_oi)
+    // Approximate FQ-end label from reporting month (Indian FY: Apr-Mar)
+    int m = month
+    int y = year
+    int fqM = m <= 2 ? 12 : m <= 5 ? 3 : m <= 8 ? 6 : m <= 11 ? 9 : 12
+    int fqY = fqM == 12 and m <= 2 ? y - 1 : y
+    string ms = fqM == 3 ? "Mar" : fqM == 6 ? "Jun" : fqM == 9 ? "Sep" : "Dec"
+    array.unshift(q_lbl, ms + "-" + str.tostring(fqY % 100))
+    array.pop(q_lbl)
+    prevRev := revenue
+
+// Latest QoQ/YoY for the summary table
+float salesGrowth = na
+float profitGrowth = na
+if not na(array.get(q_sales, 0)) and not na(array.get(q_sales, 1)) and array.get(q_sales, 1) != 0
+    salesGrowth := ((array.get(q_sales, 0) - array.get(q_sales, 1)) / math.abs(array.get(q_sales, 1))) * 100
+if not na(array.get(q_np, 0)) and not na(array.get(q_np, 1)) and array.get(q_np, 1) != 0
+    profitGrowth := ((array.get(q_np, 0) - array.get(q_np, 1)) / math.abs(array.get(q_np, 1))) * 100
+
+//====================================================
+// FINANCIAL VALIDATION FOR BEHAVIOR TYPE (blend with chart)
+//====================================================
+// Count rising quarters (NP & Sales) for consistency checks
+float finGrowthBonus    = 0.0
+float finCyclicalBonus  = 0.0
+float finDefensiveBonus = 0.0
+float finTurnaroundBonus = 0.0
+
+// Check NP trend across available quarters
+int npRising  = 0
+int npFalling = 0
+int npSwings  = 0
+bool npRecovery = false
+
+for i = 0 to 3
+    float curr = array.get(q_np, i)
+    float prev = array.get(q_np, i + 1)
+    if not na(curr) and not na(prev)
+        if curr > prev
+            npRising += 1
+        else
+            npFalling += 1
+        // Detect erratic swings (sign changes)
+        if (curr > 0 and prev < 0) or (curr < 0 and prev > 0)
+            npSwings += 1
+
+// NP recovery from loss (latest positive, older negative)
+float npLatest = array.get(q_np, 0)
+float npOldest = array.get(q_np, 4)
+if not na(npLatest) and not na(npOldest) and npLatest > 0 and npOldest < 0
+    npRecovery := true
+
+// Check Sales trend consistency
+int salesRising = 0
+for i = 0 to 3
+    float curr = array.get(q_sales, i)
+    float prev = array.get(q_sales, i + 1)
+    if not na(curr) and not na(prev) and curr > prev
+        salesRising += 1
+
+// Growth: NP rising consistently + Sales expanding (>15% YoY implied)
+finGrowthBonus := (npRising >= 3 ? 25.0 : npRising >= 2 ? 15.0 : 0.0) + (salesRising >= 3 ? 15.0 : 0.0)
+
+// Cyclical: erratic NP swings, sign changes
+finCyclicalBonus := npSwings >= 2 ? 30.0 : npSwings >= 1 ? 15.0 : 0.0
+
+// Defensive: stable NP (no big swings) + low but positive
+float npStability = npSwings == 0 and npFalling <= 1 ? 20.0 : 0.0
+finDefensiveBonus := npStability + (salesRising <= 2 and salesRising >= 1 ? 10.0 : 0.0)
+
+// Turnaround: NP recovering from losses
+finTurnaroundBonus := npRecovery ? 35.0 : 0.0
+
+// Blend: Chart 60% + Financial 40%
+cyclicalScore  := chartCyclical  * 0.6 + math.min(finCyclicalBonus  * 1.33, 40)
+growthScore    := chartGrowth    * 0.6 + math.min(finGrowthBonus    * 1.0, 40)
+defensiveScore := chartDefensive * 0.6 + math.min(finDefensiveBonus * 1.33, 40)
+turnaroundScore := chartTurnaround * 0.6 + math.min(finTurnaroundBonus * 1.14, 40)
+
+maxBehav := math.max(cyclicalScore, math.max(growthScore, math.max(defensiveScore, turnaroundScore)))
+behavType := maxBehav == growthScore ? "GROWTH" : maxBehav == cyclicalScore ? "CYCLICAL" : maxBehav == turnaroundScore ? "TURNAROUND" : "DEFENSIVE"
+behavClr := maxBehav == growthScore ? color.new(#00E676, 0) : maxBehav == cyclicalScore ? color.new(#2196F3, 0) : maxBehav == turnaroundScore ? color.new(#AA00FF, 0) : color.new(#9E9E9E, 0)
+
+//====================================================
+// TABLE UI
+//====================================================
+var table t = table.new(f_pos(summaryPos), 2, 14, border_width=1)
+
+if barstate.islast
+
+    table.cell(t, 0, 0, "ISME", text_color=color.white, bgcolor=color.black, text_size=fontSize)
+    table.cell(t, 1, 0, "", bgcolor=color.black)
+
+    table.cell(t, 0, 1, "Stage", text_size=fontSize)
+    table.cell(t, 1, 1, stageText, bgcolor=stageColor, text_color=color.white, text_size=fontSize)
+
+    // Score row
+    string scoreLabel = wScore >= 80 ? "BREAKOUT" : wScore >= 60 ? "STRONG" : wScore >= 40 ? "WATCH" : "WEAK"
+    color scoreClr = wScore >= 80 ? color.new(#00E676, 0) : wScore >= 60 ? color.new(#FFD740, 0) : wScore >= 40 ? color.new(#FF9100, 0) : color.new(#FF5252, 50)
+    table.cell(t, 0, 2, "Score", text_size=fontSize)
+    table.cell(t, 1, 2, str.tostring(wScore, "#") + " " + scoreLabel, text_color=color.white, bgcolor=scoreClr, text_size=fontSize)
+
+    // Regime row
+    table.cell(t, 0, 3, "Regime", text_size=fontSize)
+    table.cell(t, 1, 3, trendOk ? "✅ TREND" : "❌ CHOP", text_size=fontSize,
+         bgcolor = trendOk ? color.new(color.green, 60) : color.new(color.red, 60))
+
+    // Stock Behavior Type row
+    table.cell(t, 0, 4, "Type", text_size=fontSize)
+    table.cell(t, 1, 4, behavType + " " + str.tostring(maxBehav, "#") + "%", text_color=color.white, bgcolor=behavClr, text_size=fontSize)
+
+    table.cell(t, 0, 5, "RS", text_size=fontSize)
+    table.cell(t, 1, 5, na(rs) ? "N/A" : str.tostring(rs, "#.####"), text_size=fontSize)
+
+    table.cell(t, 0, 6, "RS EMA", text_size=fontSize)
+    table.cell(t, 1, 6, na(rsEMA) ? "N/A" : str.tostring(rsEMA, "#.####"), text_size=fontSize)
+
+    table.cell(t, 0, 7, "ADX", text_size=fontSize)
+    table.cell(t, 1, 7, str.tostring(adx, "#.##"), text_size=fontSize,
+         bgcolor = adx > thresholdADX ? color.new(color.green, 80) : color.new(color.red, 80))
+
+    table.cell(t, 0, 8, "RSI", text_size=fontSize)
+    table.cell(t, 1, 8, str.tostring(rsi, "#.##"), text_size=fontSize,
+         bgcolor = rsi > 55 ? color.new(color.green, 80) :
+                   rsi < 45 ? color.new(color.red, 80) :
+                   color.new(color.gray, 80))
+
+    table.cell(t, 0, 9, "Sales QoQ", text_size=fontSize)
+    table.cell(t, 1, 9,
+         na(salesGrowth) ? "N/A" : str.tostring(salesGrowth, "#.##") + "%", text_size=fontSize,
+         bgcolor = not na(salesGrowth) and salesGrowth > 0 ?
+              color.new(color.green, 80) : color.new(color.red, 80))
+
+    table.cell(t, 0, 10, "Profit QoQ", text_size=fontSize)
+    table.cell(t, 1, 10,
+         na(profitGrowth) ? "N/A" : str.tostring(profitGrowth, "#.##") + "%", text_size=fontSize,
+         bgcolor = not na(profitGrowth) and profitGrowth > 0 ?
+              color.new(color.green, 80) : color.new(color.red, 80))
+
+    table.cell(t, 0, 11, "Mkt Cap", text_size=fontSize)
+    table.cell(t, 1, 11,
+         na(marketCap) ? "N/A" : str.tostring(marketCap / CRORE, "#.##") + " Cr", text_size=fontSize)
+
+    table.cell(t, 0, 12, "52W High", text_size=fontSize)
+    table.cell(t, 1, 12,
+         close >= high52 ? "✅ YES" : "NO", text_size=fontSize,
+         bgcolor = close >= high52 ? color.new(color.green, 80) : color.new(color.gray, 80))
+
+//====================================================
+// FUNDAMENTALS TABLE (bottom-right, matching screener layout)
+//====================================================
+var table ft = table.new(f_pos(fundPos), 8, 9, border_width=0)
+
+if barstate.islast
+    color hdrBg  = color.new(#1a1a2e, 0)
+    color rowBg1 = color.new(#16213e, 0)
+    color rowBg2 = color.new(#0f3460, 0)
+    color txtW   = color.white
+    color txtG   = color.gray
+
+    // Market cap classification (Indian market convention)
+    float mcCr = na(marketCap) ? na : marketCap / CRORE
+    string capType = na(mcCr) ? "" : mcCr >= 20000 ? " · Large Cap" : mcCr >= 5000 ? " · Mid Cap" : mcCr >= 1000 ? " · Small Cap" : " · Micro Cap"
+    color capClr   = na(mcCr) ? color.yellow : mcCr >= 20000 ? color.new(#00E676, 0) : mcCr >= 5000 ? color.new(#FFD740, 0) : mcCr >= 1000 ? color.new(#FF9100, 0) : color.new(#FF5252, 0)
+
+    // --- Row 0: Market Cap + Classification (full-width title bar) ---
+    string mcStr = na(marketCap) ? "N/A" : str.tostring(marketCap / CRORE, "#,###") + " Cr"
+    table.cell(ft, 0, 0, "Mkt Cap: " + mcStr + capType, text_color=capClr, bgcolor=hdrBg, text_size=fontSize, text_halign=text.align_center)
+    for c = 1 to 7
+        table.cell(ft, c, 0, "", bgcolor=hdrBg)
+    table.merge_cells(ft, 0, 0, 7, 0)
+
+    // --- Row 1: Sector (cols 0–3) | Industry (cols 4–7) ---
+    table.cell(ft, 0, 1, syminfo.sector, text_color=color.new(color.aqua, 0), bgcolor=hdrBg, text_size=fontSize, text_halign=text.align_center)
+    table.cell(ft, 1, 1, "", bgcolor=hdrBg)
+    table.cell(ft, 2, 1, "", bgcolor=hdrBg)
+    table.cell(ft, 3, 1, "", bgcolor=hdrBg)
+    table.cell(ft, 4, 1, syminfo.industry, text_color=color.new(color.aqua, 0), bgcolor=hdrBg, text_size=fontSize, text_halign=text.align_center)
+    table.cell(ft, 5, 1, "", bgcolor=hdrBg)
+    table.cell(ft, 6, 1, "", bgcolor=hdrBg)
+    table.cell(ft, 7, 1, "", bgcolor=hdrBg)
+    table.merge_cells(ft, 0, 1, 3, 1)
+    table.merge_cells(ft, 4, 1, 7, 1)
+
+    // --- Row 2: Column Headers (tight, no border gaps) ---
+    string[] hdrs = array.from("FQ", "NP", "YoY", "QoQ", "Sales", "YoY", "QoQ", "OPM")
+    for c = 0 to 7
+        table.cell(ft, c, 2, array.get(hdrs, c), text_color=txtW, bgcolor=color.new(#533483, 0), text_size=fontSize)
+
+    // --- Rows 3–7: Quarter data ---
+    for row = 0 to 4
+        int r = row + 3
+        color rBg = row % 2 == 0 ? rowBg1 : rowBg2
+
+        string lbl = array.get(q_lbl, row)
+        float np   = array.get(q_np, row)
+        float sal  = array.get(q_sales, row)
+        float oi   = array.get(q_oi, row)
+
+        // YoY = vs 4 quarters back (array is 9 deep, so row+4 always valid)
+        float np4  = row + 4 < 9 ? array.get(q_np, row + 4) : na
+        float sal4 = row + 4 < 9 ? array.get(q_sales, row + 4) : na
+        // QoQ = vs previous quarter
+        float np1  = row + 1 < 9 ? array.get(q_np, row + 1) : na
+        float sal1 = row + 1 < 9 ? array.get(q_sales, row + 1) : na
+
+        float npYoY  = not na(np) and not na(np4) and np4 != 0 ? ((np - np4) / math.abs(np4)) * 100 : na
+        float npQoQ  = not na(np) and not na(np1) and np1 != 0 ? ((np - np1) / math.abs(np1)) * 100 : na
+        float salYoY = not na(sal) and not na(sal4) and sal4 != 0 ? ((sal - sal4) / math.abs(sal4)) * 100 : na
+        float salQoQ = not na(sal) and not na(sal1) and sal1 != 0 ? ((sal - sal1) / math.abs(sal1)) * 100 : na
+        float opm    = not na(oi) and not na(sal) and sal != 0 ? (oi / sal) * 100 : na
+
+        // Growth % colors: vivid green/red backgrounds for instant readability
+        color npYoYbg  = na(npYoY)  ? rBg : npYoY  > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+        color npQoQbg  = na(npQoQ)  ? rBg : npQoQ  > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+        color salYoYbg = na(salYoY) ? rBg : salYoY > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+        color salQoQbg = na(salQoQ) ? rBg : salQoQ > 0 ? color.new(#00C853, 40) : color.new(#FF1744, 40)
+
+        // FQ label
+        table.cell(ft, 0, r, lbl != "" ? lbl : "--", text_color=txtW, bgcolor=rBg, text_size=fontSize)
+        // Net Profit (in Cr)
+        table.cell(ft, 1, r, na(np) ? "--" : str.tostring(np / CRORE, "#"), text_color=txtW, bgcolor=rBg, text_size=fontSize)
+        // NP YoY % (colored bg)
+        table.cell(ft, 2, r, na(npYoY) ? "--" : str.tostring(npYoY, "#") + "%", text_color=txtW, bgcolor=npYoYbg, text_size=fontSize)
+        // NP QoQ % (colored bg)
+        table.cell(ft, 3, r, na(npQoQ) ? "--" : str.tostring(npQoQ, "#") + "%", text_color=txtW, bgcolor=npQoQbg, text_size=fontSize)
+        // Sales (in Cr)
+        table.cell(ft, 4, r, na(sal) ? "--" : str.tostring(sal / CRORE, "#"), text_color=txtW, bgcolor=rBg, text_size=fontSize)
+        // Sales YoY % (colored bg)
+        table.cell(ft, 5, r, na(salYoY) ? "--" : str.tostring(salYoY, "#") + "%", text_color=txtW, bgcolor=salYoYbg, text_size=fontSize)
+        // Sales QoQ % (colored bg)
+        table.cell(ft, 6, r, na(salQoQ) ? "--" : str.tostring(salQoQ, "#") + "%", text_color=txtW, bgcolor=salQoQbg, text_size=fontSize)
+        // OPM %
+        table.cell(ft, 7, r, na(opm) ? "--" : str.tostring(opm, "#.#") + "%", text_color=txtW, bgcolor=rBg, text_size=fontSize)
+
+//====================================================
+// INSIDER / INSTITUTIONAL ACTIVITY DETECTOR
+//====================================================
+// Detects unusual volume + price action patterns that signal smart money
+volRatio     = volume / volMA
+priceRange   = high - low
+closePos     = priceRange > 0 ? (close - low) / priceRange : 0.5
+
+// Accumulation: high volume + close in upper 60% of range
+accumulation = volRatio > 2.0 and closePos > 0.6 and close > close[1]
+// Distribution: high volume + close in lower 40% of range
+distribution = volRatio > 2.0 and closePos < 0.4 and close < close[1]
+// Stealth accumulation: ATR-normalized price movement
+stealth      = ta.sma(volume, 5) > volMA * 1.5 and math.abs(close - close[5]) / atr < 0.5 and close > ema50
+
+// Trigger versions (fire once)
+accum_trigger = accumulation and not accumulation[1]
+dist_trigger  = distribution and not distribution[1]
+stealth_trigger = stealth and not stealth[1]
+
+// Gate insider buy signals by regime (DIST always fires)
+plotshape(
+     showInsider and accum_trigger and trendOk,
+     title="Accumulation",
+     text="ACC",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.new(#00E676, 0),
+     textcolor=color.black,
+     size=size.small
+)
+
+plotshape(
+     showInsider and dist_trigger,
+     title="Distribution",
+     text="DIST",
+     style=shape.labeldown,
+     location=location.abovebar,
+     color=color.new(#FF1744, 0),
+     textcolor=color.white,
+     size=size.small
+)
+
+plotshape(
+     showInsider and stealth_trigger and trendOk,
+     title="Stealth Accumulation",
+     text="🕵",
+     style=shape.labelup,
+     location=location.belowbar,
+     color=color.new(#7C4DFF, 0),
+     textcolor=color.white,
+     size=size.small
+)
+
+//====================================================
+// SIGNAL LEGEND TABLE (toggle with checkbox)
+//====================================================
+var table legend = na
+
+if showLegend and barstate.islast
+    legend := table.new(f_pos(legendPos), 2, 22, border_width=0)
+    color lBg  = color.new(#1a1a2e, 10)
+    color lBg2 = color.new(#0f3460, 10)
+    color lHdr = color.new(#533483, 0)
+    color lSec = color.new(#1B5E20, 0)
+
+    table.cell(legend, 0, 0, "Signal", text_color=color.white, bgcolor=lHdr, text_size=size.small)
+    table.cell(legend, 1, 0, "How to Read", text_color=color.white, bgcolor=lHdr, text_size=size.small)
+
+    // --- Buy Signals ---
+    table.cell(legend, 0, 1, "🟢 A", text_color=color.green, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 1, "Trend breakout — EMA aligned + RSI > 55 + ADX strong (40pts)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 2, "🟢 B", text_color=color.lime, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 2, "Donchian breakout — Close crosses 20-day high + volume surge (30pts)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 3, "🟢 C", text_color=color.teal, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 3, "52W breakout — Price at yearly high + RS outperforming (30pts)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 4, "🔵 STRONG", text_color=color.blue, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 4, "Score ≥70 — Suppresses A/B/C, highest conviction signal", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    // --- Sell Signals ---
+    table.cell(legend, 0, 5, "🔴 X", text_color=color.red, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 5, "Momentum loss — Below EMA20 + RSI < 45 (suppressed if Z fires)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 6, "🔴 Y", text_color=color.maroon, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 6, "Trend weakness — Below EMA50 + RS < RS EMA (suppressed if Z)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 7, "🟠 Z", text_color=color.orange, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 7, "Trend breakdown — Below EMA200 + strong ADX (highest priority)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    // --- Chart Markers ---
+    table.cell(legend, 0, 8, "◆", text_color=color.orange, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 8, "Donchian — Close crosses above 20-day channel high", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 9, "🔥 52W", text_color=color.yellow, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 9, "52-week high — Major breakout level", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 10, "▲", text_color=color.purple, bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 10, "RS high — Relative Strength at 100-bar peak", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    // --- Insider Activity ---
+    table.cell(legend, 0, 11, "ACC", text_color=color.new(#00E676, 0), bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 11, "Accumulation — 2x vol + close in upper 60% (regime gated)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 12, "DIST", text_color=color.new(#FF1744, 0), bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 12, "Distribution — 2x vol + close in lower 40% (always fires)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 13, "🕵", text_color=color.new(#7C4DFF, 0), bgcolor=lBg, text_size=size.small)
+    table.cell(legend, 1, 13, "Stealth — Vol rising 1.5x, price flat (ATR-norm, regime gated)", text_color=color.white, bgcolor=lBg, text_size=size.small, text_halign=text.align_left)
+
+    // --- System Settings ---
+    table.cell(legend, 0, 14, "SYSTEM", text_color=color.white, bgcolor=lSec, text_size=size.small)
+    table.cell(legend, 1, 14, "Detection Logic", text_color=color.white, bgcolor=lSec, text_size=size.small)
+
+    table.cell(legend, 0, 15, "Regime", text_color=color.aqua, bgcolor=lBg2, text_size=size.small)
+    table.cell(legend, 1, 15, "ADX > 18 + EMA50 > EMA200 → gates all buy signals", text_color=color.white, bgcolor=lBg2, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 16, "Score", text_color=color.aqua, bgcolor=lBg2, text_size=size.small)
+    table.cell(legend, 1, 16, "A=40 + B=30 + C=30 → 80+ Break, 60+ Strong, 40+ Watch", text_color=color.white, bgcolor=lBg2, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 17, "Cooldown", text_color=color.aqua, bgcolor=lBg2, text_size=size.small)
+    table.cell(legend, 1, 17, "5-bar gap after STRONG BUY — prevents signal spam", text_color=color.white, bgcolor=lBg2, text_size=size.small, text_halign=text.align_left)
+
+    // --- Stock Behavior Types ---
+    table.cell(legend, 0, 18, "GROWTH", text_color=color.new(#00E676, 0), bgcolor=lBg2, text_size=size.small)
+    table.cell(legend, 1, 18, "Chart: trend above EMA50 + RS | Fin: NP rising 3+ Qs + Sales expanding", text_color=color.white, bgcolor=lBg2, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 19, "CYCLICAL", text_color=color.new(#2196F3, 0), bgcolor=lBg2, text_size=size.small)
+    table.cell(legend, 1, 19, "Chart: high vol + deep drawdowns | Fin: erratic NP sign changes", text_color=color.white, bgcolor=lBg2, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 20, "DEFENSIVE", text_color=color.new(#9E9E9E, 0), bgcolor=lBg2, text_size=size.small)
+    table.cell(legend, 1, 20, "Chart: low vol + flat slope | Fin: stable NP, no swings, slow sales", text_color=color.white, bgcolor=lBg2, text_size=size.small, text_halign=text.align_left)
+
+    table.cell(legend, 0, 21, "TURNAROUND", text_color=color.new(#AA00FF, 0), bgcolor=lBg2, text_size=size.small)
+    table.cell(legend, 1, 21, "Chart: slope shift + 60d breakout | Fin: NP recovery from losses", text_color=color.white, bgcolor=lBg2, text_size=size.small, text_halign=text.align_left)
+
+//====================================================
+// ALERTS (trigger-based now, so alerts fire once per transition)
+//====================================================
+alertcondition(
+     strongBuy and trendOk,
+     title="STRONG BUY (High Confidence)",
+     message="🚀 STRONG BUY — {{ticker}} score 70+ in trending regime"
+)
+
+alertcondition(
+     showA,
+     title="BUY A",
+     message="BUY A Trigger — {{ticker}} crossed into trend breakout zone"
+)
+
+alertcondition(
+     showB,
+     title="BUY B",
+     message="BUY B Trigger — {{ticker}} Donchian breakout with volume"
+)
+
+alertcondition(
+     showC,
+     title="BUY C",
+     message="BUY C Trigger — {{ticker}} 52W high breakout with RS strength"
+)
+
+alertcondition(
+     sellX,
+     title="SELL X",
+     message="SELL X — {{ticker}} below EMA20 with weak RSI"
+)
+
+alertcondition(
+     sellY,
+     title="SELL Y",
+     message="SELL Y — {{ticker}} below EMA50 with RS weakness"
+)
+
+alertcondition(
+     sellZ,
+     title="SELL Z",
+     message="SELL Z — {{ticker}} below EMA200 with strong ADX decline"
+)
