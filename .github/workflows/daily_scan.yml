@@ -5,7 +5,12 @@ on:
     # 4:15 PM IST (10:45 UTC) Mon–Fri
     # NSE closes 3:30 PM IST — 45 min buffer for yfinance EOD data to settle
     - cron: '45 10 * * 1-5'
-  workflow_dispatch:   # manual trigger anytime from GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      skip_scanner:
+        description: 'Skip the 1-hour scan (fast export test only)'
+        type: boolean
+        default: false
 
 # Prevent two runs from conflicting
 concurrency:
@@ -52,23 +57,28 @@ jobs:
 
       # ── 4. Main market scanner (produces scan_results/ JSON & CSV) ────────
       - name: Run Market Scanner
+        if: ${{ !inputs.skip_scanner }}
         run: python scanner.py
 
       # ── 5. Supporting data enrichment steps (non-fatal) ──────────────────
       - name: Fetch Market News
+        if: ${{ !inputs.skip_scanner }}
         run: python news_fetcher.py
         continue-on-error: true
 
       - name: Update Market Regime
+        if: ${{ !inputs.skip_scanner }}
         run: python regime_filter.py
         continue-on-error: true
 
       - name: Run AI Intelligence Engine
+        if: ${{ !inputs.skip_scanner }}
         run: python ai_engine.py
         continue-on-error: true
         timeout-minutes: 10
 
       - name: Run Prediction Engine
+        if: ${{ !inputs.skip_scanner }}
         run: python prediction_engine.py --backtest-weeks 12
         continue-on-error: true
         timeout-minutes: 15
@@ -81,6 +91,7 @@ jobs:
 
       # ── 8. Validate sector labels ─────────────────────────────────────────
       - name: Validate Sector Labels
+        if: ${{ !inputs.skip_scanner }}
         continue-on-error: true
         run: |
           python -c "
