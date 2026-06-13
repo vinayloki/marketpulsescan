@@ -181,7 +181,8 @@ class NSEDirectProvider(BaseDataProvider):
             f"({interval} interval)..."
         )
 
-        yf_tickers = [f"{t}.NS" for t in tickers]
+        # Append .NS only if no suffix is present, to support .BO for BSE
+        yf_tickers = [t if t.endswith((".NS", ".BO")) else f"{t}.NS" for t in tickers]
         all_data = pd.DataFrame()
         total_batches = (len(yf_tickers) + BATCH_SIZE - 1) // BATCH_SIZE
 
@@ -212,16 +213,16 @@ class NSEDirectProvider(BaseDataProvider):
 
                     # yfinance returns multi-level when >1 ticker, flat when =1
                     if len(batch) == 1:
-                        sym = batch[0].replace(".NS", "")
+                        sym = batch[0].replace(".NS", "").replace(".BO", "")
                         raw.columns = pd.MultiIndex.from_tuples(
                             [(col, sym) for col in raw.columns]
                         )
                     else:
                         # Swap levels: (ticker, field) → (field, ticker)
                         raw = raw.swaplevel(axis=1)
-                        # Strip .NS from ticker level
+                        # Strip .NS or .BO from ticker level
                         raw.columns = pd.MultiIndex.from_tuples(
-                            [(field, sym.replace(".NS", ""))
+                            [(field, sym.replace(".NS", "").replace(".BO", ""))
                              for field, sym in raw.columns]
                         )
                     raw.sort_index(axis=1, inplace=True)
@@ -303,7 +304,8 @@ class NSEDirectProvider(BaseDataProvider):
     def _fetch_single_fundamental(self, symbol: str) -> dict:
         """Fetch and normalise fundamental info for one stock."""
         try:
-            info = yf.Ticker(f"{symbol}.NS").info
+            yf_symbol = symbol if symbol.endswith((".NS", ".BO")) else f"{symbol}.NS"
+            info = yf.Ticker(yf_symbol).info
             mcap = info.get("marketCap")
             return {
                 "s":      symbol,

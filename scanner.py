@@ -389,6 +389,17 @@ def run_opportunity_engine(ohlcv: pd.DataFrame, fundamentals: dict[str, dict]):
     # ── Save output ─────────────────────────────────────────────────
     engine.save(opportunities)
 
+    # ── Stage 2 Scanner to DB ───────────────────────────────────────
+    try:
+        from scanners.stage2_scanner import Stage2Scanner
+        from database.db_updater import update_stage2_results
+        
+        log.info("🎯 Running Stage 2 Scanner & Updating DB...")
+        stage2_results = Stage2Scanner().scan(ohlcv)
+        update_stage2_results(stage2_results)
+    except Exception as e:
+        log.error(f"Error running Stage 2 DB updates: {e}")
+
     # ── Console summary ─────────────────────────────────────────────
     print("\n" + "═" * 70)
     print(f"  🎯 OPPORTUNITY ENGINE — {len(opportunities)} ranked setups")
