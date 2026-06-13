@@ -129,7 +129,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 30
 
-      # ── 7. Validate sector labels ─────────────────────────────────────────
+      # ── 7. Export DB to static JSON for serverless React app ─────────────
+      - name: Export Static API
+        run: python export_static_api.py
+
+      # ── 8. Validate sector labels ─────────────────────────────────────────
       - name: Validate Sector Labels
         continue-on-error: true
         run: |
@@ -149,13 +153,13 @@ jobs:
               print(f'Sector validation skipped: {e}')
           "
 
-      # ── 8. Commit results ─────────────────────────────────────────────────
+      # ── 9. Commit results ─────────────────────────────────────────────────
       - name: Commit and Push Results
         run: |
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Stage scan results (powers GitHub Pages site — DO NOT REMOVE)
+          # Stage scan results (powers GitHub Pages site + React static JSONs)
           git add scan_results/
 
           # Stage SQLite DB (powers new FastAPI / React platform)

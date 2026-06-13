@@ -157,11 +157,9 @@ function Scanner() {
 
     let url;
     if (view === 'market') {
-      const tf   = returnTf;
-      const mcap = mcapFilter;
-      url = `/api/scanner/market?sort_by=${tf}&order=desc&mcap=${mcap}&limit=3500`;
+      url = `${import.meta.env.BASE_URL}../scan_results/api/market.json`;
     } else {
-      url = `/api/scanner/stage2?timeframe=${stage2Tf}&limit=500`;
+      url = `${import.meta.env.BASE_URL}../scan_results/api/stage2_${stage2Tf}.json`;
     }
 
     axios.get(url)
@@ -182,26 +180,45 @@ function Scanner() {
 
   // ── Sort & Filter (client side) ────────────────────────────────────────────
   const filtered = useMemo(() => {
+    let result = data;
+    
+    // Serverless Market filters (applied client-side now)
+    if (view === 'market' && mcapFilter) {
+      result = result.filter(s => s.mcap_code === mcapFilter);
+    }
+    
     const q = search.toLowerCase();
-    if (!q) return data;
-    return data.filter(
-      (s) =>
-        (s.symbol || s.ticker || '').toLowerCase().includes(q) ||
-        (s.name || '').toLowerCase().includes(q) ||
-        (s.sector || '').toLowerCase().includes(q),
-    );
-  }, [data, search]);
+    if (q) {
+      result = result.filter(
+        (s) =>
+          (s.symbol || s.ticker || '').toLowerCase().includes(q) ||
+          (s.name || '').toLowerCase().includes(q) ||
+          (s.sector || '').toLowerCase().includes(q),
+      );
+    }
+    return result;
+  }, [data, search, view, mcapFilter]);
 
   const sorted = useMemo(() => {
-    if (!sortKey) return filtered;
+    let sortK = sortKey;
+    let sortD = sortDir;
+    
+    // Serverless Market default sort (applied client-side)
+    if (view === 'market' && !sortKey) {
+      const tfMap = { '1W': 'ret_1w', '2W': 'ret_2w', '1M': 'ret_1m', '3M': 'ret_3m', '6M': 'ret_6m', '12M': 'ret_12m' };
+      sortK = tfMap[returnTf] || 'ret_1m';
+      sortD = 'desc';
+    }
+    
+    if (!sortK) return filtered;
     return [...filtered].sort((a, b) => {
-      const av = a[sortKey] ?? (typeof a[sortKey] === 'number' ? 0 : '');
-      const bv = b[sortKey] ?? (typeof b[sortKey] === 'number' ? 0 : '');
-      if (av < bv) return sortDir === 'asc' ? -1 : 1;
-      if (av > bv) return sortDir === 'asc' ? 1 : -1;
+      const av = a[sortK] ?? (typeof a[sortK] === 'number' ? -Infinity : '');
+      const bv = b[sortK] ?? (typeof b[sortK] === 'number' ? -Infinity : '');
+      if (av < bv) return sortD === 'asc' ? -1 : 1;
+      if (av > bv) return sortD === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [filtered, sortKey, sortDir]);
+  }, [filtered, sortKey, sortDir, view, returnTf]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const paginated  = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
