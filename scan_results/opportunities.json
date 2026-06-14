@@ -1,8 +1,8 @@
 {
-  "generated": "12 Jun 2026",
-  "generated_ts": "2026-06-12_1448",
+  "generated": "14 Jun 2026",
+  "generated_ts": "2026-06-14_1128",
   "engine_version": "2.0",
-  "total_opportunities": 30,
+  "total_opportunities": 35,
   "opportunities": [
     {
       "ticker": "GOLDIAM",
@@ -16,7 +16,7 @@
       "indicators": {
         "high_52w": 485.0,
         "pct_from_52w_high": 1.28,
-        "volume_ratio": 6.86,
+        "volume_ratio": 6.87,
         "price": 478.8,
         "pct_change_1d": 12.98,
         "above_sma10": true
@@ -155,8 +155,37 @@
       }
     },
     {
-      "ticker": "MAHABANK",
+      "ticker": "ACCORD",
       "rank": 6,
+      "score": 38,
+      "signals": [
+        "52W_BREAKOUT",
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "high_52w": 86.1,
+        "pct_from_52w_high": 0.0,
+        "volume_ratio": 2.58,
+        "price": 86.1,
+        "pct_change_1d": 5.0,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Accord Synergy Ltd",
+        "sector": "Others",
+        "ind": "Telecom Services",
+        "mcap_cr": 16.8,
+        "pe": -13.1,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "MAHABANK",
+      "rank": 7,
       "score": 38,
       "signals": [
         "52W_BREAKOUT",
@@ -185,7 +214,7 @@
     },
     {
       "ticker": "EBBETF0431",
-      "rank": 7,
+      "rank": 8,
       "score": 30,
       "signals": [
         "52W_BREAKOUT",
@@ -211,8 +240,35 @@
       }
     },
     {
+      "ticker": "UCL",
+      "rank": 9,
+      "score": 30,
+      "signals": [
+        "52W_BREAKOUT",
+        "HIGH_VOLUME"
+      ],
+      "indicators": {
+        "high_52w": 155.75,
+        "pct_from_52w_high": 1.99,
+        "volume_ratio": 18.99,
+        "price": 152.65
+      },
+      "fundamental": {
+        "name": "Ushanti Colour Chem Ltd",
+        "sector": "Others",
+        "ind": "Specialty Chemicals",
+        "mcap_cr": 173.5,
+        "pe": -65.7,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
       "ticker": "GILT5BETA",
-      "rank": 8,
+      "rank": 10,
       "score": 29,
       "signals": [
         "52W_BREAKOUT"
@@ -238,7 +294,7 @@
     },
     {
       "ticker": "SENORES",
-      "rank": 9,
+      "rank": 11,
       "score": 28,
       "signals": [
         "52W_BREAKOUT"
@@ -264,7 +320,7 @@
     },
     {
       "ticker": "ABSLAMC",
-      "rank": 10,
+      "rank": 12,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -290,7 +346,7 @@
     },
     {
       "ticker": "VENUSREM",
-      "rank": 11,
+      "rank": 13,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -316,7 +372,7 @@
     },
     {
       "ticker": "AEGISVOPAK",
-      "rank": 12,
+      "rank": 14,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -342,7 +398,7 @@
     },
     {
       "ticker": "AIIL",
-      "rank": 13,
+      "rank": 15,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -368,7 +424,7 @@
     },
     {
       "ticker": "ARIHANTCAP",
-      "rank": 14,
+      "rank": 16,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -394,7 +450,7 @@
     },
     {
       "ticker": "BETA",
-      "rank": 15,
+      "rank": 17,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -420,7 +476,7 @@
     },
     {
       "ticker": "CAPILLARY",
-      "rank": 16,
+      "rank": 18,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -446,7 +502,7 @@
     },
     {
       "ticker": "CLSEL",
-      "rank": 17,
+      "rank": 19,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -472,7 +528,7 @@
     },
     {
       "ticker": "EXXARO",
-      "rank": 18,
+      "rank": 20,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -498,7 +554,7 @@
     },
     {
       "ticker": "HINDWAREAP",
-      "rank": 19,
+      "rank": 21,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -524,7 +580,7 @@
     },
     {
       "ticker": "INDIASHLTR",
-      "rank": 20,
+      "rank": 22,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -549,8 +605,60 @@
       }
     },
     {
+      "ticker": "KHFM",
+      "rank": 23,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 8.68,
+        "price": 66.0,
+        "pct_change_1d": 11.96,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "KHFM Hospitality and Facility Management Services Ltd",
+        "sector": "Others",
+        "ind": "Business Support Services",
+        "mcap_cr": 104.4,
+        "pe": 30.4,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "MAKS",
+      "rank": 24,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 10.0,
+        "price": 26.4,
+        "pct_change_1d": 1.54,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Maks Energy Solutions India Ltd",
+        "sector": "Others",
+        "ind": "Electrical Components & Equipments",
+        "mcap_cr": 18.0,
+        "pe": 32.2,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
       "ticker": "MMTC",
-      "rank": 21,
+      "rank": 25,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -576,7 +684,7 @@
     },
     {
       "ticker": "MOTISONS",
-      "rank": 22,
+      "rank": 26,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -602,7 +710,7 @@
     },
     {
       "ticker": "MSCIINDIA",
-      "rank": 23,
+      "rank": 27,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -628,7 +736,7 @@
     },
     {
       "ticker": "RELCHEMQ",
-      "rank": 24,
+      "rank": 28,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -654,13 +762,13 @@
     },
     {
       "ticker": "ROTO",
-      "rank": 25,
+      "rank": 29,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 13.43,
+        "volume_ratio": 13.44,
         "price": 64.52,
         "pct_change_1d": 10.94,
         "above_sma10": true
@@ -680,7 +788,7 @@
     },
     {
       "ticker": "SHIVAUM",
-      "rank": 26,
+      "rank": 30,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -706,7 +814,7 @@
     },
     {
       "ticker": "SHREDIGCEM",
-      "rank": 27,
+      "rank": 31,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -731,8 +839,34 @@
       }
     },
     {
+      "ticker": "TIRUPATI",
+      "rank": 32,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 16.84,
+        "price": 498.2,
+        "pct_change_1d": 0.04,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Shree Tirupati Balajee FIBC Ltd",
+        "sector": "Others",
+        "ind": "Packaging",
+        "mcap_cr": 471.5,
+        "pe": 32.9,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
       "ticker": "TOP10ADD",
-      "rank": 28,
+      "rank": 33,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -758,7 +892,7 @@
     },
     {
       "ticker": "TTML",
-      "rank": 29,
+      "rank": 34,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -784,7 +918,7 @@
     },
     {
       "ticker": "WENDT",
-      "rank": 30,
+      "rank": 35,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
