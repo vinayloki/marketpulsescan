@@ -12,13 +12,13 @@ Scoring model (preserved from legacy scoring_engine.py + ai_engine.py):
     10%  Mean-reversion   — RSI extremes, %B position
 
 Multi-signal bonus (preserved from legacy):
-    2 signal types → +5 pts
-    3 signal types → +10 pts
+    2 signal types -> +5 pts
+    3 signal types -> +10 pts
 
 Thresholds:
-    Score >= 65 → BUY
-    Score >= 40 → HOLD
-    Score < 40  → SELL
+    Score >= 65 -> BUY
+    Score >= 40 -> HOLD
+    Score < 40  -> SELL
 """
 
 from __future__ import annotations

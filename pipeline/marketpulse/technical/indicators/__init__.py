@@ -52,9 +52,9 @@ def rsi(series: pd.Series, period: int = 14) -> pd.Series:
 
     Degenerate cases are handled explicitly so RSI is well-defined even when
     the series moves in only one direction:
-      - All gains (no losses)  → RSI = 100  (e.g. a monotonically rising series)
-      - All losses (no gains)  → RSI = 0
-      - Flat (no change)       → RSI = 50
+      - All gains (no losses)  -> RSI = 100  (e.g. a monotonically rising series)
+      - All losses (no gains)  -> RSI = 0
+      - Flat (no change)       -> RSI = 50
     """
     delta = series.diff()
     gain = delta.where(delta > 0, 0.0)
@@ -70,8 +70,8 @@ def rsi(series: pd.Series, period: int = 14) -> pd.Series:
 
     # Degenerate one-sided markets NaN out (0/0 or x/0) — pin them to the
     # correct boundary so RSI is always well-defined:
-    #   gains but no losses  → 100  (monotonically rising)
-    #   losses but no gains  →   0  (monotonically falling)
+    #   gains but no losses  -> 100  (monotonically rising)
+    #   losses but no gains  ->   0  (monotonically falling)
     rsi_series = rsi_series.mask((avg_loss == 0.0) & (avg_gain > 0.0), 100.0)
     rsi_series = rsi_series.mask((avg_gain == 0.0) & (avg_loss > 0.0), 0.0)
 

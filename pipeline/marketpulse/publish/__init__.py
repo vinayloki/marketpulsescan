@@ -105,7 +105,7 @@ class BundleWriter:
         manifest = build_manifest(run_id, self._file_records, pipeline_meta)
         path = self._api_dir / "manifest.json"
         _write_json(path, manifest)
-        log.info("Publish: manifest written → %s", path.name)
+        log.info("Publish: manifest written -> %s", path.name)
         return path
 
     def _write(self, filename: str, payload: dict[str, Any]) -> Path:

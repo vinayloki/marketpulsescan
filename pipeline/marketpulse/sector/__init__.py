@@ -139,9 +139,9 @@ def sector_ranks(
     Aggregate per-stock RS ratings into sector-level rankings.
 
     Args:
-        rs_scores:          pd.Series {symbol → rs_rating (0-100)}.
-        symbol_sector_map:  {symbol → sector_name | None}.
-        recommendations:    {symbol → "BUY" | "HOLD" | "SELL"} (optional).
+        rs_scores:          pd.Series {symbol -> rs_rating (0-100)}.
+        symbol_sector_map:  {symbol -> sector_name | None}.
+        recommendations:    {symbol -> "BUY" | "HOLD" | "SELL"} (optional).
         top_n:              Number of top stocks to list per sector.
 
     Returns:
@@ -207,7 +207,7 @@ def rotation_signal(
     Compare current vs previous sector rankings to detect rotation.
 
     Returns:
-        {sector → signal}
+        {sector -> signal}
         signals: "GAINING" | "LOSING" | "STABLE"
     """
     prev_map = {r.sector: r.rs_median for r in previous_ranks}

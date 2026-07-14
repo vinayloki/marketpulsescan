@@ -31,7 +31,7 @@ CANONICAL_SECTORS: list[str] = [
     "Others",
 ]
 
-# ── Alias map: raw Yahoo Finance / screener.in strings → canonical ─────────────
+# ── Alias map: raw Yahoo Finance / screener.in strings -> canonical ─────────────
 _SECTOR_ALIAS_MAP: dict[str, str] = {
     # IT & Technology
     "technology": "IT & Technology",
