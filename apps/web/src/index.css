@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/* ── Design System Tokens ─────────────────────────────────────────────── */
+@theme {
+  --color-brand-50: oklch(0.97 0.02 250);
+  --color-brand-100: oklch(0.93 0.04 250);
+  --color-brand-200: oklch(0.86 0.07 250);
+  --color-brand-300: oklch(0.76 0.11 250);
+  --color-brand-400: oklch(0.65 0.16 250);
+  --color-brand-500: oklch(0.55 0.19 250);
+  --color-brand-600: oklch(0.47 0.18 250);
+  --color-brand-700: oklch(0.39 0.15 250);
+  --color-brand-800: oklch(0.32 0.12 250);
+  --color-brand-900: oklch(0.25 0.09 250);
+  --color-brand-950: oklch(0.18 0.06 250);
+
+  --color-surface-0: oklch(0.13 0.01 260);
+  --color-surface-1: oklch(0.16 0.01 260);
+  --color-surface-2: oklch(0.19 0.01 260);
+  --color-surface-3: oklch(0.22 0.02 260);
+  --color-surface-4: oklch(0.26 0.02 260);
+
+  --color-success: oklch(0.72 0.19 155);
+  --color-warning: oklch(0.80 0.16 80);
+  --color-danger: oklch(0.65 0.22 25);
+
+  --color-text-primary: oklch(0.95 0.01 260);
+  --color-text-secondary: oklch(0.70 0.02 260);
+  --color-text-muted: oklch(0.50 0.02 260);
+
+  --color-border: oklch(0.28 0.02 260);
+  --color-border-hover: oklch(0.38 0.03 260);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-glow: 0 0 20px oklch(0.55 0.19 250 / 0.15);
+  --shadow-card: 0 1px 3px oklch(0 0 0 / 0.3), 0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-elevated: 0 4px 12px oklch(0 0 0 / 0.4), 0 2px 4px oklch(0 0 0 / 0.3);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Base Styles ──────────────────────────────────────────────────────── */
+html {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-surface-0);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* ── Utility Classes ──────────────────────────────────────────────────── */
+.glass {
+  background: oklch(0.16 0.01 260 / 0.7);
+  backdrop-filter: blur(12px) saturate(1.5);
+  border: 1px solid var(--color-border);
+}
+
+.glass-hover:hover {
+  background: oklch(0.19 0.01 260 / 0.8);
+  border-color: var(--color-border-hover);
+}
+
+.glow-brand {
+  box-shadow: var(--shadow-glow);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-brand-300), var(--color-brand-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s var(--ease-out-expo) both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s var(--ease-out-expo) both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Gain/Loss Colors ─────────────────────────────────────────────────── */
+.text-gain {
+  color: var(--color-success);
+}
+.text-loss {
+  color: var(--color-danger);
+}
+.bg-gain {
+  background: oklch(0.72 0.19 155 / 0.12);
+}
+.bg-loss {
+  background: oklch(0.65 0.22 25 / 0.12);
+}

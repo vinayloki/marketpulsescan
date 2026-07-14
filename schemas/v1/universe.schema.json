@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vinayloki.github.io/marketpulsescan/schemas/v1/universe.schema.json",
+  "title": "MarketPulseScan Universe",
+  "description": "All tradeable symbols with identity, sector, and market cap classification.",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "run_id", "data"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.\\d+$" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "run_id": { "type": "string" },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["symbol", "name", "exchange"],
+        "properties": {
+          "symbol": { "type": "string", "description": "NSE/BSE ticker symbol." },
+          "name": { "type": "string", "description": "Company name." },
+          "exchange": { "type": "string", "enum": ["NSE", "BSE"] },
+          "isin": { "type": ["string", "null"] },
+          "sector": { "type": ["string", "null"] },
+          "industry": { "type": ["string", "null"] },
+          "mcap_cr": { "type": ["number", "null"], "description": "Market cap in ₹ crore." },
+          "mcap_category": {
+            "type": ["string", "null"],
+            "enum": ["Large Cap", "Mid Cap", "Small Cap", "Micro Cap", null]
+          },
+          "listing_date": { "type": ["string", "null"], "format": "date" },
+          "is_active": { "type": "boolean", "default": true }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,115 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['apps/web/**']
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      data_ref:
+        description: 'Git ref for the data branch (for rollback)'
+        required: false
+        default: 'data'
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Build production UI from main ─────────────────────────────
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Build production
+        working-directory: apps/web
+        run: npm run build
+        env:
+          VITE_ENV: production
+
+      - name: Assemble site
+        run: |
+          mkdir -p site
+          cp -r apps/web/dist/* site/
+
+      # ── Build staging UI from develop (if branch exists) ──────────
+      - name: Checkout develop for staging build
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          path: develop-src
+        continue-on-error: true
+
+      - name: Build staging
+        if: success()
+        working-directory: develop-src/apps/web
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_ENV: staging
+        continue-on-error: true
+
+      - name: Copy staging build
+        if: success()
+        run: |
+          mkdir -p site/staging
+          cp -r develop-src/apps/web/dist/* site/staging/ 2>/dev/null || true
+
+      # ── Copy data from data branch ────────────────────────────────
+      - name: Checkout data branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.data_ref || 'data' }}
+          path: data-src
+        continue-on-error: true
+
+      - name: Copy API data
+        run: |
+          mkdir -p site/api/v1
+          cp -r data-src/api/v1/* site/api/v1/ 2>/dev/null || true
+
+      # ── Transition: copy legacy scan_results ──────────────────────
+      - name: Copy legacy data (transition period)
+        run: |
+          if [ -d "scan_results" ]; then
+            cp -r scan_results site/scan_results
+          fi
+          # Keep legacy index.html accessible at /legacy/ if it exists
+          if [ -f "archive/index.html" ]; then
+            mkdir -p site/legacy
+            cp archive/index.html archive/app.js site/legacy/ 2>/dev/null || true
+          fi
+
+      # ── Deploy ────────────────────────────────────────────────────
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

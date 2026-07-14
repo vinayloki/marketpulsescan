@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vinayloki.github.io/marketpulsescan/schemas/v1/manifest.schema.json",
+  "title": "MarketPulseScan Manifest",
+  "description": "Run health record and index of all published dataset files. Frontend polls this to detect staleness.",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "run_id", "files"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.\\d+$",
+      "description": "Schema version (semver minor). Breaking changes → v2."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp of this publish run."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Unique identifier for this pipeline run (e.g. GitHub Actions run ID)."
+    },
+    "pipeline": {
+      "type": "object",
+      "description": "Pipeline run metadata.",
+      "properties": {
+        "git_sha": { "type": "string" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "finished_at": { "type": "string", "format": "date-time" },
+        "duration_seconds": { "type": "number" },
+        "provider_chain": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Data providers used in order (e.g. ['nse_archives', 'yfinance'])."
+        },
+        "universe_count": { "type": "integer" },
+        "ok_count": { "type": "integer" },
+        "error_count": { "type": "integer" },
+        "status": {
+          "type": "string",
+          "enum": ["success", "partial", "failed"]
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "description": "Index of all published dataset files.",
+      "items": {
+        "type": "object",
+        "required": ["path", "checksum", "row_count"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path from api/v1/ root."
+          },
+          "checksum": {
+            "type": "string",
+            "description": "SHA-256 hex digest of file contents."
+          },
+          "row_count": {
+            "type": "integer",
+            "description": "Number of data records in the file."
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "description": "Data freshness date (YYYY-MM-DD)."
+          },
+          "size_bytes": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

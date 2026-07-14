@@ -1,258 +1,102 @@
-Here’s a **clean, production-ready README update** tailored to your actual architecture (Option B + rate-limit fixes + Screener enrichment). You can copy-paste this directly into your repo 👉 [https://github.com/vinayloki/marketpulsescan](https://github.com/vinayloki/marketpulsescan)
+# MarketPulseScan
 
----
+**Zero-cost Indian stock analysis platform** — nightly EOD scanning, AI-powered picks, technical & fundamental analysis for NSE/BSE stocks.
 
-# 📈 MarketPulseScan
+[![CI](https://github.com/vinayloki/marketpulsescan/actions/workflows/ci.yml/badge.svg)](https://github.com/vinayloki/marketpulsescan/actions/workflows/ci.yml)
+[![Pages](https://github.com/vinayloki/marketpulsescan/actions/workflows/deploy-pages.yml/badge.svg)](https://vinayloki.github.io/marketpulsescan/)
 
-A **high-performance NSE stock scanner + backtesting dashboard** that combines:
+## How It Works
 
-* 📊 Full-market technical scanning (2,000+ stocks)
-* 🧠 Smart signal generation (momentum, breakout, volume)
-* 🏆 Fundamental filtering via Screener.in
-* ⚡ Optimized data pipeline (rate-limit safe)
+```
+GitHub Actions (nightly, 16:15 IST)
+  → Python pipeline scans ~3,000 NSE/BSE stocks
+  → Computes indicators, scores, and AI picks
+  → Publishes JSON dataset to GitHub Pages
 
----
-
-# 🚀 Key Features
-
-## 📊 Full Market Coverage
-
-* Scans entire NSE universe (~2000 stocks)
-* Preserves:
-
-  * Market breadth (Advance/Decline)
-  * Top movers
-  * Sector momentum
-
-## ⚡ Technical Signal Engine
-
-* Breakout detection
-* Momentum scoring
-* Volume spike analysis
-* Weekly backtesting engine
-
-## 🧠 Smart Fundamental Filtering
-
-* Uses Screener.in as a **post-scan filter**
-* Applies:
-
-  * ROE
-  * Debt/Equity
-  * Growth filters
-
-## 🔄 Optimized Data Pipeline
-
-* Batch processing with retry logic
-* Rate-limit safe (Yahoo Finance optimized)
-* Caching support
-
----
-
-# 🧠 Architecture (Best of Both Worlds)
-
-```text
-1. Full Market Scan (2000+ stocks)
-        ↓
-2. Technical Signals (~100–150 stocks)
-        ↓
-3. Screener Enrichment (targeted)
-        ↓
-4. Quality Filter
-        ↓
-5. Final Trade Setups (20–40 stocks)
+Browser loads static JSON → React app renders everything client-side
 ```
 
----
+**Total hosting cost: ₹0.** No servers, no databases in production.
 
-## ⚖️ Why This Design?
+## Architecture
 
-Unlike traditional scanners:
+| Component | Stack | Location |
+|---|---|---|
+| **Pipeline** | Python 3.12, pandas, scikit-learn | [`pipeline/`](pipeline/) |
+| **Web App** | TypeScript, React 19, Vite, Tailwind CSS 4 | [`apps/web/`](apps/web/) |
+| **Schemas** | JSON Schema (Draft 2020-12) | [`schemas/v1/`](schemas/v1/) |
+| **Data** | JSON on orphan `data` branch | `api/v1/` |
 
-| Approach                    | Problem                |
-| --------------------------- | ---------------------- |
-| Pre-filter (small universe) | ❌ Misses early movers  |
-| Full scan only              | ❌ Includes junk stocks |
+## Development Setup
 
-👉 This system:
+### Prerequisites
 
-* Keeps **market accuracy**
-* Adds **quality filtering only where needed**
+- Python 3.12+
+- Node.js 22+
+- Git
 
----
-
-# 📦 Data Sources
-
-## 📊 Price Data
-
-* Yahoo Finance (via `yfinance`)
-* Optimized for:
-
-  * Batch requests
-  * Retry logic
-  * Rate-limit handling
-
-## 🧾 Fundamentals
-
-* Screener.in (targeted scraping only)
-
-## 🏛 Universe
-
-* National Stock Exchange of India equity list
-
----
-
-# ⚙️ Installation
+### Pipeline (Python)
 
 ```bash
-git clone https://github.com/vinayloki/marketpulsescan
-cd marketpulsescan
+cd pipeline
+pip install -e ".[dev]"
 
-pip install -r requirements.txt
+# Lint & type-check
+ruff check .
+mypy .
+
+# Run tests
+pytest
 ```
 
----
-
-# ▶️ Usage
-
-## Run Scanner
+### Web App (TypeScript + React)
 
 ```bash
-python main.py
+cd apps/web
+npm install
+
+# Start dev server
+npm run dev
+
+# Lint, type-check, and test
+npm run lint
+npm run typecheck
+npm run test
 ```
 
-## Optional: Continuous Mode
+### Using Fixture Data
+
+The dev server loads fixture data from `pipeline/tests/fixtures/bundle/`. To point at production data instead:
 
 ```bash
-python main.py --loop
+VITE_DATA_URL=https://vinayloki.github.io/marketpulsescan/api/v1 npm run dev
 ```
 
----
+## Project Structure
 
-# ⚡ Performance Optimizations
-
-## 🔧 Yahoo Finance Rate Limit Fixes
-
-* Batch size reduced → `15`
-* Random delay → `5–8 sec`
-* Threads disabled → `threads=False`
-* Retry system added
-
-Example:
-
-```python
-batch_size = 15
-
-for batch in batches:
-    data = safe_download(batch)
-    time.sleep(random.uniform(5, 8))
+```
+marketpulsescan/
+├── pipeline/               Python EOD computation pipeline
+│   ├── marketpulse/        Package: config, ingestion, technical,
+│   │                       scoring, risk, publish, etc.
+│   └── tests/              pytest: unit, integration, fixtures
+├── apps/web/               TypeScript + React + Tailwind web app
+│   └── src/                Components, pages, stores, API client
+├── schemas/v1/             JSON Schema contracts
+├── docs/                   ADRs, migration guide, strategies
+├── archive/                Frozen legacy code (at parity)
+└── .github/workflows/      CI, nightly scan, deploy, backtest
 ```
 
----
+## Contributing
 
-## 🔄 Smart Data Flow
+1. Branch from `develop`: `git checkout -b feat/my-feature develop`
+2. One module per PR, tests included
+3. CI must pass: lint + type-check + tests + build
+4. Never commit generated data to code branches
 
-### Daily:
+See [MIGRATION.md](docs/MIGRATION.md) for path mappings from the legacy structure.
 
-* Fetch OHLCV for full universe
-* Generate signals
+## License
 
-### Weekly:
-
-* Update Screener fundamentals
-* Refresh cache
-
----
-
-# 🧩 Sector Mapping
-
-* Uses static `sector_map.json`
-* Built from NSE classification
-* No runtime API calls
-
----
-
-# ⚠️ Known Behaviors
-
-### ❗ “Possibly delisted; no price data found”
-
-This is **expected behavior**.
-
-Reason:
-
-* Some NSE tickers are:
-
-  * Delisted
-  * Suspended
-  * Renamed
-
-👉 These are automatically skipped.
-
----
-
-# 🧠 Strategy Logic
-
-Each week:
-
-1. Scan market
-2. Generate BUY signals
-3. Apply:
-
-   * 🎯 Target: ~3%
-   * 🛑 Stop Loss: ~1%
-   * ⏱ Max Hold: 1 week
-
----
-
-# 📊 Output
-
-* Trade logs
-* Return %
-* Capital growth
-* Win/loss tracking
-
----
-
-# 🔮 Future Improvements
-
-* [ ] Replace Yahoo with NSE Bhavcopy
-* [ ] Add sector rotation model
-* [ ] Add scoring system (Tech + Fundamentals)
-* [ ] Live alerts (Telegram / Webhooks)
-* [ ] API layer for frontend
-
----
-
-# ⚠️ Disclaimer
-
-This project is for **educational and research purposes only**.
-Not financial advice.
-
----
-
-# 🤝 Contributing
-
-PRs welcome.
-Focus areas:
-
-* Performance
-* Data reliability
-* Strategy improvements
-
----
-
-# ⭐ Support
-
-If you find this useful, consider starring the repo ⭐
-
----
-
-# ✔️ What I improved for you
-
-This README now:
-
-* Explains your **real architecture clearly**
-* Highlights your **unique advantage (Option B model)**
-* Documents **rate-limit fixes**
-* Makes the project look **serious + production-ready**
-
-
+MIT

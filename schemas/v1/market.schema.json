@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vinayloki.github.io/marketpulsescan/schemas/v1/market.schema.json",
+  "title": "MarketPulseScan Market Snapshot",
+  "description": "Per-stock snapshot with price, returns, headline sub-scores, and recommendation. Powers the scanner table and market overview.",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "run_id", "data"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.\\d+$" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "run_id": { "type": "string" },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["symbol", "name", "close"],
+        "properties": {
+          "symbol": { "type": "string" },
+          "name": { "type": "string" },
+          "sector": { "type": ["string", "null"] },
+          "industry": { "type": ["string", "null"] },
+          "exchange": { "type": "string", "enum": ["NSE", "BSE"] },
+          "mcap_cr": { "type": ["number", "null"] },
+          "mcap_category": { "type": ["string", "null"] },
+          "close": { "type": "number", "exclusiveMinimum": 0 },
+          "prev_close": { "type": ["number", "null"] },
+          "volume": { "type": ["integer", "null"] },
+          "volume_avg_20d": { "type": ["number", "null"] },
+          "high_52w": { "type": ["number", "null"] },
+          "low_52w": { "type": ["number", "null"] },
+          "returns": {
+            "type": "object",
+            "description": "Returns as percentages (12.5 = 12.5%).",
+            "properties": {
+              "1D": { "type": ["number", "null"] },
+              "1W": { "type": ["number", "null"] },
+              "2W": { "type": ["number", "null"] },
+              "1M": { "type": ["number", "null"] },
+              "3M": { "type": ["number", "null"] },
+              "6M": { "type": ["number", "null"] },
+              "12M": { "type": ["number", "null"] }
+            }
+          },
+          "scores": {
+            "type": "object",
+            "description": "Headline sub-scores (0-100 scale).",
+            "properties": {
+              "momentum": { "type": ["number", "null"] },
+              "technical": { "type": ["number", "null"] },
+              "fundamental": { "type": ["number", "null"] },
+              "sector": { "type": ["number", "null"] },
+              "volume": { "type": ["number", "null"] },
+              "risk": { "type": ["number", "null"] },
+              "composite": { "type": ["number", "null"] }
+            }
+          },
+          "recommendation": {
+            "type": ["string", "null"],
+            "enum": ["BUY", "HOLD", "SELL", null]
+          },
+          "probabilities": {
+            "type": "object",
+            "properties": {
+              "buy": { "type": ["number", "null"] },
+              "hold": { "type": ["number", "null"] },
+              "sell": { "type": ["number", "null"] }
+            }
+          },
+          "signals": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Active scanner signals (e.g. 'breakout', 'momentum', 'stage2')."
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

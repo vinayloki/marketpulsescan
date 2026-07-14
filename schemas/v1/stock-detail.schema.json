@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vinayloki.github.io/marketpulsescan/schemas/v1/stock-detail.schema.json",
+  "title": "MarketPulseScan Stock Detail",
+  "description": "Full detail for a single stock: identity, price, technicals, fundamentals, scores, recommendations, risk analysis, sparkline.",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "run_id", "data"],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^1\\.\\d+$" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "run_id": { "type": "string" },
+    "data": {
+      "type": "object",
+      "required": ["identity", "price"],
+      "properties": {
+        "identity": {
+          "type": "object",
+          "required": ["symbol", "name"],
+          "properties": {
+            "symbol": { "type": "string" },
+            "name": { "type": "string" },
+            "exchange": { "type": "string" },
+            "sector": { "type": ["string", "null"] },
+            "industry": { "type": ["string", "null"] },
+            "mcap_cr": { "type": ["number", "null"] },
+            "mcap_category": { "type": ["string", "null"] }
+          }
+        },
+        "price": {
+          "type": "object",
+          "required": ["close"],
+          "properties": {
+            "close": { "type": "number" },
+            "prev_close": { "type": ["number", "null"] },
+            "returns": {
+              "type": "object",
+              "properties": {
+                "1D": { "type": ["number", "null"] },
+                "1W": { "type": ["number", "null"] },
+                "1M": { "type": ["number", "null"] },
+                "3M": { "type": ["number", "null"] },
+                "6M": { "type": ["number", "null"] },
+                "1Y": { "type": ["number", "null"] }
+              }
+            },
+            "high_52w": { "type": ["number", "null"] },
+            "low_52w": { "type": ["number", "null"] },
+            "volume": { "type": ["integer", "null"] },
+            "volume_avg_20d": { "type": ["number", "null"] }
+          }
+        },
+        "technicals": {
+          "type": "object",
+          "properties": {
+            "rsi_14": { "type": ["number", "null"] },
+            "macd": {
+              "type": "object",
+              "properties": {
+                "line": { "type": ["number", "null"] },
+                "signal": { "type": ["number", "null"] },
+                "hist": { "type": ["number", "null"] }
+              }
+            },
+            "ema": {
+              "type": "object",
+              "properties": {
+                "20": { "type": ["number", "null"] },
+                "50": { "type": ["number", "null"] },
+                "150": { "type": ["number", "null"] },
+                "200": { "type": ["number", "null"] }
+              }
+            },
+            "sma": {
+              "type": "object",
+              "properties": {
+                "20": { "type": ["number", "null"] },
+                "50": { "type": ["number", "null"] },
+                "200": { "type": ["number", "null"] }
+              }
+            },
+            "bb": {
+              "type": "object",
+              "properties": {
+                "upper": { "type": ["number", "null"] },
+                "mid": { "type": ["number", "null"] },
+                "lower": { "type": ["number", "null"] },
+                "width": { "type": ["number", "null"] }
+              }
+            },
+            "atr_14": { "type": ["number", "null"] },
+            "supertrend": {
+              "type": "object",
+              "properties": {
+                "value": { "type": ["number", "null"] },
+                "direction": { "type": ["string", "null"], "enum": ["up", "down", null] }
+              }
+            },
+            "adx_14": { "type": ["number", "null"] },
+            "ichimoku": {
+              "type": "object",
+              "properties": {
+                "tenkan": { "type": ["number", "null"] },
+                "kijun": { "type": ["number", "null"] },
+                "span_a": { "type": ["number", "null"] },
+                "span_b": { "type": ["number", "null"] },
+                "cloud_state": { "type": ["string", "null"], "enum": ["bullish", "bearish", "neutral", null] }
+              }
+            },
+            "volume_profile": {
+              "type": "object",
+              "properties": {
+                "poc": { "type": ["number", "null"] },
+                "va_high": { "type": ["number", "null"] },
+                "va_low": { "type": ["number", "null"] }
+              }
+            },
+            "breakout": { "type": "object" }
+          }
+        },
+        "fundamentals": {
+          "type": "object",
+          "properties": {
+            "as_of": { "type": ["string", "null"], "format": "date" },
+            "pe": { "type": ["number", "null"] },
+            "pb": { "type": ["number", "null"] },
+            "peg": { "type": ["number", "null"] },
+            "roe": { "type": ["number", "null"] },
+            "roce": { "type": ["number", "null"] },
+            "eps_growth_yoy": { "type": ["number", "null"] },
+            "sales_growth_yoy": { "type": ["number", "null"] },
+            "debt_equity": { "type": ["number", "null"] },
+            "dividend_yield": { "type": ["number", "null"] },
+            "dividend_history": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ex_date": { "type": "string", "format": "date" },
+                  "amount": { "type": "number" }
+                }
+              }
+            },
+            "holdings": {
+              "type": "object",
+              "properties": {
+                "promoter_pct": { "type": ["number", "null"] },
+                "fii_pct": { "type": ["number", "null"] },
+                "dii_pct": { "type": ["number", "null"] },
+                "pledge_pct": { "type": ["number", "null"] },
+                "as_of": { "type": ["string", "null"], "format": "date" }
+              }
+            }
+          }
+        },
+        "scores": {
+          "type": "object",
+          "properties": {
+            "momentum": { "type": ["number", "null"] },
+            "technical": { "type": ["number", "null"] },
+            "fundamental": { "type": ["number", "null"] },
+            "sector": { "type": ["number", "null"] },
+            "volume": { "type": ["number", "null"] },
+            "risk": { "type": ["number", "null"] },
+            "composite": { "type": ["number", "null"] },
+            "probabilities": {
+              "type": "object",
+              "properties": {
+                "buy": { "type": ["number", "null"] },
+                "hold": { "type": ["number", "null"] },
+                "sell": { "type": ["number", "null"] }
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "object",
+          "description": "Per-horizon recommendation.",
+          "patternProperties": {
+            "^(1D|1W|1M|3M|6M|1Y)$": {
+              "type": "object",
+              "properties": {
+                "signal": { "type": "string", "enum": ["BUY", "HOLD", "SELL"] },
+                "confidence": { "type": "number", "minimum": 0, "maximum": 100 },
+                "rationale": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "risk": {
+          "type": "object",
+          "properties": {
+            "support": { "type": "array", "items": { "type": "number" } },
+            "resistance": { "type": "array", "items": { "type": "number" } },
+            "entry": { "type": ["number", "null"] },
+            "stop_loss": { "type": ["number", "null"] },
+            "target": { "type": ["number", "null"] },
+            "risk_reward": { "type": ["number", "null"] },
+            "sl_pct": { "type": ["number", "null"] },
+            "tp_pct": { "type": ["number", "null"] },
+            "p_success": { "type": ["number", "null"] },
+            "position_size_hint": {
+              "type": "object",
+              "properties": {
+                "capital_ref": { "type": "number" },
+                "risk_pct": { "type": "number" },
+                "qty": { "type": "integer" }
+              }
+            }
+          }
+        },
+        "sparkline_90d": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Last 90 daily closing prices."
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
