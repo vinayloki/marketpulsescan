@@ -16,7 +16,7 @@
         "required": ["symbol", "name", "exchange"],
         "properties": {
           "symbol": { "type": "string", "description": "NSE/BSE ticker symbol." },
-          "name": { "type": "string", "description": "Company name." },
+          "name": { "type": ["string", "null"], "description": "Company name; null when the provider supplies no name (UI falls back to symbol)." },
           "exchange": { "type": "string", "enum": ["NSE", "BSE"] },
           "isin": { "type": ["string", "null"] },
           "sector": { "type": ["string", "null"] },

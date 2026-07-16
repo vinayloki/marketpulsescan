@@ -16,7 +16,7 @@
         "required": ["symbol", "name", "close"],
         "properties": {
           "symbol": { "type": "string" },
-          "name": { "type": "string" },
+          "name": { "type": ["string", "null"] },
           "sector": { "type": ["string", "null"] },
           "industry": { "type": ["string", "null"] },
           "exchange": { "type": "string", "enum": ["NSE", "BSE"] },
