@@ -5,6 +5,8 @@
  * For now, this provides the data URL resolution and fetch helpers.
  */
 
+import { useQuery } from '@tanstack/react-query'
+
 /** Base URL for the dataset API — configurable per environment */
 const DATA_BASE_URL = import.meta.env.VITE_DATA_URL
   ?? `${import.meta.env.BASE_URL}api/v1`
@@ -39,14 +41,19 @@ export interface ManifestFile {
 
 export interface MarketStock {
   symbol: string
-  name: string
-  sector: string
-  mcap_cr: number
-  mcap_category: string
-  close: number
-  returns: Record<string, number>
-  recommendation: string
-  composite_score: number
+  name: string | null
+  sector: string | null
+  exchange: string
+  mcap_cr: number | null
+  mcap_category: string | null
+  close: number | null
+  prev_close: number | null
+  returns: Record<string, number | null>
+  score: number | null
+  sub_scores: Record<string, number> | null
+  recommendation: string | null
+  signals: string[]
+  indicators: Record<string, number | string | boolean | null> | null
 }
 
 export interface MarketData {
@@ -68,3 +75,21 @@ export const queryKeys = {
   regime: ['regime'] as const,
   news: ['news'] as const,
 } as const
+
+// ── Query hooks ──────────────────────────────────────────────────────
+
+export function useManifest() {
+  return useQuery({
+    queryKey: queryKeys.manifest,
+    queryFn: () => fetchDataset<Manifest>('manifest.json'),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useMarket() {
+  return useQuery({
+    queryKey: queryKeys.market,
+    queryFn: () => fetchDataset<MarketData>('market.json'),
+    staleTime: 5 * 60 * 1000,
+  })
+}

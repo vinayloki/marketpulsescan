@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local dev dataset (copied from scan output; served from data branch in prod)
+public/api/
