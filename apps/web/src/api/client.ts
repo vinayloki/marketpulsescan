@@ -43,15 +43,24 @@ export interface MarketStock {
   symbol: string
   name: string | null
   sector: string | null
+  industry?: string | null
   exchange: string
   mcap_cr: number | null
   mcap_category: string | null
   close: number | null
   prev_close: number | null
+  volume?: number | null
+  volume_avg_20d?: number | null
+  high_52w?: number | null
+  low_52w?: number | null
   returns: Record<string, number | null>
+  // New schema: top-level score + sub_scores dict
   score: number | null
   sub_scores: Record<string, number> | null
+  // Legacy schema: scores dict with composite key
+  scores?: Record<string, number> | null
   recommendation: string | null
+  probabilities?: Record<string, number> | null
   signals: string[]
   indicators: Record<string, number | string | boolean | null> | null
 }
@@ -91,5 +100,24 @@ export function useMarket() {
     queryKey: queryKeys.market,
     queryFn: () => fetchDataset<MarketData>('market.json'),
     staleTime: 5 * 60 * 1000,
+    select: (data) => ({
+      ...data,
+      // Normalize legacy fixture schema → new schema fields
+      data: data.data.map((s) => ({
+        ...s,
+        score: s.score ?? s.scores?.['composite'] ?? null,
+        sub_scores: s.sub_scores ?? (
+          s.scores
+            ? Object.fromEntries(Object.entries(s.scores).filter(([k]) => k !== 'composite'))
+            : null
+        ),
+        indicators: s.indicators ?? (
+          // Lift legacy top-level fields into indicators dict
+          (s.high_52w != null || s.low_52w != null)
+            ? { high_52w: s.high_52w, low_52w: s.low_52w }
+            : null
+        ),
+      })),
+    }),
   })
 }

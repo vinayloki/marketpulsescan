@@ -6,6 +6,7 @@ import {
   PieChart,
   Activity,
 } from 'lucide-react'
+import { useManifest } from '../api/client'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -87,11 +88,46 @@ export function Layout() {
 
 /** Shows data freshness based on manifest.json */
 function DataFreshnessBadge() {
-  // TODO: Read from manifest.json via TanStack Query (Sprint 4)
+  const { data: manifest, isLoading } = useManifest()
+
+  if (isLoading) {
+    return (
+      <div className="h-6 w-24 rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] animate-pulse" />
+    )
+  }
+
+  const generatedAt = manifest?.generated_at
+  const runId = manifest?.run_id
+
+  let label = 'No data'
+  let dotColor = 'var(--color-danger)'
+
+  if (generatedAt) {
+    const ageMs = Date.now() - new Date(generatedAt).getTime()
+    const ageH = ageMs / 3_600_000
+    if (ageH < 26) {
+      label = 'Live'
+      dotColor = 'var(--color-success)'
+    } else if (ageH < 48) {
+      label = `${Math.round(ageH)}h ago`
+      dotColor = 'var(--color-warning)'
+    } else {
+      label = `${Math.round(ageH / 24)}d ago`
+      dotColor = 'var(--color-danger)'
+    }
+  }
+
+  const title = generatedAt
+    ? `Scan: ${runId ?? '?'} · Generated: ${new Date(generatedAt).toLocaleString()}`
+    : 'No manifest data'
+
   return (
-    <div className="flex items-center gap-1.5 px-2 py-1 rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] text-xs text-[var(--color-text-muted)]">
-      <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-success)] animate-pulse" />
-      <span className="hidden md:inline">Fixture data</span>
+    <div
+      title={title}
+      className="flex items-center gap-1.5 px-2 py-1 rounded-[var(--radius-sm)] bg-[var(--color-surface-2)] text-xs text-[var(--color-text-muted)] cursor-default"
+    >
+      <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: dotColor }} />
+      <span className="hidden md:inline">{label}</span>
     </div>
   )
 }

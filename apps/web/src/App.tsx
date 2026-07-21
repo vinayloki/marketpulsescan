@@ -13,7 +13,7 @@ export function App() {
       <Route element={<Layout />}>
         <Route index element={<DashboardPage />} />
         <Route path="scanner" element={<ScannerPage />} />
-        <Route path="stock/:symbol" element={<StockDetailPage />} />
+        <Route path="stocks/:symbol" element={<StockDetailPage />} />
         <Route path="ai-picks" element={<AiPicksPage />} />
         <Route path="sectors" element={<SectorsPage />} />
         <Route path="*" element={<NotFoundPage />} />
