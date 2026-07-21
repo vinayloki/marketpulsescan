@@ -3,12 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
-const base = process.env.VITE_BASE
-  ?? (process.env.VITE_ENV === 'staging'
-    ? '/marketpulsescan/staging/'
-    : process.env.VITE_ENV === 'production'
-      ? '/marketpulsescan/v2/'
-      : '/')
+const base = process.env.VITE_BASE || '/marketpulsescan/v2/'
 
 export default defineConfig({
   plugins: [
