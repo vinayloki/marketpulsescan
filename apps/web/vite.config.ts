@@ -3,12 +3,12 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
-// Environment-based base path for dev/staging/prod deployments
-const base = process.env.VITE_ENV === 'staging'
-  ? '/marketpulsescan/staging/'
-  : process.env.VITE_ENV === 'production'
-    ? '/marketpulsescan/'
-    : '/'
+const base = process.env.VITE_BASE
+  ?? (process.env.VITE_ENV === 'staging'
+    ? '/marketpulsescan/staging/'
+    : process.env.VITE_ENV === 'production'
+      ? '/marketpulsescan/v2/'
+      : '/')
 
 export default defineConfig({
   plugins: [

@@ -9,8 +9,12 @@ interface SectorStats {
   name: string
   count: number
   avgScore: number
+  avg1D: number
+  avg1W: number
   avg1M: number
   avg3M: number
+  avg6M: number
+  avg12M: number
   buys: number
   top: MarketStock | null
   color: string
@@ -26,10 +30,14 @@ const SECTOR_COLORS: Record<string, string> = {
   'Metals':                 'oklch(0.60 0.10 280)',
   'Power':                  'oklch(0.72 0.18 50)',
   'Realty':                 'oklch(0.62 0.16 340)',
+  'Capital Goods':          'oklch(0.65 0.18 130)',
+  'Chemicals':              'oklch(0.68 0.16 190)',
+  'Consumer Durables':      'oklch(0.70 0.17 310)',
+  'Textiles':               'oklch(0.64 0.14 100)',
 }
 
 function sectorColor(name: string) {
-  return SECTOR_COLORS[name] ?? 'oklch(0.55 0.12 260)'
+  return SECTOR_COLORS[name] ?? 'oklch(0.65 0.18 240)'
 }
 
 function aggregateSectors(stocks: MarketStock[]): SectorStats[] {
@@ -42,15 +50,23 @@ function aggregateSectors(stocks: MarketStock[]): SectorStats[] {
 
   return Object.entries(map).map(([name, ss]) => {
     const scores = ss.map(s => s.score).filter((v): v is number => v != null)
+    const ret1d = ss.map(s => s.returns?.['1D']).filter((v): v is number => v != null)
+    const ret1w = ss.map(s => s.returns?.['1W']).filter((v): v is number => v != null)
     const ret1m = ss.map(s => s.returns?.['1M']).filter((v): v is number => v != null)
     const ret3m = ss.map(s => s.returns?.['3M']).filter((v): v is number => v != null)
+    const ret6m = ss.map(s => s.returns?.['6M']).filter((v): v is number => v != null)
+    const ret12m = ss.map(s => s.returns?.['12M']).filter((v): v is number => v != null)
     const avg = (arr: number[]) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
     return {
       name,
       count: ss.length,
       avgScore: avg(scores),
+      avg1D: avg(ret1d),
+      avg1W: avg(ret1w),
       avg1M: avg(ret1m),
       avg3M: avg(ret3m),
+      avg6M: avg(ret6m),
+      avg12M: avg(ret12m),
       buys: ss.filter(s => s.recommendation === 'BUY').length,
       top: ss.sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0] ?? null,
       color: sectorColor(name),
@@ -268,42 +284,66 @@ export function SectorsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[var(--color-border)] text-left">
-                {['Sector', 'Stocks', 'BUYs', 'Avg Score', '1M Avg', '3M Avg', 'Top Pick'].map(h => (
-                  <th key={h} className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-[var(--color-text-muted)]">{h}</th>
+                {['Sector', 'Stocks', 'BUYs', 'Avg Score', '1D Avg', '1W Avg', '1M Avg', '3M Avg', '6M Avg', '12M Avg', 'Top Pick'].map(h => (
+                  <th key={h} className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[var(--color-text-muted)] text-right first:text-left last:text-left">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]">
               {sectors.map((sec) => (
                 <tr key={sec.name} className="hover:bg-[var(--color-surface-2)]/50 transition-colors">
-                  <td className="px-4 py-3 font-medium">
+                  <td className="px-3 py-3 font-medium">
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sec.color }} />
                       {sec.name}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-[var(--color-text-muted)]">{sec.count}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 text-[var(--color-text-muted)] text-right">{sec.count}</td>
+                  <td className="px-3 py-3 text-right">
                     <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[var(--color-success)]/10 text-[var(--color-success)]">
                       {sec.buys}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-mono font-bold" style={{ color: sec.color }}>
+                  <td className="px-3 py-3 font-mono font-bold text-right" style={{ color: sec.color }}>
                     {sec.avgScore.toFixed(1)}
                   </td>
                   <td
-                    className="px-4 py-3 font-mono"
+                    className="px-3 py-3 font-mono text-right"
+                    style={{ color: sec.avg1D >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}
+                  >
+                    {sec.avg1D >= 0 ? '+' : ''}{sec.avg1D.toFixed(1)}%
+                  </td>
+                  <td
+                    className="px-3 py-3 font-mono text-right"
+                    style={{ color: sec.avg1W >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}
+                  >
+                    {sec.avg1W >= 0 ? '+' : ''}{sec.avg1W.toFixed(1)}%
+                  </td>
+                  <td
+                    className="px-3 py-3 font-mono text-right"
                     style={{ color: sec.avg1M >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}
                   >
                     {sec.avg1M >= 0 ? '+' : ''}{sec.avg1M.toFixed(1)}%
                   </td>
                   <td
-                    className="px-4 py-3 font-mono"
+                    className="px-3 py-3 font-mono text-right"
                     style={{ color: sec.avg3M >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}
                   >
                     {sec.avg3M >= 0 ? '+' : ''}{sec.avg3M.toFixed(1)}%
                   </td>
-                  <td className="px-4 py-3">
+                  <td
+                    className="px-3 py-3 font-mono text-right"
+                    style={{ color: sec.avg6M >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}
+                  >
+                    {sec.avg6M >= 0 ? '+' : ''}{sec.avg6M.toFixed(1)}%
+                  </td>
+                  <td
+                    className="px-3 py-3 font-mono text-right"
+                    style={{ color: sec.avg12M >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}
+                  >
+                    {sec.avg12M >= 0 ? '+' : ''}{sec.avg12M.toFixed(1)}%
+                  </td>
+                  <td className="px-3 py-3">
                     {sec.top && (
                       <Link
                         to={`/stocks/${sec.top.symbol}`}

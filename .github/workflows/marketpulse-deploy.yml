@@ -1,0 +1,152 @@
+name: MarketPulse — Deploy to GitHub Pages
+
+# ═══════════════════════════════════════════════════════════════════════
+#  Deploys the new pipeline's bundle from the 'marketpulse-data' branch
+#  to GitHub Pages at the path /marketpulse/
+#
+#  Completely independent from the legacy deploy-pages.yml.
+#  The legacy site at / is NOT touched.
+#
+#  URL layout after deploy:
+#    https://<user>.github.io/<repo>/marketpulse/           ← React UI
+#    https://<user>.github.io/<repo>/marketpulse/api/v1/    ← JSON API
+#
+#  Triggers:
+#    - Automatically when marketpulse-scan.yml pushes to 'marketpulse-data'
+#    - Manually via workflow_dispatch
+# ═══════════════════════════════════════════════════════════════════════
+
+on:
+  push:
+    branches: ['marketpulse-data']
+  workflow_dispatch:
+    inputs:
+      data_ref:
+        description: 'Data branch ref to deploy from'
+        required: false
+        default: 'marketpulse-data'
+
+concurrency:
+  group: marketpulse-deploy
+  cancel-in-progress: true  # only ever one deploy at a time
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy MarketPulse Site
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}marketpulse/
+
+    steps:
+      # ── 1. Checkout the API data from marketpulse-data branch ─────────────
+      - name: Checkout data branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.data_ref || 'marketpulse-data' }}
+          path: data-src
+
+      # ── 2. Checkout main branch for the web app source ────────────────────
+      - name: Checkout main (web app source)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: code
+
+      # ── 3. Build the new React/Vite web app ───────────────────────────────
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: code/apps/web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: code/apps/web
+        run: npm ci
+
+      - name: Build web app
+        working-directory: code/apps/web
+        run: npm run build
+        env:
+          VITE_ENV: production
+          VITE_BASE: /marketpulsescan/v2/
+          VITE_API_BASE: /marketpulsescan/v2/api/v1
+
+      # ── 4. Assemble the site folder ───────────────────────────────────────
+      # Layout:
+      #   site/                          ← Existing legacy app (untouched)
+      #   site/v2/                       ← New independent V2 app
+      #   site/v2/api/v1/                ← New API data
+      - name: Assemble site
+        run: |
+          mkdir -p site/v2/api/v1
+
+          # 1. Copy legacy root site if present (preserves existing version untouched)
+          if [ -f "code/index.html" ]; then
+            cp -r code/*.html code/*.js code/*.css site/ 2>/dev/null || true
+          fi
+          if [ -d "code/scan_results" ]; then
+            cp -r code/scan_results site/ 2>/dev/null || true
+          fi
+
+          # 2. Deploy new V2 web app to /v2/
+          cp -r code/apps/web/dist/* site/v2/
+
+          # 3. Deploy new V2 API data to /v2/api/v1/
+          cp -r data-src/api/v1/* site/v2/api/v1/
+
+          echo "Site layout:"
+          find site -maxdepth 3 | sort
+
+      # ── 5. Show bundle stats in summary ───────────────────────────────────
+      - name: Bundle stats
+        run: |
+          python3 - <<'EOF' >> $GITHUB_STEP_SUMMARY
+          import json
+          from pathlib import Path
+
+          try:
+              api = Path("site/v2/api/v1")
+              with open(api / "manifest.json") as f:
+                  m = json.load(f)
+              with open(api / "market.json") as f:
+                  market = json.load(f)
+              with open(api / "universe.json") as f:
+                  universe = json.load(f)
+
+              print("## 🚀 MarketPulse Deploy")
+              print(f"| Key | Value |")
+              print(f"|-----|-------|")
+              print(f"| **Data generated** | {m.get('generated_at', 'n/a')} |")
+              print(f"| **Run ID** | {m.get('run_id', 'n/a')} |")
+              print(f"| **Universe** | {len(universe.get('data', []))} symbols |")
+              print(f"| **Market records** | {len(market.get('data', []))} |")
+          except Exception as e:
+              print(f"Could not read bundle stats: {e}")
+          EOF
+
+      # ── 6. Upload to GitHub Pages ─────────────────────────────────────────
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "## ❌ MarketPulse Deploy Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **[View log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> $GITHUB_STEP_SUMMARY

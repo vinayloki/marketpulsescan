@@ -110,6 +110,14 @@ class ProviderChain:
         df: pd.DataFrame = p.fetch_ohlcv(symbols, period=period, interval=interval)
         return df
 
+    def fetch_universe_meta(self) -> dict[str, dict[str, object]]:
+        p = self._first("universe_meta")
+        if p is None:
+            log.debug("No universe_meta provider in chain")
+            return {}
+        result: dict[str, dict[str, object]] = p.fetch_universe_meta()
+        return result
+
     def fetch_fundamentals(
         self,
         symbols: list[str],
@@ -127,16 +135,23 @@ def get_provider_chain() -> ProviderChain:
     Build the standard provider chain for production use.
 
     Chain (in priority order):
-      1. BhavcopProvider  — universe + bhavcopy OHLCV (NSE archives, official)
-      2. YFinanceProvider — ohlcv history + fundamentals (fallback)
+      1. NSEPythonProvider — universe + symbol metadata (nsepython, official NSE)
+      2. BhavcopProvider   — universe fallback + bhavcopy OHLCV (NSE archives)
+      3. YFinanceProvider  — ohlcv history + fundamentals (fallback)
 
     Each provider declares its capabilities; ProviderChain routes accordingly.
     """
     from marketpulse.ingestion.providers.bhavcopy import BhavcopProvider
+    from marketpulse.ingestion.providers.bse_provider import BSEProvider
+    from marketpulse.ingestion.providers.nsepython_provider import NSEPythonProvider
+    from marketpulse.ingestion.providers.screener_provider import ScreenerProvider
     from marketpulse.ingestion.providers.yfinance import YFinanceProvider
 
     return ProviderChain(
         [
+            NSEPythonProvider(),
+            BSEProvider(),
+            ScreenerProvider(),
             BhavcopProvider(),
             YFinanceProvider(),
         ]

@@ -47,6 +47,9 @@ export interface MarketStock {
   exchange: string
   mcap_cr: number | null
   mcap_category: string | null
+  open?: number | null
+  high?: number | null
+  low?: number | null
   close: number | null
   prev_close: number | null
   volume?: number | null
@@ -114,7 +117,7 @@ export function useMarket() {
         indicators: s.indicators ?? (
           // Lift legacy top-level fields into indicators dict
           (s.high_52w != null || s.low_52w != null)
-            ? { high_52w: s.high_52w, low_52w: s.low_52w }
+            ? { high_52w: s.high_52w ?? null, low_52w: s.low_52w ?? null }
             : null
         ),
       })),

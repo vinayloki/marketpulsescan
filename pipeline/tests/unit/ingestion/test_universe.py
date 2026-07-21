@@ -5,6 +5,7 @@ Unit tests for ingestion/universe.py — no network calls.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from datetime import date
 from unittest.mock import MagicMock
 
@@ -193,3 +194,170 @@ def test_load_universe_returns_empty_when_provider_returns_empty(tmp_path):
     )
 
     assert result == []
+
+
+# ── enrich_universe ───────────────────────────────────────────────────────────
+
+
+def test_enrich_universe_from_snapshot(tmp_path: Path) -> None:
+    from marketpulse.ingestion.universe import UniverseSymbol, enrich_universe
+
+    snapshot = tmp_path / "fundamentals.json"
+    snapshot.write_text(
+        json.dumps(
+            {
+                "stocks": [
+                    {
+                        "s": "ABC",
+                        "name": "ABC Ltd",
+                        "sector": "IT & Technology",
+                        "ind": "Software",
+                        "mcap": 55000.0,
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    universe = [UniverseSymbol(symbol="ABC"), UniverseSymbol(symbol="XYZ")]
+    enriched = enrich_universe(universe, snapshot_file=snapshot)
+
+    assert enriched == 1
+    assert universe[0].name == "ABC Ltd"
+    assert universe[0].sector == "IT & Technology"
+    assert universe[0].mcap_cr == 55000.0
+    assert universe[0].mcap_category is not None
+    assert universe[1].name is None
+
+
+def test_enrich_universe_missing_file_is_noop(tmp_path: Path) -> None:
+    from marketpulse.ingestion.universe import UniverseSymbol, enrich_universe
+
+    universe = [UniverseSymbol(symbol="ABC")]
+    assert enrich_universe(universe, snapshot_file=tmp_path / "nope.json") == 0
+    assert universe[0].name is None
+
+
+def test_enrich_universe_does_not_overwrite_existing(tmp_path: Path) -> None:
+    from marketpulse.ingestion.universe import UniverseSymbol, enrich_universe
+
+    snapshot = tmp_path / "fundamentals.json"
+    snapshot.write_text(
+        json.dumps({"stocks": [{"s": "ABC", "name": "Snapshot Name", "sector": "Others"}]}),
+        encoding="utf-8",
+    )
+    universe = [UniverseSymbol(symbol="ABC", name="Official Name")]
+    enrich_universe(universe, snapshot_file=snapshot)
+    assert universe[0].name == "Official Name"  # official NSE name wins
+    assert universe[0].sector == "Others"
+
+
+def test_enrich_universe_falls_back_to_provider(tmp_path: Path) -> None:
+    """When no snapshot exists, enrich_universe uses the provider chain."""
+    from marketpulse.ingestion.universe import UniverseSymbol, enrich_universe
+
+    mock_provider = MagicMock()
+    mock_provider.fetch_fundamentals.return_value = {
+        "ABC": {
+            "name": "ABC Corp",
+            "sector": "Technology",
+            "industry": "Software",
+            "mcap": 12000.0,
+        },
+    }
+
+    universe = [UniverseSymbol(symbol="ABC"), UniverseSymbol(symbol="XYZ")]
+    enriched = enrich_universe(
+        universe,
+        snapshot_file=tmp_path / "nope.json",  # does not exist
+        provider=mock_provider,
+    )
+
+    assert enriched == 1
+    assert universe[0].name == "ABC Corp"
+    assert universe[0].sector == "Technology"
+    assert universe[0].industry == "Software"
+    assert universe[0].mcap_cr == 12000.0
+    assert universe[0].mcap_category == "Mid Cap"
+    assert universe[1].sector is None  # not in provider response
+    mock_provider.fetch_fundamentals.assert_called_once()
+
+
+def test_enrich_universe_snapshot_beats_provider(tmp_path: Path) -> None:
+    """When a snapshot exists, provider is NOT called even if passed."""
+    from marketpulse.ingestion.universe import UniverseSymbol, enrich_universe
+
+    snapshot = tmp_path / "fundamentals.json"
+    snapshot.write_text(
+        json.dumps({"stocks": [{"s": "ABC", "name": "From Snapshot", "sector": "Finance"}]}),
+        encoding="utf-8",
+    )
+
+    mock_provider = MagicMock()
+    mock_provider.fetch_fundamentals.return_value = {
+        "ABC": {"name": "From Provider", "sector": "Tech"},
+    }
+
+    universe = [UniverseSymbol(symbol="ABC")]
+    enrich_universe(universe, snapshot_file=snapshot, provider=mock_provider)
+
+    assert universe[0].name == "From Snapshot"
+    assert universe[0].sector == "Finance"
+    mock_provider.fetch_fundamentals.assert_not_called()
+
+
+def test_enrich_universe_provider_exception_is_noop(tmp_path: Path) -> None:
+    """Provider failure doesn't raise — returns 0."""
+    from marketpulse.ingestion.universe import UniverseSymbol, enrich_universe
+
+    mock_provider = MagicMock()
+    mock_provider.fetch_fundamentals.side_effect = RuntimeError("API down")
+
+    universe = [UniverseSymbol(symbol="ABC")]
+    result = enrich_universe(
+        universe,
+        snapshot_file=tmp_path / "nope.json",
+        provider=mock_provider,
+    )
+    assert result == 0
+    assert universe[0].sector is None
+
+
+def test_enrich_universe_provider_skips_already_enriched(tmp_path: Path) -> None:
+    """Provider only fetches symbols missing sector data."""
+    from marketpulse.ingestion.universe import UniverseSymbol, enrich_universe
+
+    mock_provider = MagicMock()
+    mock_provider.fetch_fundamentals.return_value = {}
+
+    universe = [UniverseSymbol(symbol="ABC", sector="Already Set")]
+    enrich_universe(
+        universe,
+        snapshot_file=tmp_path / "nope.json",
+        provider=mock_provider,
+    )
+    # All symbols already have sector → no fetch needed
+    mock_provider.fetch_fundamentals.assert_not_called()
+
+
+def test_load_universe_passes_provider_to_enrich(tmp_path: Path) -> None:
+    """load_universe wires its provider into enrich_universe."""
+    from marketpulse.ingestion.universe import load_universe
+
+    mock_provider = MagicMock()
+    mock_provider.fetch_universe.return_value = ["ABC"]
+    mock_provider.fetch_universe_meta.return_value = {}
+    mock_provider.fetch_fundamentals.return_value = {
+        "ABC": {"name": "Live Name", "sector": "Healthcare", "industry": "Pharma", "mcap": 800.0},
+    }
+
+    result = load_universe(
+        provider=mock_provider,
+        cache_file=tmp_path / "symbols.json",
+        force_refresh=True,
+    )
+
+    assert len(result) == 1
+    assert result[0].sector == "Healthcare"
+    assert result[0].industry == "Pharma"
+    mock_provider.fetch_fundamentals.assert_called_once()

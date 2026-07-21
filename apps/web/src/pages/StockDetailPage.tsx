@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import {
   ArrowLeft, TrendingUp, TrendingDown, BarChart3,
-  Activity, Shield, Info, Zap, Building2,
+  Activity, Shield, Info, Zap, Building2, ExternalLink,
 } from 'lucide-react'
 import { useMarket } from '../api/client'
 import type { MarketStock } from '../api/client'
@@ -151,6 +151,24 @@ export function StockDetailPage() {
                 <span className="ml-2 text-[var(--color-text-muted)]">· {stock.mcap_category}</span>
               )}
             </p>
+            <div className="flex items-center gap-2 mt-2">
+              <a
+                href={`https://in.tradingview.com/chart/?symbol=NSE:${stock.symbol}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-md)] bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs text-[var(--color-brand-400)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-brand-500)] transition-all"
+              >
+                TradingView <ExternalLink className="h-3 w-3" />
+              </a>
+              <a
+                href={`https://www.screener.in/company/${stock.symbol}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius-md)] bg-[var(--color-surface-2)] border border-[var(--color-border)] text-xs text-[var(--color-brand-400)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-brand-500)] transition-all"
+              >
+                Screener.in <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
           </div>
         </div>
 
@@ -204,6 +222,70 @@ export function StockDetailPage() {
             <ReturnPill key={key} label={label} value={returns[key]} />
           ))}
         </div>
+      </div>
+
+      {/* ── OHLC Daily Price Action Card ────────────────────────────────────── */}
+      <div className="glass rounded-[var(--radius-lg)] p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
+            OHLC Daily Price Action
+          </h2>
+          <span className="text-[11px] font-mono text-[var(--color-text-muted)]">
+            Exchange: {stock.exchange}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-2)]">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">Open</span>
+            <span className="text-sm font-mono font-bold">
+              {stock.open != null ? `₹${stock.open.toLocaleString('en-IN')}` : '—'}
+            </span>
+          </div>
+          <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-2)]">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">Day High</span>
+            <span className="text-sm font-mono font-bold text-[var(--color-success)]">
+              {stock.high != null ? `₹${stock.high.toLocaleString('en-IN')}` : '—'}
+            </span>
+          </div>
+          <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-2)]">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">Day Low</span>
+            <span className="text-sm font-mono font-bold text-[var(--color-danger)]">
+              {stock.low != null ? `₹${stock.low.toLocaleString('en-IN')}` : '—'}
+            </span>
+          </div>
+          <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-2)]">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">Close (LTP)</span>
+            <span className="text-sm font-mono font-bold text-[var(--color-brand-400)]">
+              {stock.close != null ? `₹${stock.close.toLocaleString('en-IN')}` : '—'}
+            </span>
+          </div>
+          <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-2)]">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">Prev Close</span>
+            <span className="text-sm font-mono font-bold text-[var(--color-text-secondary)]">
+              {stock.prev_close != null ? `₹${stock.prev_close.toLocaleString('en-IN')}` : '—'}
+            </span>
+          </div>
+        </div>
+
+        {/* Intraday Price Location Bar */}
+        {stock.high != null && stock.low != null && stock.close != null && stock.high > stock.low && (
+          <div className="mt-4 pt-3 border-t border-[var(--color-border)]">
+            <div className="flex justify-between text-[11px] font-mono text-[var(--color-text-muted)] mb-1">
+              <span>Low: ₹{stock.low}</span>
+              <span className="text-[var(--color-text-primary)] font-semibold">Intraday Position: {(((stock.close - stock.low) / (stock.high - stock.low)) * 100).toFixed(0)}%</span>
+              <span>High: ₹{stock.high}</span>
+            </div>
+            <div className="h-2 rounded-full bg-[var(--color-surface-3)] relative overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${Math.max(3, Math.min(100, ((stock.close - stock.low) / (stock.high - stock.low)) * 100))}%`,
+                  background: up ? 'var(--color-success)' : 'var(--color-danger)',
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Score + Chart row ───────────────────────────────────────────── */}

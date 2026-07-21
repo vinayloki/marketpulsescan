@@ -1,7 +1,7 @@
 # Migration Guide: india-swing-scanner → MarketPulseScan
 
-**Status:** In progress (Sprint 0 — scaffold phase)
-**Last updated:** 2026-07-13
+**Status:** In progress (Sprint 3 — scoring + fundamentals + risk)
+**Last updated:** 2026-07-20
 
 ## Path Mapping (Old → New)
 

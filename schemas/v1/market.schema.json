@@ -22,7 +22,7 @@
           "exchange": { "type": "string", "enum": ["NSE", "BSE"] },
           "mcap_cr": { "type": ["number", "null"] },
           "mcap_category": { "type": ["string", "null"] },
-          "close": { "type": "number", "exclusiveMinimum": 0 },
+          "close": { "type": ["number", "null"] },
           "prev_close": { "type": ["number", "null"] },
           "volume": { "type": ["integer", "null"] },
           "volume_avg_20d": { "type": ["number", "null"] },

@@ -121,9 +121,154 @@ def load_universe(
         return []
 
     universe = [UniverseSymbol(symbol=sym, exchange=exchange) for sym in raw_symbols]
+
+    # Official NSE metadata (name/ISIN/listing date) via provider chain
+    try:
+        nse_meta: dict[str, dict[str, Any]] = provider.fetch_universe_meta()
+    except AttributeError:
+        nse_meta = {}
+    if nse_meta:
+        for u in universe:
+            m = nse_meta.get(u.symbol)
+            if m:
+                u.name = u.name or (str(m["name"]) if m.get("name") else None)
+                u.isin = u.isin or (str(m["isin"]) if m.get("isin") else None)
+        log.info("Universe: NSE metadata applied to %d symbols", len(nse_meta))
+
+    # Sector/industry/mcap from fundamentals snapshot (interim until Sprint 3)
+    enrich_universe(universe, provider=provider)
     _save_to_cache(universe, cache_file)
     log.info("Universe: loaded %d symbols from provider", len(universe))
     return universe
+
+
+def enrich_universe(
+    universe: list[UniverseSymbol],
+    snapshot_file: Path | None = None,
+    *,
+    provider: Any | None = None,
+) -> int:
+    """
+    Enrich UniverseSymbol records in-place with name/sector/industry/mcap.
+
+    Two sources, tried in order:
+      1. **Snapshot file** — ``{"stocks": [{"s", "name", "sector", "ind",
+         "mcap", ...}]}`` (legacy scan_results/fundamentals.json shape).
+         Fast batch source refreshed by the nightly pipeline.
+      2. **Provider chain fallback** — ``provider.fetch_fundamentals()``
+         (YFinance .info). Used only when no snapshot is available and a
+         provider is passed in. Capped at ``FUNDAMENTALS_TOP_N`` symbols
+         to avoid excessive API calls.
+
+    Returns the number of symbols enriched. Missing/invalid file is a no-op
+    unless a provider fallback is available.
+    """
+    enriched = _enrich_from_snapshot(universe, snapshot_file)
+    if enriched > 0:
+        return enriched
+
+    # Fallback: live fundamentals from the provider chain
+    if provider is not None:
+        enriched = _enrich_from_provider(universe, provider)
+
+    return enriched
+
+
+def _enrich_from_snapshot(
+    universe: list[UniverseSymbol],
+    snapshot_file: Path | None = None,
+) -> int:
+    """Enrich from a local fundamentals snapshot JSON. Returns count enriched."""
+    from marketpulse.config.settings import OUTPUT_DIR
+
+    path = snapshot_file or (OUTPUT_DIR / "fundamentals.json")
+    if not path.exists():
+        log.debug("Universe: no fundamentals snapshot at %s — skipping", path)
+        return 0
+
+    try:
+        with path.open(encoding="utf-8") as f:
+            stocks = json.load(f).get("stocks", [])
+    except (OSError, json.JSONDecodeError) as exc:
+        log.warning("Universe: could not read fundamentals snapshot: %s", exc)
+        return 0
+
+    by_symbol: dict[str, dict[str, Any]] = {
+        str(s["s"]): s for s in stocks if isinstance(s, dict) and s.get("s")
+    }
+
+    enriched = 0
+    for u in universe:
+        meta = by_symbol.get(u.symbol)
+        if meta is None:
+            continue
+        _apply_fundamental_fields(u, meta, name_key="name", industry_key="ind")
+        enriched += 1
+
+    log.info("Universe: enriched %d/%d symbols from %s", enriched, len(universe), path.name)
+    return enriched
+
+
+def _enrich_from_provider(
+    universe: list[UniverseSymbol],
+    provider: Any,
+) -> int:
+    """
+    Enrich from the provider chain's ``fetch_fundamentals()``.
+
+    Only fetches for symbols still missing sector data, capped at
+    ``FUNDAMENTALS_TOP_N`` to limit API calls.
+    """
+    from marketpulse.config.settings import FUNDAMENTALS_TOP_N
+
+    need = [u.symbol for u in universe if u.sector is None]
+    if not need:
+        return 0
+
+    batch = need[:FUNDAMENTALS_TOP_N]
+    log.info(
+        "Universe: fetching fundamentals for %d/%d symbols via provider",
+        len(batch),
+        len(need),
+    )
+
+    try:
+        fund_data: dict[str, dict[str, Any]] = provider.fetch_fundamentals(batch)
+    except Exception as exc:
+        log.warning("Universe: provider fundamentals fetch failed: %s", exc)
+        return 0
+
+    if not fund_data:
+        return 0
+
+    by_symbol = {sym: data for sym, data in fund_data.items() if data}
+    enriched = 0
+    for u in universe:
+        meta = by_symbol.get(u.symbol)
+        if meta is None:
+            continue
+        _apply_fundamental_fields(u, meta, name_key="name", industry_key="industry")
+        enriched += 1
+
+    log.info("Universe: enriched %d/%d symbols from provider", enriched, len(universe))
+    return enriched
+
+
+def _apply_fundamental_fields(
+    u: UniverseSymbol,
+    meta: dict[str, Any],
+    *,
+    name_key: str = "name",
+    industry_key: str = "ind",
+) -> None:
+    """Apply name/sector/industry/mcap from a metadata dict to a UniverseSymbol."""
+    u.name = u.name or (str(meta[name_key]) if meta.get(name_key) else None)
+    u.sector = u.sector or (str(meta["sector"]) if meta.get("sector") else None)
+    u.industry = u.industry or (str(meta[industry_key]) if meta.get(industry_key) else None)
+    mcap_val = meta.get("mcap") or meta.get("mcap_cr")
+    if u.mcap_cr is None and isinstance(mcap_val, (int, float)):
+        u.mcap_cr = float(mcap_val)
+        u.mcap_category = classify_mcap(u.mcap_cr)
 
 
 def is_trading_day(dt: date | datetime | None = None) -> bool:
