@@ -1,7 +1,7 @@
 import { TrendingUp, TrendingDown, BarChart3, Zap, PieChart } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { useManifest, useMarket } from '../api/client'
 import type { MarketStock } from '../api/client'
+import { StockBadge } from '../components/StockBadge'
 
 // ── Derived regime from BUY % ─────────────────────────────────────────────
 function deriveRegime(stocks: MarketStock[]): { label: string; color: string; desc: string } {
@@ -220,15 +220,7 @@ function MoversPanel({
             return (
               <li key={s.symbol} className="flex items-center justify-between py-2.5">
                 <div>
-                  <Link
-                    to={`/stocks/${s.symbol}`}
-                    className="font-medium text-sm hover:text-[var(--color-brand-400)] transition-colors"
-                  >
-                    {s.symbol}
-                  </Link>
-                  <span className="ml-2 text-xs text-[var(--color-text-muted)]">
-                    ₹{s.close?.toLocaleString('en-IN')}
-                  </span>
+                  <StockBadge stock={s} />
                 </div>
                 <div className="flex items-center gap-3">
                   {s.recommendation && (

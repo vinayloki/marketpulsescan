@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Sparkles, TrendingUp, TrendingDown, Zap, Filter } from 'lucide-react'
 import { useMarket } from '../api/client'
 import type { MarketStock } from '../api/client'
+import { StockBadge } from '../components/StockBadge'
 
 // ── Score bar ─────────────────────────────────────────────────────────────
 function MiniScoreBar({ value }: { value: number }) {
@@ -173,15 +173,7 @@ export function AiPicksPage() {
                   <tr key={s.symbol} className="hover:bg-[var(--color-surface-2)]/50 transition-colors group">
                     <td className="px-4 py-3 text-[var(--color-text-muted)] text-xs font-mono">{i + 1}</td>
                     <td className="px-4 py-3">
-                      <Link
-                        to={`/stocks/${s.symbol}`}
-                        className="font-semibold hover:text-[var(--color-brand-400)] transition-colors"
-                      >
-                        {s.symbol}
-                      </Link>
-                      <div className="text-[11px] text-[var(--color-text-muted)] truncate max-w-[140px]">
-                        {s.name}
-                      </div>
+                      <StockBadge stock={s} showNames />
                     </td>
                     <td className="px-4 py-3 text-xs text-[var(--color-text-muted)] hidden sm:table-cell">{s.sector ?? '—'}</td>
                     <td className="px-4 py-3 text-right font-mono text-sm">
