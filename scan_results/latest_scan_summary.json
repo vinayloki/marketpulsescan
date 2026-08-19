@@ -1,7 +1,7 @@
 {
-  "scan_date": "18 Aug 2026",
-  "scan_timestamp": "2026-08-18_1201",
-  "total_stocks_scanned": 2913,
+  "scan_date": "19 Aug 2026",
+  "scan_timestamp": "2026-08-19_1209",
+  "total_stocks_scanned": 2890,
   "timeframes": [
     "1W",
     "2W",
@@ -12,241 +12,226 @@
   ],
   "market_breadth": {
     "1W": {
-      "advancing": 1196,
-      "declining": 1618,
-      "unchanged": 99,
-      "advance_decline_ratio": 0.74,
-      "avg_return_pct": 28.75,
-      "median_return_pct": -0.29
+      "advancing": 968,
+      "declining": 1759,
+      "unchanged": 163,
+      "advance_decline_ratio": 0.55,
+      "avg_return_pct": 28.67,
+      "median_return_pct": -0.61
     },
     "2W": {
-      "advancing": 1092,
-      "declining": 1759,
-      "unchanged": 62,
-      "advance_decline_ratio": 0.62,
-      "avg_return_pct": 27.97,
-      "median_return_pct": -1.02
+      "advancing": 1002,
+      "declining": 1811,
+      "unchanged": 77,
+      "advance_decline_ratio": 0.55,
+      "avg_return_pct": 27.79,
+      "median_return_pct": -1.44
     },
     "1M": {
-      "advancing": 1398,
-      "declining": 1464,
-      "unchanged": 51,
-      "advance_decline_ratio": 0.95,
-      "avg_return_pct": 30.06,
-      "median_return_pct": -0.09
+      "advancing": 1364,
+      "declining": 1478,
+      "unchanged": 48,
+      "advance_decline_ratio": 0.92,
+      "avg_return_pct": 29.87,
+      "median_return_pct": -0.28
     },
     "3M": {
-      "advancing": 1666,
-      "declining": 1202,
-      "unchanged": 30,
-      "advance_decline_ratio": 1.39,
-      "avg_return_pct": 36.34,
-      "median_return_pct": 3.0
+      "advancing": 1586,
+      "declining": 1260,
+      "unchanged": 29,
+      "advance_decline_ratio": 1.26,
+      "avg_return_pct": 35.22,
+      "median_return_pct": 2.28
     },
     "6M": {
-      "advancing": 1437,
-      "declining": 1351,
-      "unchanged": 27,
-      "advance_decline_ratio": 1.06,
-      "avg_return_pct": 11.73,
-      "median_return_pct": 0.75
+      "advancing": 1472,
+      "declining": 1312,
+      "unchanged": 30,
+      "advance_decline_ratio": 1.12,
+      "avg_return_pct": 12.47,
+      "median_return_pct": 1.2
     },
     "12M": {
-      "advancing": 1125,
-      "declining": 1547,
+      "advancing": 1085,
+      "declining": 1589,
       "unchanged": 13,
-      "advance_decline_ratio": 0.73,
-      "avg_return_pct": 6.37,
-      "median_return_pct": -6.37
+      "advance_decline_ratio": 0.68,
+      "avg_return_pct": 5.08,
+      "median_return_pct": -7.09
     }
   },
   "top_10_by_timeframe": {
     "1W": [
       {
         "ticker": "NV20",
-        "last_close": 11849.5,
-        "1W": 84118.2
-      },
-      {
-        "ticker": "SEL",
-        "last_close": 314.0,
-        "1W": 29.22
-      },
-      {
-        "ticker": "VIVO",
-        "last_close": 152.65,
-        "1W": 27.47
-      },
-      {
-        "ticker": "GIRIRAJ",
-        "last_close": 68.8,
-        "1W": 27.41
-      },
-      {
-        "ticker": "GOLDSTAR",
-        "last_close": 8.05,
-        "1W": 21.97
-      },
-      {
-        "ticker": "SANGANI",
-        "last_close": 55.45,
-        "1W": 20.54
-      },
-      {
-        "ticker": "SUNREST",
-        "last_close": 44.65,
-        "1W": 20.35
-      },
-      {
-        "ticker": "TCL",
-        "last_close": 141.55,
-        "1W": 19.1
+        "last_close": 11800.2,
+        "1W": 83767.81
       },
       {
         "ticker": "PRABHA",
-        "last_close": 192.2,
-        "1W": 17.64
+        "last_close": 199.79,
+        "1W": 22.29
       },
       {
-        "ticker": "ROXHITECH",
-        "last_close": 56.45,
-        "1W": 17.6
+        "ticker": "TECILCHEM",
+        "last_close": 10.24,
+        "1W": 22.05
+      },
+      {
+        "ticker": "SUPREMEPWR",
+        "last_close": 230.9,
+        "1W": 19.98
+      },
+      {
+        "ticker": "TPHQ",
+        "last_close": 0.69,
+        "1W": 18.97
+      },
+      {
+        "ticker": "ABINFRA",
+        "last_close": 13.45,
+        "1W": 18.4
+      },
+      {
+        "ticker": "SONAMLTD",
+        "last_close": 67.19,
+        "1W": 17.08
+      },
+      {
+        "ticker": "ZAGGLE",
+        "last_close": 186.04,
+        "1W": 15.93
+      },
+      {
+        "ticker": "DSKULKARNI",
+        "last_close": 15.38,
+        "1W": 15.64
+      },
+      {
+        "ticker": "GFLLIMITED",
+        "last_close": 56.76,
+        "1W": 14.69
       }
     ],
     "2W": [
       {
         "ticker": "NV20",
-        "last_close": 11849.5,
-        "2W": 82821.62
-      },
-      {
-        "ticker": "VIVO",
-        "last_close": 152.65,
-        "2W": 62.48
+        "last_close": 11800.2,
+        "2W": 82476.63
       },
       {
         "ticker": "TPHQ",
-        "last_close": 0.63,
-        "2W": 53.66
+        "last_close": 0.69,
+        "2W": 68.29
       },
       {
         "ticker": "DOLPHIN",
-        "last_close": 619.4,
-        "2W": 48.36
-      },
-      {
-        "ticker": "INDSWFTLAB",
-        "last_close": 346.87,
-        "2W": 46.21
+        "last_close": 619.25,
+        "2W": 48.32
       },
       {
         "ticker": "ALPHAGEO",
-        "last_close": 352.26,
-        "2W": 43.96
+        "last_close": 345.41,
+        "2W": 41.16
       },
       {
-        "ticker": "ESCONET",
-        "last_close": 192.0,
-        "2W": 43.28
+        "ticker": "VCL",
+        "last_close": 1.94,
+        "2W": 38.57
       },
       {
-        "ticker": "ZEEMEDIA",
-        "last_close": 9.38,
-        "2W": 35.94
+        "ticker": "GSLSU",
+        "last_close": 36.61,
+        "2W": 36.55
       },
       {
-        "ticker": "SHEKHAWATI",
-        "last_close": 18.71,
-        "2W": 35.88
+        "ticker": "INDSWFTLAB",
+        "last_close": 322.06,
+        "2W": 35.75
       },
       {
-        "ticker": "VMARCIND",
-        "last_close": 360.2,
-        "2W": 35.31
+        "ticker": "VALIANTLAB",
+        "last_close": 91.96,
+        "2W": 35.61
+      },
+      {
+        "ticker": "KOHINOOR",
+        "last_close": 31.27,
+        "2W": 34.96
+      },
+      {
+        "ticker": "SALSTEEL",
+        "last_close": 79.22,
+        "2W": 34.25
       }
     ],
     "1M": [
       {
         "ticker": "NV20",
-        "last_close": 11849.5,
-        "1M": 82879.69
+        "last_close": 11800.2,
+        "1M": 82534.46
       },
       {
         "ticker": "VIVO",
-        "last_close": 152.65,
-        "1M": 97.35
-      },
-      {
-        "ticker": "ALPHAGEO",
-        "last_close": 352.26,
-        "1M": 78.37
-      },
-      {
-        "ticker": "SHALPAINTS",
-        "last_close": 86.88,
-        "1M": 77.34
+        "last_close": 146.5,
+        "1M": 89.4
       },
       {
         "ticker": "GULFPETRO",
-        "last_close": 62.81,
-        "1M": 69.34
+        "last_close": 64.61,
+        "1M": 75.6
       },
       {
-        "ticker": "UEL",
-        "last_close": 211.36,
-        "1M": 68.15
+        "ticker": "ALPHAGEO",
+        "last_close": 345.41,
+        "1M": 74.9
       },
       {
         "ticker": "GATECH",
-        "last_close": 0.8,
-        "1M": 66.67
+        "last_close": 0.83,
+        "1M": 72.92
       },
       {
-        "ticker": "DIACABS",
-        "last_close": 367.95,
-        "1M": 65.46
+        "ticker": "SHALPAINTS",
+        "last_close": 82.54,
+        "1M": 68.48
+      },
+      {
+        "ticker": "VCL",
+        "last_close": 1.94,
+        "1M": 65.81
+      },
+      {
+        "ticker": "IMPEXFERRO",
+        "last_close": 3.78,
+        "1M": 65.79
+      },
+      {
+        "ticker": "TPHQ",
+        "last_close": 0.69,
+        "1M": 64.29
       },
       {
         "ticker": "DOLPHIN",
-        "last_close": 619.4,
-        "1M": 64.3
-      },
-      {
-        "ticker": "E2E",
-        "last_close": 664.55,
-        "1M": 64.11
+        "last_close": 619.25,
+        "1M": 64.26
       }
     ],
     "3M": [
       {
         "ticker": "NV20",
-        "last_close": 11849.5,
-        "3M": 84781.8
+        "last_close": 11800.2,
+        "3M": 83767.81
       },
       {
         "ticker": "ACCORD",
         "last_close": 198.35,
-        "3M": 332.61
+        "3M": 312.37
       },
       {
         "ticker": "VIJIFIN",
-        "last_close": 12.88,
-        "3M": 238.95
-      },
-      {
-        "ticker": "YASHO",
-        "last_close": 4915.8,
-        "3M": 187.86
-      },
-      {
-        "ticker": "INDSWFTLAB",
-        "last_close": 346.87,
-        "3M": 162.38
-      },
-      {
-        "ticker": "SUPREMEENG",
-        "last_close": 2.41,
-        "3M": 159.14
+        "last_close": 13.13,
+        "3M": 238.4
       },
       {
         "ticker": "SIGNORIA",
@@ -254,31 +239,46 @@
         "3M": 158.59
       },
       {
-        "ticker": "UNIVASTU",
-        "last_close": 176.89,
-        "3M": 153.39
-      },
-      {
-        "ticker": "HITECHCORP",
-        "last_close": 331.0,
-        "3M": 143.99
+        "ticker": "SUPREMEENG",
+        "last_close": 2.45,
+        "3M": 155.21
       },
       {
         "ticker": "SANGINITA",
-        "last_close": 59.53,
-        "3M": 143.18
+        "last_close": 62.5,
+        "3M": 150.4
+      },
+      {
+        "ticker": "CUPID",
+        "last_close": 284.56,
+        "3M": 148.87
+      },
+      {
+        "ticker": "YASHO",
+        "last_close": 4470.8,
+        "3M": 145.85
+      },
+      {
+        "ticker": "HITECHCORP",
+        "last_close": 332.0,
+        "3M": 143.21
+      },
+      {
+        "ticker": "UNIVASTU",
+        "last_close": 168.05,
+        "3M": 140.11
       }
     ],
     "6M": [
       {
         "ticker": "NV20",
-        "last_close": 11849.5,
-        "6M": 7625.08
+        "last_close": 11800.2,
+        "6M": 7616.58
       },
       {
         "ticker": "ARIHANT",
-        "last_close": 1021.5,
-        "6M": 2476.29
+        "last_close": 1029.5,
+        "6M": 2496.47
       },
       {
         "ticker": "ACCORD",
@@ -287,50 +287,50 @@
       },
       {
         "ticker": "VIJIFIN",
-        "last_close": 12.88,
-        "6M": 540.8
+        "last_close": 13.13,
+        "6M": 522.27
       },
       {
         "ticker": "SANGINITA",
-        "last_close": 59.53,
-        "6M": 308.02
+        "last_close": 62.5,
+        "6M": 336.45
       },
       {
         "ticker": "STLTECH",
-        "last_close": 646.0,
-        "6M": 307.52
+        "last_close": 621.2,
+        "6M": 296.38
       },
       {
         "ticker": "CLCIND",
-        "last_close": 49.97,
-        "6M": 297.53
-      },
-      {
-        "ticker": "AHLWEST",
-        "last_close": 536.0,
-        "6M": 271.83
+        "last_close": 49.02,
+        "6M": 289.98
       },
       {
         "ticker": "SIGMAADV",
-        "last_close": 658.45,
-        "6M": 262.02
+        "last_close": 691.35,
+        "6M": 276.0
+      },
+      {
+        "ticker": "AHLWEST",
+        "last_close": 536.1,
+        "6M": 271.9
       },
       {
         "ticker": "UCL",
         "last_close": 260.0,
-        "6M": 242.56
+        "6M": 256.16
       }
     ],
     "12M": [
       {
         "ticker": "NV20",
-        "last_close": 11849.5,
-        "12M": 7988.4
+        "last_close": 11800.2,
+        "12M": 7945.41
       },
       {
         "ticker": "ARIHANT",
-        "last_close": 1021.5,
-        "12M": 2476.29
+        "last_close": 1029.5,
+        "12M": 2496.47
       },
       {
         "ticker": "ACCORD",
@@ -339,23 +339,23 @@
       },
       {
         "ticker": "CUPID",
-        "last_close": 284.03,
-        "12M": 726.49
+        "last_close": 284.56,
+        "12M": 728.12
       },
       {
         "ticker": "SWANDEF",
-        "last_close": 2379.2,
-        "12M": 539.23
+        "last_close": 2348.2,
+        "12M": 530.9
       },
       {
         "ticker": "SANGINITA",
-        "last_close": 59.53,
-        "12M": 495.3
+        "last_close": 62.5,
+        "12M": 525.63
       },
       {
         "ticker": "SIGMAADV",
-        "last_close": 658.45,
-        "12M": 491.23
+        "last_close": 691.35,
+        "12M": 491.35
       },
       {
         "ticker": "UCL",
@@ -363,14 +363,14 @@
         "12M": 420.0
       },
       {
-        "ticker": "STLTECH",
-        "last_close": 646.0,
-        "12M": 372.08
+        "ticker": "SALSTEEL",
+        "last_close": 79.22,
+        "12M": 408.15
       },
       {
         "ticker": "MTARTECH",
-        "last_close": 7132.0,
-        "12M": 363.09
+        "last_close": 6918.5,
+        "12M": 356.64
       }
     ]
   }
