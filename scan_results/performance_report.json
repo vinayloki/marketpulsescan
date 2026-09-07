@@ -1,5 +1,5 @@
 {
-  "generated": "31 Aug 2026 02:08",
+  "generated": "07 Sep 2026 01:53",
   "backtest_file": "/home/runner/work/marketpulsescan/marketpulsescan/scan_results/backtest_results.json",
   "config": {
     "take_profit_pct": 4.0,
@@ -15,47 +15,47 @@
   },
   "mode_a": {
     "mode": "A",
-    "total_trades": 9247,
-    "wins": 4761,
-    "losses": 4486,
+    "total_trades": 9478,
+    "wins": 4880,
+    "losses": 4598,
     "win_rate_pct": 51.5,
-    "avg_win_pct": 3.54,
-    "avg_loss_pct": -4.56,
+    "avg_win_pct": 3.56,
+    "avg_loss_pct": -4.58,
     "expectancy_pct": -0.39,
-    "profit_factor": 0.579,
-    "total_pnl": -2445097.16,
-    "final_capital": -1445097.16,
-    "total_return_pct": -244.51,
-    "max_drawdown_pct": 203.98,
-    "max_drawdown_abs": 2855222.86,
-    "max_dd_peak_date": "2025-10-30",
-    "max_dd_trough_date": "2026-05-18",
-    "sharpe_like": -1.22,
+    "profit_factor": 0.39,
+    "total_pnl": -2236461.44,
+    "final_capital": -1236461.44,
+    "total_return_pct": -223.65,
+    "max_drawdown_pct": 203.27,
+    "max_drawdown_abs": 2453115.07,
+    "max_dd_peak_date": "2025-11-04",
+    "max_dd_trough_date": "2026-04-02",
+    "sharpe_like": -1.36,
     "avg_holding_days": 3.3,
     "exit_reasons": {
-      "TP": 3978,
-      "SL": 2634,
-      "TIME": 2635
+      "TP": 4120,
+      "SL": 2679,
+      "TIME": 2679
     },
-    "trades_in_3_5pct": 4003,
+    "trades_in_3_5pct": 4146,
     "trades_over_target": 0,
-    "target_hit_rate_pct": 43.3,
+    "target_hit_rate_pct": 43.7,
     "can_achieve_3_5pct_goal": false,
     "viability_verdict": "NOT VIABLE — negative expectancy, fundamental revision needed",
     "regime_breakdown": {
       "Bull": {
-        "trades": 8992,
-        "win_rate_pct": 51.4,
-        "avg_return": -0.39,
-        "expectancy": -0.39,
-        "total_pnl": -2444224.11
+        "trades": 9225,
+        "win_rate_pct": 51.5,
+        "avg_return": -0.38,
+        "expectancy": -0.38,
+        "total_pnl": -2233558.68
       },
       "Sideways": {
-        "trades": 253,
-        "win_rate_pct": 53.8,
-        "avg_return": -0.27,
-        "expectancy": -0.27,
-        "total_pnl": -898.58
+        "trades": 251,
+        "win_rate_pct": 50.6,
+        "avg_return": -0.49,
+        "expectancy": -0.49,
+        "total_pnl": -2928.29
       },
       "Bear": {
         "trades": 2,
@@ -67,122 +67,114 @@
     },
     "signal_breakdown": {
       "BREAKOUT": {
-        "trades": 39,
-        "win_rate_pct": 41.0,
-        "avg_return": 0.03,
+        "trades": 33,
+        "win_rate_pct": 39.4,
+        "avg_return": 0.07,
         "best_trade": 4.02,
         "worst_trade": -8.65
       },
       "MOMENTUM": {
-        "trades": 7895,
-        "win_rate_pct": 51.8,
-        "avg_return": -0.35,
+        "trades": 8147,
+        "win_rate_pct": 51.9,
+        "avg_return": -0.34,
         "best_trade": 4.25,
         "worst_trade": -15.91
       },
       "VOLUME": {
-        "trades": 326,
-        "win_rate_pct": 47.2,
-        "avg_return": -1.23,
+        "trades": 327,
+        "win_rate_pct": 46.8,
+        "avg_return": -1.27,
         "best_trade": 4.04,
         "worst_trade": -12.11
       },
       "MULTI": {
-        "trades": 987,
-        "win_rate_pct": 50.9,
-        "avg_return": -0.43,
+        "trades": 971,
+        "win_rate_pct": 49.6,
+        "avg_return": -0.53,
         "best_trade": 4.09,
         "worst_trade": -12.0
       }
     },
     "monthly_dist": [
       {
-        "month": "2025-10",
-        "trades": 196,
-        "wins": 124,
-        "pnl": 224595.7,
-        "return_pct": 22.46,
-        "win_rate": 63.3
-      },
-      {
         "month": "2025-11",
-        "trades": 1293,
-        "wins": 597,
-        "pnl": -2654965.87,
-        "return_pct": -265.5,
-        "win_rate": 46.2
+        "trades": 1131,
+        "wins": 528,
+        "pnl": -2221371.23,
+        "return_pct": -222.14,
+        "win_rate": 46.7
       },
       {
         "month": "2025-12",
         "trades": 977,
-        "wins": 472,
-        "pnl": -8516.83,
+        "wins": 471,
+        "pnl": -8524.94,
         "return_pct": -0.85,
-        "win_rate": 48.3
+        "win_rate": 48.2
       },
       {
         "month": "2026-01",
         "trades": 754,
-        "wins": 282,
-        "pnl": -10624.61,
-        "return_pct": -1.06,
-        "win_rate": 37.4
+        "wins": 281,
+        "pnl": -10678.24,
+        "return_pct": -1.07,
+        "win_rate": 37.3
       },
       {
         "month": "2026-02",
-        "trades": 700,
-        "wins": 403,
-        "pnl": 8248.02,
-        "return_pct": 0.82,
-        "win_rate": 57.6
+        "trades": 696,
+        "wins": 400,
+        "pnl": 8278.04,
+        "return_pct": 0.83,
+        "win_rate": 57.5
       },
       {
         "month": "2026-03",
-        "trades": 672,
-        "wins": 284,
-        "pnl": -13539.67,
-        "return_pct": -1.35,
-        "win_rate": 42.3
+        "trades": 665,
+        "wins": 282,
+        "pnl": -13392.63,
+        "return_pct": -1.34,
+        "win_rate": 42.4
       },
       {
         "month": "2026-04",
-        "trades": 1442,
+        "trades": 1443,
         "wins": 1029,
-        "pnl": 14650.78,
+        "pnl": 14703.68,
         "return_pct": 1.47,
-        "win_rate": 71.4
+        "win_rate": 71.3
       },
       {
         "month": "2026-05",
-        "trades": 2976,
-        "wins": 1449,
-        "pnl": -3386.16,
-        "return_pct": -0.34,
-        "win_rate": 48.7
+        "trades": 3327,
+        "wins": 1712,
+        "pnl": 2419.37,
+        "return_pct": 0.24,
+        "win_rate": 51.5
       },
       {
         "month": "2026-06",
-        "trades": 62,
-        "wins": 35,
-        "pnl": -531.25,
-        "return_pct": -0.05,
-        "win_rate": 56.5
+        "trades": 291,
+        "wins": 83,
+        "pnl": -5497.33,
+        "return_pct": -0.55,
+        "win_rate": 28.5
       },
       {
         "month": "2026-07",
-        "trades": 95,
-        "wins": 36,
-        "pnl": -1107.0,
+        "trades": 96,
+        "wins": 37,
+        "pnl": -1102.74,
         "return_pct": -0.11,
-        "win_rate": 37.9
+        "win_rate": 38.5
       },
       {
         "month": "2026-08",
-        "trades": 80,
-        "wins": 50,
-        "pnl": 79.73,
-        "return_pct": 0.01,
-        "win_rate": 62.5
+        "trades": 98,
+        "wins": 57,
+        "pnl": -1295.42,
+        "return_pct": -0.13,
+        "win_rate": 58.2
       }
     ],
     "return_histogram": [
@@ -190,106 +182,105 @@
         "range_low": -15.9,
         "range_high": -13.9,
         "label": "-15.9% to -13.9%",
-        "count": 2,
+        "count": 3,
         "pct_of_total": 0.0
       },
       {
         "range_low": -13.9,
         "range_high": -11.9,
         "label": "-13.9% to -11.9%",
-        "count": 16,
-        "pct_of_total": 0.2
+        "count": 14,
+        "pct_of_total": 0.1
       },
       {
         "range_low": -11.9,
         "range_high": -9.9,
         "label": "-11.9% to -9.9%",
-        "count": 76,
+        "count": 74,
         "pct_of_total": 0.8
       },
       {
         "range_low": -9.9,
         "range_high": -7.8,
         "label": "-9.9% to -7.8%",
-        "count": 325,
-        "pct_of_total": 3.5
+        "count": 340,
+        "pct_of_total": 3.6
       },
       {
         "range_low": -7.8,
         "range_high": -5.8,
         "label": "-7.8% to -5.8%",
-        "count": 1021,
-        "pct_of_total": 11.0
+        "count": 1067,
+        "pct_of_total": 11.3
       },
       {
         "range_low": -5.8,
         "range_high": -3.8,
         "label": "-5.8% to -3.8%",
-        "count": 1313,
-        "pct_of_total": 14.2
+        "count": 1338,
+        "pct_of_total": 14.1
       },
       {
         "range_low": -3.8,
         "range_high": -1.8,
         "label": "-3.8% to -1.8%",
-        "count": 952,
+        "count": 976,
         "pct_of_total": 10.3
       },
       {
         "range_low": -1.8,
         "range_high": 0.2,
         "label": "-1.8% to +0.2%",
-        "count": 869,
-        "pct_of_total": 9.4
+        "count": 873,
+        "pct_of_total": 9.2
       },
       {
         "range_low": 0.2,
         "range_high": 2.2,
         "label": "+0.2% to +2.2%",
-        "count": 591,
-        "pct_of_total": 6.4
+        "count": 572,
+        "pct_of_total": 6.0
       },
       {
         "range_low": 2.2,
         "range_high": 4.3,
         "label": "+2.2% to +4.3%",
-        "count": 4081,
-        "pct_of_total": 44.1
+        "count": 4220,
+        "pct_of_total": 44.5
       }
     ],
     "weekly_returns": [
-      -210.85,
-      22.46,
-      -54.59,
-      -0.21,
-      0.16,
-      -0.28,
-      -0.06,
+      -172.47,
+      -49.6,
+      -0.22,
+      0.15,
+      -0.29,
+      -0.05,
       -0.28,
       0.13,
       -0.28,
-      -0.52,
-      -0.13,
-      -0.56,
-      0.06,
+      -0.51,
+      -0.14,
+      -0.55,
+      0.05,
       -0.08,
       0.18,
       0.18,
       0.55,
-      -0.33,
+      -0.32,
       -0.81,
       -0.05,
       -0.15,
       -0.07,
       0.36,
-      0.48,
-      0.57,
-      0.12,
+      0.5,
+      0.56,
+      0.11,
       1.3,
-      -1.88,
+      -1.87,
       0.05,
-      0.19,
-      0.0,
+      0.76,
+      -0.49,
       -0.0,
       0.01,
       -0.04,
@@ -298,664 +289,665 @@
       -0.05,
       -0.04,
       -0.07,
-      -0.02,
+      -0.03,
       0.14,
       -0.11,
-      -0.0
+      -0.11,
+      -0.03
     ],
     "equity_curve": [
       {
-        "date": "2026-07-22",
-        "ticker": "STYLAMIND",
-        "equity": -1443929.76,
-        "drawdown_pct": 203.16
-      },
-      {
-        "date": "2026-07-22",
-        "ticker": "TATVA",
-        "equity": -1444037.52,
-        "drawdown_pct": 203.16
-      },
-      {
-        "date": "2026-07-22",
-        "ticker": "TIPSMUSIC",
-        "equity": -1444080.24,
-        "drawdown_pct": 203.17
-      },
-      {
-        "date": "2026-07-24",
-        "ticker": "MAHLOG",
-        "equity": -1444064.28,
-        "drawdown_pct": 203.17
-      },
-      {
-        "date": "2026-07-24",
-        "ticker": "NAVINFLUOR",
-        "equity": -1444386.55,
-        "drawdown_pct": 203.19
-      },
-      {
-        "date": "2026-07-24",
-        "ticker": "SAREGAMA",
-        "equity": -1444415.46,
-        "drawdown_pct": 203.19
-      },
-      {
-        "date": "2026-07-24",
-        "ticker": "VISHNU",
-        "equity": -1444447.43,
-        "drawdown_pct": 203.19
-      },
-      {
-        "date": "2026-07-27",
-        "ticker": "BETA",
-        "equity": -1444653.73,
-        "drawdown_pct": 203.21
-      },
-      {
-        "date": "2026-07-27",
-        "ticker": "MBAPL",
-        "equity": -1444647.85,
-        "drawdown_pct": 203.21
-      },
-      {
-        "date": "2026-07-27",
-        "ticker": "SOLARINDS",
-        "equity": -1445162.55,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-28",
-        "ticker": "CARTRADE",
-        "equity": -1445044.15,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-28",
-        "ticker": "LORDSCHLO",
-        "equity": -1445055.28,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-28",
-        "ticker": "MANBA",
-        "equity": -1445062.6,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-28",
-        "ticker": "PYRAMID",
-        "equity": -1445074.49,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-29",
-        "ticker": "APCOTEXIND",
-        "equity": -1445050.85,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-30",
-        "ticker": "BHAGYANGR",
-        "equity": -1445082.98,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-30",
-        "ticker": "TMB",
-        "equity": -1445132.09,
-        "drawdown_pct": 203.24
-      },
-      {
-        "date": "2026-07-31",
-        "ticker": "ALLDIGI",
-        "equity": -1445173.43,
-        "drawdown_pct": 203.24
-      },
-      {
         "date": "2026-07-31",
         "ticker": "OAL",
-        "equity": -1445201.93,
-        "drawdown_pct": 203.25
+        "equity": -1235191.06,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-07-31",
         "ticker": "RKFORGE",
-        "equity": -1445176.89,
-        "drawdown_pct": 203.24
+        "equity": -1235166.02,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-03",
         "ticker": "CREDITACC",
-        "equity": -1445222.09,
-        "drawdown_pct": 203.25
+        "equity": -1235211.22,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-03",
         "ticker": "EMCURE",
-        "equity": -1445177.19,
-        "drawdown_pct": 203.24
+        "equity": -1235166.41,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-03",
         "ticker": "IDFCFIRSTB",
-        "equity": -1445175.98,
-        "drawdown_pct": 203.24
+        "equity": -1235165.2,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-03",
         "ticker": "KTKBANK",
-        "equity": -1445173.48,
-        "drawdown_pct": 203.24
+        "equity": -1235162.7,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-03",
         "ticker": "LLOYDSME",
-        "equity": -1445145.18,
-        "drawdown_pct": 203.24
+        "equity": -1235134.4,
+        "drawdown_pct": 202.35
+      },
+      {
+        "date": "2026-08-03",
+        "ticker": "MANORAMA",
+        "equity": -1235172.4,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-03",
         "ticker": "MONARCH",
-        "equity": -1445159.49,
-        "drawdown_pct": 203.24
+        "equity": -1235186.71,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-03",
         "ticker": "NH",
-        "equity": -1445232.32,
-        "drawdown_pct": 203.25
+        "equity": -1235259.54,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-03",
         "ticker": "SUNPHARMA",
-        "equity": -1445247.62,
-        "drawdown_pct": 203.25
+        "equity": -1235274.84,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-03",
         "ticker": "WSTCSTPAPR",
-        "equity": -1445262.45,
-        "drawdown_pct": 203.25
+        "equity": -1235289.67,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-04",
         "ticker": "AVADHSUGAR",
-        "equity": -1445239.65,
-        "drawdown_pct": 203.25
+        "equity": -1235266.87,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-04",
         "ticker": "DALMIASUG",
-        "equity": -1445263.8,
-        "drawdown_pct": 203.25
+        "equity": -1235291.02,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-04",
         "ticker": "KDDL",
-        "equity": -1445122.76,
-        "drawdown_pct": 203.24
+        "equity": -1235149.98,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-04",
         "ticker": "KHAITANLTD",
-        "equity": -1445132.42,
-        "drawdown_pct": 203.24
+        "equity": -1235159.64,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-04",
         "ticker": "RITCO",
-        "equity": -1445120.48,
-        "drawdown_pct": 203.24
+        "equity": -1235147.7,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-05",
         "ticker": "ATULAUTO",
-        "equity": -1445097.68,
-        "drawdown_pct": 203.24
+        "equity": -1235124.9,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-05",
         "ticker": "IGPL",
-        "equity": -1445077.66,
-        "drawdown_pct": 203.24
+        "equity": -1235104.88,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-05",
         "ticker": "NAHARSPING",
-        "equity": -1445065.06,
-        "drawdown_pct": 203.24
+        "equity": -1235092.33,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-05",
         "ticker": "RATNAVEER",
-        "equity": -1445056.75,
-        "drawdown_pct": 203.24
+        "equity": -1235084.02,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-05",
         "ticker": "RPTECH",
-        "equity": -1445021.15,
-        "drawdown_pct": 203.23
+        "equity": -1235048.42,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-05",
         "ticker": "RSL",
-        "equity": -1445015.43,
-        "drawdown_pct": 203.23
+        "equity": -1235042.7,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-05",
         "ticker": "SPORTKING",
-        "equity": -1445033.66,
-        "drawdown_pct": 203.23
+        "equity": -1235060.85,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-06",
         "ticker": "BHAGCHEM",
-        "equity": -1445052.67,
-        "drawdown_pct": 203.24
+        "equity": -1235079.86,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-06",
         "ticker": "CONFIPET",
-        "equity": -1445058.76,
-        "drawdown_pct": 203.24
+        "equity": -1235085.95,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-06",
         "ticker": "RANEHOLDIN",
-        "equity": -1445143.36,
-        "drawdown_pct": 203.24
+        "equity": -1235170.55,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-06",
         "ticker": "THELEELA",
-        "equity": -1445123.36,
-        "drawdown_pct": 203.24
+        "equity": -1235150.55,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-06",
         "ticker": "VINDHYATEL",
-        "equity": -1445298.04,
-        "drawdown_pct": 203.25
+        "equity": -1235325.23,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-07",
         "ticker": "ABCAPITAL",
-        "equity": -1445315.75,
-        "drawdown_pct": 203.25
+        "equity": -1235342.94,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-07",
         "ticker": "GAEL",
-        "equity": -1445325.82,
-        "drawdown_pct": 203.26
+        "equity": -1235353.01,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-07",
         "ticker": "UNIVCABLES",
-        "equity": -1445422.29,
-        "drawdown_pct": 203.26
+        "equity": -1235449.48,
+        "drawdown_pct": 202.37
       },
       {
         "date": "2026-08-10",
         "ticker": "ASIANENE",
-        "equity": -1445434.59,
-        "drawdown_pct": 203.26
+        "equity": -1235461.78,
+        "drawdown_pct": 202.37
       },
       {
         "date": "2026-08-10",
         "ticker": "MINDACORP",
-        "equity": -1445430.49,
-        "drawdown_pct": 203.26
+        "equity": -1235457.68,
+        "drawdown_pct": 202.37
       },
       {
         "date": "2026-08-10",
         "ticker": "NITINSPIN",
-        "equity": -1445407.54,
-        "drawdown_pct": 203.26
+        "equity": -1235434.73,
+        "drawdown_pct": 202.37
       },
       {
         "date": "2026-08-10",
         "ticker": "PAYTM",
-        "equity": -1445350.1,
-        "drawdown_pct": 203.26
+        "equity": -1235377.29,
+        "drawdown_pct": 202.37
       },
       {
         "date": "2026-08-11",
         "ticker": "AKUMS",
-        "equity": -1445320.82,
-        "drawdown_pct": 203.25
+        "equity": -1235348.01,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-11",
         "ticker": "ENTERO",
-        "equity": -1445266.26,
-        "drawdown_pct": 203.25
+        "equity": -1235293.45,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-11",
         "ticker": "GLAND",
-        "equity": -1445152.44,
-        "drawdown_pct": 203.24
+        "equity": -1235179.63,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-11",
         "ticker": "NRBBEARING",
-        "equity": -1445183.22,
-        "drawdown_pct": 203.24
+        "equity": -1235210.41,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-11",
         "ticker": "POLYMED",
-        "equity": -1445111.76,
-        "drawdown_pct": 203.24
+        "equity": -1235138.95,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-11",
         "ticker": "SEDEMAC",
-        "equity": -1444993.96,
-        "drawdown_pct": 203.23
+        "equity": -1235021.15,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-11",
         "ticker": "SHAILY",
-        "equity": -1444859.68,
-        "drawdown_pct": 203.22
+        "equity": -1234886.87,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-12",
         "ticker": "BELRISE",
-        "equity": -1444849.52,
-        "drawdown_pct": 203.22
+        "equity": -1234876.71,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-12",
         "ticker": "DIVGIITTS",
-        "equity": -1444806.73,
-        "drawdown_pct": 203.22
+        "equity": -1234833.92,
+        "drawdown_pct": 202.32
       },
       {
         "date": "2026-08-12",
         "ticker": "POLYPLEX",
-        "equity": -1444758.99,
-        "drawdown_pct": 203.21
+        "equity": -1234786.18,
+        "drawdown_pct": 202.32
       },
       {
         "date": "2026-08-13",
         "ticker": "AZAD",
-        "equity": -1444656.59,
-        "drawdown_pct": 203.21
+        "equity": -1234683.78,
+        "drawdown_pct": 202.31
       },
       {
         "date": "2026-08-13",
         "ticker": "GRASIM",
-        "equity": -1444771.02,
-        "drawdown_pct": 203.22
+        "equity": -1234798.21,
+        "drawdown_pct": 202.32
       },
       {
         "date": "2026-08-13",
         "ticker": "LMW",
-        "equity": -1444066.22,
-        "drawdown_pct": 203.17
+        "equity": -1234093.41,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-13",
         "ticker": "NELCO",
-        "equity": -1444025.92,
-        "drawdown_pct": 203.16
+        "equity": -1234053.11,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-14",
         "ticker": "DMCC",
-        "equity": -1444048.59,
-        "drawdown_pct": 203.16
+        "equity": -1234075.78,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-14",
         "ticker": "MINDACORP",
-        "equity": -1444019.1,
-        "drawdown_pct": 203.16
+        "equity": -1234046.29,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-17",
         "ticker": "IRISDOREME",
-        "equity": -1444017.73,
-        "drawdown_pct": 203.16
+        "equity": -1234044.92,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-17",
         "ticker": "SBCL",
-        "equity": -1444063.04,
-        "drawdown_pct": 203.16
+        "equity": -1234090.23,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-17",
         "ticker": "SYRMA",
-        "equity": -1444111.49,
-        "drawdown_pct": 203.17
+        "equity": -1234138.68,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-17",
         "ticker": "THOMASCOTT",
-        "equity": -1444141.82,
-        "drawdown_pct": 203.17
+        "equity": -1234169.01,
+        "drawdown_pct": 202.27
       },
       {
         "date": "2026-08-17",
         "ticker": "TITAN",
-        "equity": -1444163.32,
-        "drawdown_pct": 203.17
+        "equity": -1234190.51,
+        "drawdown_pct": 202.27
       },
       {
         "date": "2026-08-17",
         "ticker": "UNIVCABLES",
-        "equity": -1444153.72,
-        "drawdown_pct": 203.17
+        "equity": -1234180.91,
+        "drawdown_pct": 202.27
       },
       {
         "date": "2026-08-18",
         "ticker": "ASIANENE",
-        "equity": -1444136.64,
-        "drawdown_pct": 203.17
+        "equity": -1234163.83,
+        "drawdown_pct": 202.27
       },
       {
         "date": "2026-08-18",
         "ticker": "AVALON",
-        "equity": -1444054.26,
-        "drawdown_pct": 203.16
+        "equity": -1234081.45,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-18",
         "ticker": "AVTNPL",
-        "equity": -1444050.78,
-        "drawdown_pct": 203.16
+        "equity": -1234077.97,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-18",
         "ticker": "METROGLOBL",
-        "equity": -1444063.07,
-        "drawdown_pct": 203.16
+        "equity": -1234090.26,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-18",
         "ticker": "MODTHREAD",
-        "equity": -1444060.67,
-        "drawdown_pct": 203.16
+        "equity": -1234087.86,
+        "drawdown_pct": 202.26
       },
       {
         "date": "2026-08-18",
         "ticker": "PTCIL",
-        "equity": -1444905.84,
-        "drawdown_pct": 203.23
+        "equity": -1234933.03,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-18",
         "ticker": "REGAAL",
-        "equity": -1444902.23,
-        "drawdown_pct": 203.22
+        "equity": -1234929.42,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-18",
         "ticker": "RISHABH",
-        "equity": -1444949.33,
-        "drawdown_pct": 203.23
+        "equity": -1234976.52,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-19",
         "ticker": "APOLLOPIPE",
-        "equity": -1444927.52,
-        "drawdown_pct": 203.23
-      },
-      {
-        "date": "2026-08-19",
-        "ticker": "CALSOFT",
-        "equity": -1444926.47,
-        "drawdown_pct": 203.23
+        "equity": -1234954.71,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-19",
         "ticker": "DALMIASUG",
-        "equity": -1444908.11,
-        "drawdown_pct": 203.23
+        "equity": -1234936.35,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-19",
         "ticker": "GKSL",
-        "equity": -1444902.03,
-        "drawdown_pct": 203.22
+        "equity": -1234930.27,
+        "drawdown_pct": 202.33
       },
       {
         "date": "2026-08-19",
         "ticker": "KINGFA",
-        "equity": -1445222.83,
-        "drawdown_pct": 203.25
+        "equity": -1235251.07,
+        "drawdown_pct": 202.36
       },
       {
         "date": "2026-08-19",
         "ticker": "KRN",
-        "equity": -1445162.12,
-        "drawdown_pct": 203.24
+        "equity": -1235190.36,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-19",
         "ticker": "MAWANASUG",
-        "equity": -1445157.08,
-        "drawdown_pct": 203.24
+        "equity": -1235185.32,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-19",
         "ticker": "NRBBEARING",
-        "equity": -1445137.72,
-        "drawdown_pct": 203.24
+        "equity": -1235165.96,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-19",
         "ticker": "PONNIERODE",
-        "equity": -1445122.9,
-        "drawdown_pct": 203.24
+        "equity": -1235151.14,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-19",
         "ticker": "PREMIERPOL",
-        "equity": -1445119.5,
-        "drawdown_pct": 203.24
+        "equity": -1235147.74,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-20",
         "ticker": "BALRAMCHIN",
-        "equity": -1445093.19,
-        "drawdown_pct": 203.24
+        "equity": -1235121.43,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-20",
         "ticker": "KWIL",
-        "equity": -1445091.63,
-        "drawdown_pct": 203.24
+        "equity": -1235119.87,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-24",
         "ticker": "IPCALAB",
-        "equity": -1445048.33,
-        "drawdown_pct": 203.24
+        "equity": -1235076.57,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-24",
         "ticker": "KMEW",
-        "equity": -1445075.63,
-        "drawdown_pct": 203.24
+        "equity": -1235103.87,
+        "drawdown_pct": 202.34
       },
       {
         "date": "2026-08-24",
         "ticker": "LAXMIINDIA",
-        "equity": -1445086.31,
-        "drawdown_pct": 203.24
+        "equity": -1235114.55,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-24",
         "ticker": "RUBICON",
-        "equity": -1445099.51,
-        "drawdown_pct": 203.24
+        "equity": -1235127.75,
+        "drawdown_pct": 202.35
       },
       {
         "date": "2026-08-24",
         "ticker": "SETL",
-        "equity": -1445097.16,
-        "drawdown_pct": 203.24
+        "equity": -1235125.4,
+        "drawdown_pct": 202.35
+      },
+      {
+        "date": "2026-08-25",
+        "ticker": "NAHARINDUS",
+        "equity": -1235135.59,
+        "drawdown_pct": 202.35
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "IGPL",
+        "equity": -1235115.55,
+        "drawdown_pct": 202.35
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "MAXESTATES",
+        "equity": -1235093.83,
+        "drawdown_pct": 202.34
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "PITTIENG",
+        "equity": -1235049.03,
+        "drawdown_pct": 202.34
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "RENUKA",
+        "equity": -1235050.65,
+        "drawdown_pct": 202.34
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "SETL",
+        "equity": -1235038.17,
+        "drawdown_pct": 202.34
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "YATHARTH",
+        "equity": -1235001.49,
+        "drawdown_pct": 202.34
+      },
+      {
+        "date": "2026-08-27",
+        "ticker": "PTCIL",
+        "equity": -1236020.85,
+        "drawdown_pct": 202.42
+      },
+      {
+        "date": "2026-08-27",
+        "ticker": "SAYAJIHOTL",
+        "equity": -1236039.79,
+        "drawdown_pct": 202.42
+      },
+      {
+        "date": "2026-08-27",
+        "ticker": "SHRIPISTON",
+        "equity": -1236276.49,
+        "drawdown_pct": 202.44
+      },
+      {
+        "date": "2026-08-28",
+        "ticker": "PIRAMALFIN",
+        "equity": -1236188.89,
+        "drawdown_pct": 202.43
+      },
+      {
+        "date": "2026-08-28",
+        "ticker": "SHIVAUM",
+        "equity": -1236171.16,
+        "drawdown_pct": 202.43
+      },
+      {
+        "date": "2026-08-31",
+        "ticker": "EIDPARRY",
+        "equity": -1236191.76,
+        "drawdown_pct": 202.43
+      },
+      {
+        "date": "2026-08-31",
+        "ticker": "GUJALKALI",
+        "equity": -1236221.76,
+        "drawdown_pct": 202.44
+      },
+      {
+        "date": "2026-08-31",
+        "ticker": "MSTCLTD",
+        "equity": -1236192.45,
+        "drawdown_pct": 202.43
+      },
+      {
+        "date": "2026-08-31",
+        "ticker": "PVRINOX",
+        "equity": -1236246.94,
+        "drawdown_pct": 202.44
+      },
+      {
+        "date": "2026-08-31",
+        "ticker": "SIEMENS",
+        "equity": -1236330.94,
+        "drawdown_pct": 202.45
+      },
+      {
+        "date": "2026-08-31",
+        "ticker": "WENDT",
+        "equity": -1236461.44,
+        "drawdown_pct": 202.46
       }
     ]
   },
   "mode_b": {
     "mode": "B",
     "total_trades": 212,
-    "wins": 111,
-    "losses": 101,
-    "win_rate_pct": 52.4,
-    "avg_win_pct": 3.62,
-    "avg_loss_pct": -4.59,
-    "expectancy_pct": -0.29,
-    "profit_factor": 0.779,
-    "total_pnl": -202358.01,
-    "final_capital": 797641.99,
-    "total_return_pct": -20.24,
-    "max_drawdown_pct": 26.22,
-    "max_drawdown_abs": 268423.12,
-    "max_dd_peak_date": "2025-11-03",
+    "wins": 108,
+    "losses": 104,
+    "win_rate_pct": 50.9,
+    "avg_win_pct": 3.56,
+    "avg_loss_pct": -4.49,
+    "expectancy_pct": -0.39,
+    "profit_factor": 0.723,
+    "total_pnl": -245912.35,
+    "final_capital": 754087.65,
+    "total_return_pct": -24.59,
+    "max_drawdown_pct": 30.6,
+    "max_drawdown_abs": 301389.38,
+    "max_dd_peak_date": "2025-11-06",
     "max_dd_trough_date": "2026-04-06",
-    "sharpe_like": -1.52,
-    "avg_holding_days": 2.6,
+    "sharpe_like": -1.88,
+    "avg_holding_days": 2.5,
     "exit_reasons": {
-      "TP": 95,
-      "SL": 74,
-      "TIME": 43
+      "TP": 92,
+      "SL": 75,
+      "TIME": 45
     },
-    "trades_in_3_5pct": 95,
+    "trades_in_3_5pct": 92,
     "trades_over_target": 0,
-    "target_hit_rate_pct": 44.8,
+    "target_hit_rate_pct": 43.4,
     "can_achieve_3_5pct_goal": false,
     "viability_verdict": "NOT VIABLE — negative expectancy, fundamental revision needed",
     "regime_breakdown": {
       "Bull": {
         "trades": 150,
-        "win_rate_pct": 52.0,
-        "avg_return": -0.33,
-        "expectancy": -0.33,
-        "total_pnl": -184028.26
+        "win_rate_pct": 51.3,
+        "avg_return": -0.37,
+        "expectancy": -0.37,
+        "total_pnl": -216719.1
       },
       "Sideways": {
         "trades": 60,
-        "win_rate_pct": 53.3,
-        "avg_return": -0.19,
-        "expectancy": -0.19,
-        "total_pnl": -17188.03
+        "win_rate_pct": 50.0,
+        "avg_return": -0.42,
+        "expectancy": -0.42,
+        "total_pnl": -28124.88
       },
       "Bear": {
         "trades": 2,
         "win_rate_pct": 50.0,
         "avg_return": -0.57,
         "expectancy": -0.57,
-        "total_pnl": -1141.72
+        "total_pnl": -1068.37
       }
     },
     "signal_breakdown": {
@@ -968,100 +960,92 @@
       },
       "MULTI": {
         "trades": 211,
-        "win_rate_pct": 52.1,
-        "avg_return": -0.31,
-        "best_trade": 4.01,
+        "win_rate_pct": 50.7,
+        "avg_return": -0.41,
+        "best_trade": 4.02,
         "worst_trade": -12.0
       }
     },
     "monthly_dist": [
       {
-        "month": "2025-10",
-        "trades": 2,
-        "wins": 2,
-        "pnl": 21870.4,
-        "return_pct": 2.19,
-        "win_rate": 100.0
-      },
-      {
         "month": "2025-11",
-        "trades": 21,
-        "wins": 10,
-        "pnl": -53891.03,
-        "return_pct": -5.39,
-        "win_rate": 47.6
+        "trades": 18,
+        "wins": 8,
+        "pnl": -47291.8,
+        "return_pct": -4.73,
+        "win_rate": 44.4
       },
       {
         "month": "2025-12",
         "trades": 26,
         "wins": 10,
-        "pnl": -108378.73,
-        "return_pct": -10.84,
+        "pnl": -113124.8,
+        "return_pct": -11.31,
         "win_rate": 38.5
       },
       {
         "month": "2026-01",
         "trades": 19,
-        "wins": 9,
-        "pnl": -23722.6,
-        "return_pct": -2.37,
-        "win_rate": 47.4
+        "wins": 7,
+        "pnl": -58130.92,
+        "return_pct": -5.81,
+        "win_rate": 36.8
       },
       {
         "month": "2026-02",
         "trades": 19,
-        "wins": 12,
-        "pnl": 32062.88,
-        "return_pct": 3.21,
-        "win_rate": 63.2
+        "wins": 11,
+        "pnl": 4169.21,
+        "return_pct": 0.42,
+        "win_rate": 57.9
       },
       {
         "month": "2026-03",
         "trades": 22,
         "wins": 10,
-        "pnl": -71343.13,
-        "return_pct": -7.13,
+        "pnl": -64668.89,
+        "return_pct": -6.47,
         "win_rate": 45.5
       },
       {
         "month": "2026-04",
-        "trades": 23,
-        "wins": 15,
-        "pnl": 18134.67,
-        "return_pct": 1.81,
-        "win_rate": 65.2
+        "trades": 22,
+        "wins": 16,
+        "pnl": 35248.35,
+        "return_pct": 3.52,
+        "win_rate": 72.7
       },
       {
         "month": "2026-05",
-        "trades": 23,
+        "trades": 24,
         "wins": 15,
-        "pnl": 18561.28,
-        "return_pct": 1.86,
-        "win_rate": 65.2
+        "pnl": 27079.75,
+        "return_pct": 2.71,
+        "win_rate": 62.5
       },
       {
         "month": "2026-06",
         "trades": 17,
         "wins": 9,
-        "pnl": -4026.36,
-        "return_pct": -0.4,
+        "pnl": -3764.1,
+        "return_pct": -0.38,
         "win_rate": 52.9
       },
       {
         "month": "2026-07",
         "trades": 23,
-        "wins": 12,
-        "pnl": -9222.73,
-        "return_pct": -0.92,
-        "win_rate": 52.2
+        "wins": 13,
+        "pnl": 1314.92,
+        "return_pct": 0.13,
+        "win_rate": 56.5
       },
       {
         "month": "2026-08",
-        "trades": 17,
-        "wins": 7,
-        "pnl": -22402.66,
-        "return_pct": -2.24,
-        "win_rate": 41.2
+        "trades": 22,
+        "wins": 9,
+        "pnl": -26744.07,
+        "return_pct": -2.67,
+        "win_rate": 40.9
       }
     ],
     "return_histogram": [
@@ -1069,8 +1053,8 @@
         "range_low": -12.0,
         "range_high": -10.4,
         "label": "-12.0% to -10.4%",
-        "count": 2,
-        "pct_of_total": 0.9
+        "count": 1,
+        "pct_of_total": 0.5
       },
       {
         "range_low": -10.4,
@@ -1097,29 +1081,29 @@
         "range_low": -5.6,
         "range_high": -4.0,
         "label": "-5.6% to -4.0%",
-        "count": 33,
-        "pct_of_total": 15.6
+        "count": 35,
+        "pct_of_total": 16.5
       },
       {
         "range_low": -4.0,
         "range_high": -2.4,
         "label": "-4.0% to -2.4%",
-        "count": 14,
-        "pct_of_total": 6.6
+        "count": 15,
+        "pct_of_total": 7.1
       },
       {
         "range_low": -2.4,
         "range_high": -0.8,
         "label": "-2.4% to -0.8%",
-        "count": 10,
-        "pct_of_total": 4.7
+        "count": 12,
+        "pct_of_total": 5.7
       },
       {
         "range_low": -0.8,
         "range_high": 0.8,
         "label": "-0.8% to +0.8%",
-        "count": 16,
-        "pct_of_total": 7.5
+        "count": 17,
+        "pct_of_total": 8.0
       },
       {
         "range_low": 0.8,
@@ -1132,666 +1116,667 @@
         "range_low": 2.4,
         "range_high": 4.0,
         "label": "+2.4% to +4.0%",
-        "count": 98,
-        "pct_of_total": 46.2
+        "count": 94,
+        "pct_of_total": 44.3
       }
     ],
     "weekly_returns": [
-      -6.65,
-      2.19,
-      0.92,
-      -0.75,
+      -5.99,
+      0.91,
+      -0.74,
       1.09,
-      -4.82,
-      0.51,
-      -4.31,
-      -1.69,
-      0.72,
-      1.55,
+      -4.06,
+      -0.15,
+      -4.22,
+      -2.39,
+      0.73,
+      1.51,
+      -0.92,
+      -6.8,
+      -0.83,
+      -2.25,
+      2.32,
+      1.52,
+      -1.17,
+      -3.08,
+      -0.11,
+      -1.73,
+      -0.48,
+      -3.73,
+      1.74,
+      0.69,
+      2.29,
+      1.46,
+      0.53,
+      -3.19,
+      2.19,
+      3.17,
+      1.02,
+      -0.11,
+      0.06,
       -0.94,
-      -5.09,
-      0.86,
-      -1.76,
-      3.69,
-      -0.41,
-      1.68,
-      -3.4,
-      -0.11,
-      -1.91,
-      -0.52,
-      -4.13,
-      1.92,
-      -0.02,
-      2.49,
-      0.37,
-      1.24,
-      -3.46,
-      2.38,
-      1.71,
-      1.08,
-      -0.11,
-      0.07,
-      -1.0,
-      0.52,
-      -0.4,
-      -1.27,
-      -0.54,
-      -0.99,
-      0.33,
-      -0.66,
-      -0.58
+      0.48,
+      -0.38,
+      -0.18,
+      -0.51,
+      -0.95,
+      0.32,
+      -0.62,
+      -0.55,
+      -0.25,
+      -0.3
     ],
     "equity_curve": [
       {
-        "date": "2026-04-01",
-        "ticker": "PARASPETRO",
-        "equity": 779073.97,
-        "drawdown_pct": 23.9
-      },
-      {
-        "date": "2026-04-02",
-        "ticker": "AUROPHARMA",
-        "equity": 767128.5,
-        "drawdown_pct": 25.07
-      },
-      {
-        "date": "2026-04-06",
-        "ticker": "GAYAPROJ",
-        "equity": 755310.73,
-        "drawdown_pct": 26.22
-      },
-      {
-        "date": "2026-04-07",
-        "ticker": "BUILDPRO",
-        "equity": 760152.92,
-        "drawdown_pct": 25.75
-      },
-      {
-        "date": "2026-04-07",
-        "ticker": "CCL",
-        "equity": 768333.56,
-        "drawdown_pct": 24.95
-      },
-      {
         "date": "2026-04-07",
         "ticker": "MAWANASUG",
-        "equity": 774580.6,
-        "drawdown_pct": 24.34
+        "equity": 701122.67,
+        "drawdown_pct": 29.89
       },
       {
         "date": "2026-04-08",
         "ticker": "SPORTKING",
-        "equity": 780812.35,
-        "drawdown_pct": 23.73
+        "equity": 706764.57,
+        "drawdown_pct": 29.32
       },
       {
         "date": "2026-04-10",
         "ticker": "SPLPETRO",
-        "equity": 786296.39,
-        "drawdown_pct": 23.19
+        "equity": 711729.07,
+        "drawdown_pct": 28.83
+      },
+      {
+        "date": "2026-04-15",
+        "ticker": "AKUMS",
+        "equity": 718843.37,
+        "drawdown_pct": 28.12
       },
       {
         "date": "2026-04-15",
         "ticker": "KRN",
-        "equity": 792838.47,
-        "drawdown_pct": 22.55
+        "equity": 724739.85,
+        "drawdown_pct": 27.53
       },
       {
         "date": "2026-04-16",
         "ticker": "HIRECT",
-        "equity": 797819.76,
-        "drawdown_pct": 22.07
+        "equity": 729246.73,
+        "drawdown_pct": 27.08
       },
       {
         "date": "2026-04-16",
         "ticker": "LUMAXTECH",
-        "equity": 786084.33,
-        "drawdown_pct": 23.21
+        "equity": 718670.36,
+        "drawdown_pct": 28.13
       },
       {
         "date": "2026-04-21",
         "ticker": "BIRLAMONEY",
-        "equity": 791794.74,
-        "drawdown_pct": 22.66
+        "equity": 723892.34,
+        "drawdown_pct": 27.61
       },
       {
         "date": "2026-04-21",
         "ticker": "CORONA",
-        "equity": 798509.84,
-        "drawdown_pct": 22.0
+        "equity": 730061.5,
+        "drawdown_pct": 26.99
       },
       {
         "date": "2026-04-21",
         "ticker": "EBGNG",
-        "equity": 794214.59,
-        "drawdown_pct": 22.42
+        "equity": 726177.1,
+        "drawdown_pct": 27.38
       },
       {
         "date": "2026-04-21",
         "ticker": "HSCL",
-        "equity": 802553.03,
-        "drawdown_pct": 21.61
+        "equity": 733791.31,
+        "drawdown_pct": 26.62
       },
       {
         "date": "2026-04-21",
         "ticker": "MAHABANK",
-        "equity": 811057.15,
-        "drawdown_pct": 20.77
-      },
-      {
-        "date": "2026-04-21",
-        "ticker": "SONACOMS",
-        "equity": 811021.42,
-        "drawdown_pct": 20.78
+        "equity": 741565.89,
+        "drawdown_pct": 25.84
       },
       {
         "date": "2026-04-27",
         "ticker": "HARDWYN",
-        "equity": 819742.55,
-        "drawdown_pct": 19.93
+        "equity": 749540.28,
+        "drawdown_pct": 25.05
       },
       {
         "date": "2026-04-28",
         "ticker": "TMB",
-        "equity": 827026.18,
-        "drawdown_pct": 19.21
-      },
-      {
-        "date": "2026-04-29",
-        "ticker": "AURUS",
-        "equity": 814732.46,
-        "drawdown_pct": 20.42
+        "equity": 756201.15,
+        "drawdown_pct": 24.38
       },
       {
         "date": "2026-05-04",
         "ticker": "KANPRPLA",
-        "equity": 820360.81,
-        "drawdown_pct": 19.87
+        "equity": 761350.84,
+        "drawdown_pct": 23.86
       },
       {
         "date": "2026-05-04",
         "ticker": "NRAIL",
-        "equity": 808078.4,
-        "drawdown_pct": 21.07
+        "equity": 750139.38,
+        "drawdown_pct": 24.99
+      },
+      {
+        "date": "2026-05-04",
+        "ticker": "VBL",
+        "equity": 743961.08,
+        "drawdown_pct": 25.6
       },
       {
         "date": "2026-05-05",
         "ticker": "GRINDWELL",
-        "equity": 797887.22,
-        "drawdown_pct": 22.06
+        "equity": 734656.09,
+        "drawdown_pct": 26.53
       },
       {
         "date": "2026-05-07",
         "ticker": "CMPDI",
-        "equity": 804773.34,
-        "drawdown_pct": 21.39
+        "equity": 740993.2,
+        "drawdown_pct": 25.9
       },
       {
         "date": "2026-05-07",
         "ticker": "LAURUSLABS",
-        "equity": 816018.83,
-        "drawdown_pct": 20.29
+        "equity": 751348.42,
+        "drawdown_pct": 24.87
       },
       {
         "date": "2026-05-07",
         "ticker": "LINDEINDIA",
-        "equity": 827097.16,
-        "drawdown_pct": 19.21
+        "equity": 761528.51,
+        "drawdown_pct": 23.85
       },
       {
         "date": "2026-05-11",
         "ticker": "AETHER",
-        "equity": 818525.65,
-        "drawdown_pct": 20.05
+        "equity": 753620.6,
+        "drawdown_pct": 24.64
       },
       {
         "date": "2026-05-11",
         "ticker": "SHREEJISPG",
-        "equity": 813265.75,
-        "drawdown_pct": 20.56
+        "equity": 748784.25,
+        "drawdown_pct": 25.12
       },
       {
         "date": "2026-05-12",
         "ticker": "PARACABLES",
-        "equity": 801082.81,
-        "drawdown_pct": 21.75
+        "equity": 737566.89,
+        "drawdown_pct": 26.24
       },
       {
         "date": "2026-05-12",
         "ticker": "SASKEN",
-        "equity": 809359.22,
-        "drawdown_pct": 20.94
+        "equity": 745164.91,
+        "drawdown_pct": 25.48
       },
       {
         "date": "2026-05-13",
         "ticker": "JINDWORLD",
-        "equity": 797142.26,
-        "drawdown_pct": 22.13
+        "equity": 733917.87,
+        "drawdown_pct": 26.61
       },
       {
         "date": "2026-05-13",
         "ticker": "NDRAUTO",
-        "equity": 784971.96,
-        "drawdown_pct": 23.32
+        "equity": 722712.62,
+        "drawdown_pct": 27.73
       },
       {
         "date": "2026-05-15",
         "ticker": "GULPOLY",
-        "equity": 792454.11,
-        "drawdown_pct": 22.59
+        "equity": 729602.27,
+        "drawdown_pct": 27.04
       },
       {
         "date": "2026-05-19",
         "ticker": "GESHIP",
-        "equity": 799691.14,
-        "drawdown_pct": 21.88
+        "equity": 736303.24,
+        "drawdown_pct": 26.37
       },
       {
         "date": "2026-05-20",
         "ticker": "ASTEC",
-        "equity": 805166.5,
-        "drawdown_pct": 21.35
+        "equity": 741329.8,
+        "drawdown_pct": 25.87
       },
       {
         "date": "2026-05-20",
         "ticker": "RAYMOND",
-        "equity": 811215.9,
-        "drawdown_pct": 20.76
+        "equity": 746912.3,
+        "drawdown_pct": 25.31
       },
       {
         "date": "2026-05-20",
         "ticker": "SAKAR",
-        "equity": 816229.24,
-        "drawdown_pct": 20.27
+        "equity": 751544.88,
+        "drawdown_pct": 24.85
       },
       {
         "date": "2026-05-25",
         "ticker": "SOLEX",
-        "equity": 815971.74,
-        "drawdown_pct": 20.29
+        "equity": 751307.38,
+        "drawdown_pct": 24.87
       },
       {
         "date": "2026-05-26",
         "ticker": "ASTRAMICRO",
-        "equity": 820549.66,
-        "drawdown_pct": 19.85
+        "equity": 759766.58,
+        "drawdown_pct": 24.02
       },
       {
         "date": "2026-05-26",
         "ticker": "BLUEJET",
-        "equity": 823986.46,
-        "drawdown_pct": 19.51
+        "equity": 766083.38,
+        "drawdown_pct": 23.39
       },
       {
         "date": "2026-05-26",
         "ticker": "ROSSTECH",
-        "equity": 826516.06,
-        "drawdown_pct": 19.26
+        "equity": 770734.58,
+        "drawdown_pct": 22.93
       },
       {
         "date": "2026-05-27",
         "ticker": "CORDSCABLE",
-        "equity": 829629.1,
-        "drawdown_pct": 18.96
+        "equity": 776475.14,
+        "drawdown_pct": 22.35
       },
       {
         "date": "2026-05-29",
         "ticker": "COCKERILL",
-        "equity": 833293.74,
-        "drawdown_pct": 18.6
+        "equity": 783280.9,
+        "drawdown_pct": 21.67
       },
       {
         "date": "2026-06-02",
         "ticker": "NAHARINDUS",
-        "equity": 837095.34,
-        "drawdown_pct": 18.23
+        "equity": 786856.9,
+        "drawdown_pct": 21.31
       },
       {
         "date": "2026-06-02",
         "ticker": "NMDC",
-        "equity": 842894.07,
-        "drawdown_pct": 17.66
+        "equity": 792306.89,
+        "drawdown_pct": 20.77
       },
       {
         "date": "2026-06-02",
         "ticker": "SPORTKING",
-        "equity": 846009.32,
-        "drawdown_pct": 17.36
+        "equity": 795232.05,
+        "drawdown_pct": 20.48
       },
       {
         "date": "2026-06-02",
         "ticker": "VISHNU",
-        "equity": 850348.92,
-        "drawdown_pct": 16.94
+        "equity": 799323.67,
+        "drawdown_pct": 20.07
       },
       {
         "date": "2026-06-05",
         "ticker": "MOREPENLAB",
-        "equity": 844103.46,
-        "drawdown_pct": 17.55
+        "equity": 793451.87,
+        "drawdown_pct": 20.65
       },
       {
         "date": "2026-06-09",
         "ticker": "INOXINDIA",
-        "equity": 846113.46,
-        "drawdown_pct": 17.35
+        "equity": 795327.87,
+        "drawdown_pct": 20.47
       },
       {
         "date": "2026-06-10",
         "ticker": "KIMS",
-        "equity": 842961.74,
-        "drawdown_pct": 17.66
+        "equity": 792383.5,
+        "drawdown_pct": 20.76
       },
       {
         "date": "2026-06-16",
         "ticker": "SUDEEPPHRM",
-        "equity": 846745.76,
-        "drawdown_pct": 17.29
+        "equity": 795937.19,
+        "drawdown_pct": 20.41
       },
       {
         "date": "2026-06-17",
         "ticker": "ABSLAMC",
-        "equity": 840444.18,
-        "drawdown_pct": 17.9
+        "equity": 790006.29,
+        "drawdown_pct": 21.0
       },
       {
         "date": "2026-06-17",
         "ticker": "IFCI",
-        "equity": 843651.86,
-        "drawdown_pct": 17.59
+        "equity": 793020.65,
+        "drawdown_pct": 20.7
       },
       {
         "date": "2026-06-22",
         "ticker": "DIVGIITTS",
-        "equity": 841365.26,
-        "drawdown_pct": 17.81
+        "equity": 790878.25,
+        "drawdown_pct": 20.91
       },
       {
         "date": "2026-06-22",
         "ticker": "SHRIPISTON",
-        "equity": 842554.23,
-        "drawdown_pct": 17.7
+        "equity": 791992.91,
+        "drawdown_pct": 20.8
       },
       {
         "date": "2026-06-23",
         "ticker": "NOCIL",
-        "equity": 836240.37,
-        "drawdown_pct": 18.31
+        "equity": 786063.0,
+        "drawdown_pct": 21.39
       },
       {
         "date": "2026-06-24",
         "ticker": "SANSTAR",
-        "equity": 839945.37,
-        "drawdown_pct": 17.95
+        "equity": 789543.0,
+        "drawdown_pct": 21.05
       },
       {
         "date": "2026-06-25",
         "ticker": "EDELWEISS",
-        "equity": 833626.92,
-        "drawdown_pct": 18.57
+        "equity": 783601.44,
+        "drawdown_pct": 21.64
       },
       {
         "date": "2026-06-29",
         "ticker": "HAPPYFORGE",
-        "equity": 833043.38,
-        "drawdown_pct": 18.63
+        "equity": 783056.8,
+        "drawdown_pct": 21.69
       },
       {
         "date": "2026-06-29",
         "ticker": "KMEW",
-        "equity": 829267.38,
-        "drawdown_pct": 19.0
+        "equity": 779516.8,
+        "drawdown_pct": 22.05
       },
       {
         "date": "2026-07-01",
         "ticker": "WHEELS",
-        "equity": 823170.08,
-        "drawdown_pct": 19.59
+        "equity": 773684.6,
+        "drawdown_pct": 22.63
       },
       {
         "date": "2026-07-02",
         "ticker": "IOLCP",
-        "equity": 826597.28,
-        "drawdown_pct": 19.26
+        "equity": 776904.44,
+        "drawdown_pct": 22.31
       },
       {
         "date": "2026-07-02",
         "ticker": "MACPOWER",
-        "equity": 829924.82,
-        "drawdown_pct": 18.93
+        "equity": 780017.3,
+        "drawdown_pct": 22.0
       },
       {
         "date": "2026-07-02",
         "ticker": "ZYDUSWELL",
-        "equity": 834391.24,
-        "drawdown_pct": 18.5
+        "equity": 784211.65,
+        "drawdown_pct": 21.58
       },
       {
         "date": "2026-07-03",
         "ticker": "ACUTAAS",
-        "equity": 838836.64,
-        "drawdown_pct": 18.06
+        "equity": 788370.25,
+        "drawdown_pct": 21.16
       },
       {
         "date": "2026-07-08",
         "ticker": "ABDL",
-        "equity": 832551.95,
-        "drawdown_pct": 18.67
+        "equity": 782471.77,
+        "drawdown_pct": 21.75
       },
       {
         "date": "2026-07-08",
         "ticker": "IMPAL",
-        "equity": 826296.99,
-        "drawdown_pct": 19.29
+        "equity": 776584.75,
+        "drawdown_pct": 22.34
       },
       {
         "date": "2026-07-08",
         "ticker": "SPARC",
-        "equity": 830138.19,
-        "drawdown_pct": 18.91
+        "equity": 780191.21,
+        "drawdown_pct": 21.98
       },
       {
         "date": "2026-07-09",
         "ticker": "WELCORP",
-        "equity": 834834.99,
-        "drawdown_pct": 18.45
+        "equity": 784579.01,
+        "drawdown_pct": 21.54
       },
       {
         "date": "2026-07-13",
         "ticker": "MANAPPURAM",
-        "equity": 829818.41,
-        "drawdown_pct": 18.94
+        "equity": 779858.28,
+        "drawdown_pct": 22.01
       },
       {
         "date": "2026-07-14",
         "ticker": "PLASTIBLEN",
-        "equity": 834550.02,
-        "drawdown_pct": 18.48
+        "equity": 784304.36,
+        "drawdown_pct": 21.57
       },
       {
         "date": "2026-07-16",
         "ticker": "SATIN",
-        "equity": 828339.57,
-        "drawdown_pct": 19.09
+        "equity": 778460.21,
+        "drawdown_pct": 22.15
       },
       {
         "date": "2026-07-17",
-        "ticker": "AVANTEL",
-        "equity": 822119.55,
-        "drawdown_pct": 19.69
+        "ticker": "BEPL",
+        "equity": 782818.58,
+        "drawdown_pct": 21.72
       },
       {
         "date": "2026-07-20",
         "ticker": "SHYAMMETL",
-        "equity": 828114.16,
-        "drawdown_pct": 19.11
+        "equity": 788441.11,
+        "drawdown_pct": 21.16
       },
       {
         "date": "2026-07-20",
         "ticker": "TRIVENI",
-        "equity": 826189.87,
-        "drawdown_pct": 19.3
+        "equity": 786629.58,
+        "drawdown_pct": 21.34
       },
       {
         "date": "2026-07-21",
         "ticker": "JSFB",
-        "equity": 830668.74,
-        "drawdown_pct": 18.86
+        "equity": 790894.15,
+        "drawdown_pct": 20.91
       },
       {
         "date": "2026-07-22",
         "ticker": "TIPSMUSIC",
-        "equity": 824474.34,
-        "drawdown_pct": 19.46
+        "equity": 784998.79,
+        "drawdown_pct": 21.5
       },
       {
         "date": "2026-07-24",
         "ticker": "MAHLOG",
-        "equity": 829070.82,
-        "drawdown_pct": 19.02
+        "equity": 789371.83,
+        "drawdown_pct": 21.06
       },
       {
         "date": "2026-07-24",
         "ticker": "NAVINFLUOR",
-        "equity": 822947.69,
-        "drawdown_pct": 19.61
+        "equity": 783570.97,
+        "drawdown_pct": 21.64
       },
       {
         "date": "2026-07-24",
         "ticker": "SAREGAMA",
-        "equity": 816760.95,
-        "drawdown_pct": 20.22
+        "equity": 777673.33,
+        "drawdown_pct": 22.23
       },
       {
         "date": "2026-07-29",
         "ticker": "APCOTEXIND",
-        "equity": 821016.15,
-        "drawdown_pct": 19.8
+        "equity": 781739.41,
+        "drawdown_pct": 21.83
       },
       {
         "date": "2026-07-30",
         "ticker": "BHAGYANGR",
-        "equity": 814911.45,
-        "drawdown_pct": 20.4
+        "equity": 775923.88,
+        "drawdown_pct": 22.41
       },
       {
         "date": "2026-07-31",
         "ticker": "RKFORGE",
-        "equity": 820044.65,
-        "drawdown_pct": 19.9
+        "equity": 780831.72,
+        "drawdown_pct": 21.92
       },
       {
         "date": "2026-08-03",
         "ticker": "CREDITACC",
-        "equity": 816519.04,
-        "drawdown_pct": 20.24
+        "equity": 777486.91,
+        "drawdown_pct": 22.25
       },
       {
         "date": "2026-08-03",
         "ticker": "LLOYDSME",
-        "equity": 818273.64,
-        "drawdown_pct": 20.07
+        "equity": 779156.61,
+        "drawdown_pct": 22.08
       },
       {
         "date": "2026-08-04",
         "ticker": "KHAITANLTD",
-        "equity": 812139.54,
-        "drawdown_pct": 20.67
+        "equity": 773312.31,
+        "drawdown_pct": 22.67
       },
       {
         "date": "2026-08-05",
         "ticker": "IGPL",
-        "equity": 817084.48,
-        "drawdown_pct": 20.19
+        "equity": 778017.01,
+        "drawdown_pct": 22.2
       },
       {
         "date": "2026-08-05",
         "ticker": "RSL",
-        "equity": 822346.88,
-        "drawdown_pct": 19.67
+        "equity": 783027.73,
+        "drawdown_pct": 21.7
       },
       {
         "date": "2026-08-06",
         "ticker": "RANEHOLDIN",
-        "equity": 816255.38,
-        "drawdown_pct": 20.27
+        "equity": 777190.05,
+        "drawdown_pct": 22.28
       },
       {
         "date": "2026-08-07",
         "ticker": "ABCAPITAL",
-        "equity": 810127.72,
-        "drawdown_pct": 20.87
+        "equity": 771345.75,
+        "drawdown_pct": 22.87
       },
       {
         "date": "2026-08-11",
         "ticker": "NRBBEARING",
-        "equity": 804064.06,
-        "drawdown_pct": 21.46
+        "equity": 765589.89,
+        "drawdown_pct": 23.44
       },
       {
         "date": "2026-08-12",
         "ticker": "POLYPLEX",
-        "equity": 809554.16,
-        "drawdown_pct": 20.92
+        "equity": 770841.29,
+        "drawdown_pct": 22.92
       },
       {
         "date": "2026-08-13",
         "ticker": "GRASIM",
-        "equity": 803489.37,
-        "drawdown_pct": 21.51
+        "equity": 765119.79,
+        "drawdown_pct": 23.49
       },
       {
         "date": "2026-08-17",
         "ticker": "SYRMA",
-        "equity": 800049.39,
-        "drawdown_pct": 21.85
+        "equity": 761873.61,
+        "drawdown_pct": 23.81
       },
       {
         "date": "2026-08-17",
         "ticker": "TITAN",
-        "equity": 799167.89,
-        "drawdown_pct": 21.94
+        "equity": 761035.11,
+        "drawdown_pct": 23.9
       },
       {
         "date": "2026-08-18",
         "ticker": "ASIANENE",
-        "equity": 802327.69,
-        "drawdown_pct": 21.63
+        "equity": 764041.19,
+        "drawdown_pct": 23.6
       },
       {
         "date": "2026-08-18",
         "ticker": "RISHABH",
-        "equity": 796345.99,
-        "drawdown_pct": 22.21
+        "equity": 758342.09,
+        "drawdown_pct": 24.17
       },
       {
         "date": "2026-08-19",
         "ticker": "KINGFA",
-        "equity": 790571.59,
-        "drawdown_pct": 22.78
+        "equity": 752888.49,
+        "drawdown_pct": 24.71
       },
       {
         "date": "2026-08-19",
         "ticker": "MAWANASUG",
-        "equity": 793897.99,
-        "drawdown_pct": 22.45
+        "equity": 756058.65,
+        "drawdown_pct": 24.39
       },
       {
         "date": "2026-08-20",
         "ticker": "KWIL",
-        "equity": 797641.99,
-        "drawdown_pct": 22.09
+        "equity": 759623.25,
+        "drawdown_pct": 24.04
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "SETL",
+        "equity": 763192.53,
+        "drawdown_pct": 23.68
+      },
+      {
+        "date": "2026-08-26",
+        "ticker": "YATHARTH",
+        "equity": 768474.45,
+        "drawdown_pct": 23.15
+      },
+      {
+        "date": "2026-08-27",
+        "ticker": "SAYAJIHOTL",
+        "equity": 762792.45,
+        "drawdown_pct": 23.72
+      },
+      {
+        "date": "2026-08-27",
+        "ticker": "SHRIPISTON",
+        "equity": 757111.65,
+        "drawdown_pct": 24.29
+      },
+      {
+        "date": "2026-08-31",
+        "ticker": "SIEMENS",
+        "equity": 754087.65,
+        "drawdown_pct": 24.59
       }
     ]
   },
   "comparison": {
     "mode_a_win_rate": 51.5,
-    "mode_b_win_rate": 52.4,
+    "mode_b_win_rate": 50.9,
     "mode_a_expectancy": -0.39,
-    "mode_b_expectancy": -0.29,
-    "ai_filtering_edge": 0.1,
-    "mode_a_sharpe": -1.22,
-    "mode_b_sharpe": -1.52,
-    "recommendation": "AI filtering adds meaningful edge — use Mode B for live trading"
+    "mode_b_expectancy": -0.39,
+    "ai_filtering_edge": 0.0,
+    "mode_a_sharpe": -1.36,
+    "mode_b_sharpe": -1.88,
+    "recommendation": "AI filtering shows marginal improvement — review scoring model"
   }
 }
