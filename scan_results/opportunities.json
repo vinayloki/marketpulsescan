@@ -1,11 +1,11 @@
 {
-  "generated": "16 Sep 2026",
-  "generated_ts": "2026-09-16_1608",
+  "generated": "17 Sep 2026",
+  "generated_ts": "2026-09-17_1610",
   "engine_version": "2.0",
-  "total_opportunities": 30,
+  "total_opportunities": 23,
   "opportunities": [
     {
-      "ticker": "MBECL",
+      "ticker": "DSKULKARNI",
       "rank": 1,
       "score": 60,
       "signals": [
@@ -14,19 +14,19 @@
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 364.26,
+        "high_52w": 22.27,
         "pct_from_52w_high": 0.0,
-        "volume_ratio": 9.98,
-        "price": 364.26,
-        "pct_change_1d": 5.0,
+        "volume_ratio": 8.09,
+        "price": 22.27,
+        "pct_change_1d": 1.97,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "McNally Bharat Engineering Company Ltd",
-        "sector": "Others",
-        "ind": "Construction & Engineering",
-        "mcap_cr": 69.2,
-        "pe": -0.0,
+        "name": "D S Kulkarni Developers Ltd",
+        "sector": "Real Estate",
+        "ind": "Real Estate",
+        "mcap_cr": null,
+        "pe": null,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -35,28 +35,28 @@
       }
     },
     {
-      "ticker": "UNIVPHOTO",
+      "ticker": "YATHARTH",
       "rank": 2,
-      "score": 60,
+      "score": 59,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 595.05,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 6.4,
-        "price": 595.05,
-        "pct_change_1d": 4.99,
+        "high_52w": 1083.8,
+        "pct_from_52w_high": 1.05,
+        "volume_ratio": 5.86,
+        "price": 1072.4,
+        "pct_change_1d": 9.17,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Universus Photo Imagings Ltd",
+        "name": "Yatharth Hospital & Trauma Care Services Ltd",
         "sector": "Others",
-        "ind": "Health Care Equipment & Supplies",
-        "mcap_cr": 536.9,
-        "pe": 6.2,
+        "ind": "Hospitals & Diagnostic Centres",
+        "mcap_cr": 7901.1,
+        "pe": 60.5,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -65,28 +65,28 @@
       }
     },
     {
-      "ticker": "AMEYA",
+      "ticker": "VENUSPIPES",
       "rank": 3,
-      "score": 48,
+      "score": 55,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 128.45,
-        "pct_from_52w_high": 1.52,
-        "volume_ratio": 4.17,
-        "price": 126.5,
-        "pct_change_1d": 4.55,
+        "high_52w": 2160.0,
+        "pct_from_52w_high": 1.31,
+        "volume_ratio": 5.24,
+        "price": 2131.7,
+        "pct_change_1d": 9.99,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Ameya Precision Engineers Ltd",
+        "name": "Venus Pipes and Tubes Ltd",
         "sector": "Others",
-        "ind": "Industrial Machinery",
-        "mcap_cr": 81.8,
-        "pe": 18.5,
+        "ind": "Iron & Steel",
+        "mcap_cr": 2854.1,
+        "pe": 30.7,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -95,58 +95,28 @@
       }
     },
     {
-      "ticker": "KANORICHEM",
+      "ticker": "GFSTEELS",
       "rank": 4,
-      "score": 47,
+      "score": 52,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 187.02,
-        "pct_from_52w_high": 0.03,
-        "volume_ratio": 4.04,
-        "price": 186.97,
-        "pct_change_1d": 4.97,
+        "high_52w": 24.23,
+        "pct_from_52w_high": 0.0,
+        "volume_ratio": 4.75,
+        "price": 24.23,
+        "pct_change_1d": 4.98,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Kanoria Chemicals and Industries Ltd",
+        "name": "Grand Foundry Ltd",
         "sector": "Others",
-        "ind": "Specialty Chemicals",
-        "mcap_cr": 384.2,
-        "pe": -4.6,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "STLNETWORK",
-      "rank": 5,
-      "score": 46,
-      "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 39.06,
-        "pct_from_52w_high": 0.23,
-        "volume_ratio": 3.77,
-        "price": 38.97,
-        "pct_change_1d": 4.76,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "STL Networks Ltd",
-        "sector": "Others",
-        "ind": "Communication & Networking",
-        "mcap_cr": 1354.8,
-        "pe": -42.4,
+        "ind": "Iron & Steel",
+        "mcap_cr": 37.6,
+        "pe": -55.3,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -156,19 +126,19 @@
     },
     {
       "ticker": "MONQ50",
-      "rank": 6,
-      "score": 45,
+      "rank": 5,
+      "score": 52,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 275.67,
-        "pct_from_52w_high": 0.14,
-        "volume_ratio": 3.71,
-        "price": 275.28,
-        "pct_change_1d": 27.24,
+        "high_52w": 330.33,
+        "pct_from_52w_high": 0.02,
+        "volume_ratio": 4.78,
+        "price": 330.25,
+        "pct_change_1d": 43.76,
         "above_sma10": true
       },
       "fundamental": {
@@ -185,24 +155,58 @@
       }
     },
     {
-      "ticker": "FONEBOX",
+      "ticker": "AEGISVOPAK",
+      "rank": 6,
+      "score": 48,
+      "signals": [
+        "52W_BREAKOUT",
+        "HIGH_VOLUME",
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "high_52w": 316.0,
+        "pct_from_52w_high": 1.68,
+        "volume_ratio": 4.21,
+        "price": 310.7,
+        "pct_change_1d": 4.63,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Aegis Vopak Terminals Ltd",
+        "sector": "Others",
+        "ind": "Oil & Gas - Storage & Transportation",
+        "mcap_cr": 21009.7,
+        "pe": 165.1,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "SHAREINDIA",
       "rank": 7,
-      "score": 30,
+      "score": 48,
       "signals": [
-        "52W_BREAKOUT"
+        "52W_BREAKOUT",
+        "HIGH_VOLUME",
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 131.25,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 2.49,
-        "price": 131.25
+        "high_52w": 219.95,
+        "pct_from_52w_high": 0.69,
+        "volume_ratio": 4.11,
+        "price": 218.44,
+        "pct_change_1d": 11.42,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "Fonebox Retail Ltd",
+        "name": "Share India Securities Ltd",
         "sector": "Others",
-        "ind": "Retail - Speciality",
-        "mcap_cr": 68.0,
-        "pe": 15.0,
+        "ind": "Investment Banking & Brokerage",
+        "mcap_cr": 3007.8,
+        "pe": 9.2,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -211,24 +215,54 @@
       }
     },
     {
-      "ticker": "GFSTEELS",
+      "ticker": "SOFTTECH",
       "rank": 8,
+      "score": 43,
+      "signals": [
+        "52W_BREAKOUT",
+        "HIGH_VOLUME",
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "high_52w": 500.7,
+        "pct_from_52w_high": 0.0,
+        "volume_ratio": 3.4,
+        "price": 500.7,
+        "pct_change_1d": 4.99,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "SoftTech Engineers Ltd",
+        "sector": "Others",
+        "ind": "Software Services",
+        "mcap_cr": 561.1,
+        "pe": 431.6,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "LIQUIDSBI",
+      "rank": 9,
       "score": 30,
       "signals": [
         "52W_BREAKOUT"
       ],
       "indicators": {
-        "high_52w": 23.08,
+        "high_52w": 1000.01,
         "pct_from_52w_high": 0.0,
-        "volume_ratio": 2.32,
-        "price": 23.08
+        "volume_ratio": 2.37,
+        "price": 1000.01
       },
       "fundamental": {
-        "name": "Grand Foundry Ltd",
+        "name": "SBI Nifty 1D Rate Liquid ETF - IDCW",
         "sector": "Others",
-        "ind": "Iron & Steel",
-        "mcap_cr": 37.6,
-        "pe": -55.3,
+        "ind": "Debt",
+        "mcap_cr": 121.6,
+        "pe": null,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -237,50 +271,24 @@
       }
     },
     {
-      "ticker": "IMPEXFERRO",
-      "rank": 9,
-      "score": 25,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 5.38,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.54,
-        "price": 5.38
-      },
-      "fundamental": {
-        "name": "Impex Ferro Tech Ltd",
-        "sector": "Others",
-        "ind": "Iron & Steel",
-        "mcap_cr": 15.0,
-        "pe": -2.1,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SAAKSHI",
+      "ticker": "GOCLCORP",
       "rank": 10,
-      "score": 25,
+      "score": 26,
       "signals": [
         "52W_BREAKOUT"
       ],
       "indicators": {
-        "high_52w": 362.65,
-        "pct_from_52w_high": 0.18,
-        "volume_ratio": 1.64,
-        "price": 362.0
+        "high_52w": 459.9,
+        "pct_from_52w_high": 0.82,
+        "volume_ratio": 2.5,
+        "price": 456.15
       },
       "fundamental": {
-        "name": "Saakshi Medtech and Panels Ltd",
+        "name": "Gocl Corporation Ltd",
         "sector": "Others",
-        "ind": "Electrical Components & Equipments",
-        "mcap_cr": 408.4,
-        "pe": 86.7,
+        "ind": "Commodity Chemicals",
+        "mcap_cr": 1611.8,
+        "pe": 10.3,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -289,24 +297,24 @@
       }
     },
     {
-      "ticker": "AAATECH",
+      "ticker": "ACE",
       "rank": 11,
       "score": 25,
       "signals": [
-        "VOLUME_SPIKE"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "volume_ratio": 7.22,
-        "price": 92.54,
-        "pct_change_1d": 0.61,
-        "above_sma10": true
+        "high_52w": 1213.2,
+        "pct_from_52w_high": 0.63,
+        "volume_ratio": 2.27,
+        "price": 1205.6
       },
       "fundamental": {
-        "name": "AAA Technologies Ltd",
+        "name": "Action Construction Equipment Ltd",
         "sector": "Others",
-        "ind": "IT Services & Consulting",
-        "mcap_cr": 127.6,
-        "pe": 36.3,
+        "ind": "Heavy Machinery",
+        "mcap_cr": 10564.8,
+        "pe": 25.8,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -315,24 +323,24 @@
       }
     },
     {
-      "ticker": "ARISTO",
+      "ticker": "LIQUID",
       "rank": 12,
       "score": 25,
       "signals": [
-        "VOLUME_SPIKE"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "volume_ratio": 6.15,
-        "price": 112.0,
-        "pct_change_1d": 8.74,
-        "above_sma10": true
+        "high_52w": 1001.2,
+        "pct_from_52w_high": 0.12,
+        "volume_ratio": 1.57,
+        "price": 999.99
       },
       "fundamental": {
-        "name": "Aristo Bio-Tech and Lifescience Ltd",
+        "name": "Mirae Asset Nifty 1D Rate Liquid ETF - IDCW",
         "sector": "Others",
-        "ind": "Fertilizers & Agro Chemicals",
-        "mcap_cr": 81.7,
-        "pe": 20.1,
+        "ind": "Debt",
+        "mcap_cr": 60.0,
+        "pe": null,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -341,24 +349,24 @@
       }
     },
     {
-      "ticker": "ARROWGREEN",
+      "ticker": "LIQUIDCASE",
       "rank": 13,
       "score": 25,
       "signals": [
-        "VOLUME_SPIKE"
+        "52W_BREAKOUT"
       ],
       "indicators": {
-        "volume_ratio": 6.79,
-        "price": 907.45,
-        "pct_change_1d": 8.22,
-        "above_sma10": true
+        "high_52w": 115.96,
+        "pct_from_52w_high": 0.01,
+        "volume_ratio": 1.54,
+        "price": 115.95
       },
       "fundamental": {
-        "name": "Arrow Greentech Ltd",
+        "name": "Zerodha Nifty 1D Rate Liquid ETF",
         "sector": "Others",
-        "ind": "Packaging",
-        "mcap_cr": 805.2,
-        "pe": 12.8,
+        "ind": "Debt",
+        "mcap_cr": 43.3,
+        "pe": null,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -367,24 +375,24 @@
       }
     },
     {
-      "ticker": "ATAM",
+      "ticker": "AWHCL",
       "rank": 14,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 6.99,
-        "price": 62.15,
-        "pct_change_1d": 14.41,
+        "volume_ratio": 16.2,
+        "price": 379.6,
+        "pct_change_1d": 9.87,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Atam Valves Ltd",
+        "name": "Antony Waste Handling Cell Ltd",
         "sector": "Others",
-        "ind": "Industrial Machinery",
-        "mcap_cr": 78.6,
-        "pe": 12.5,
+        "ind": "Environmental Services",
+        "mcap_cr": 1441.0,
+        "pe": 16.9,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -393,24 +401,24 @@
       }
     },
     {
-      "ticker": "CMICABLES",
+      "ticker": "CBAZAAR",
       "rank": 15,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 10.16,
-        "price": 2.62,
-        "pct_change_1d": 4.38,
+        "volume_ratio": 12.0,
+        "price": 4.6,
+        "pct_change_1d": 2.22,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "CMI Ltd",
+        "name": "Net Avenue Technologies Ltd",
         "sector": "Others",
-        "ind": "Cables",
-        "mcap_cr": 5.1,
-        "pe": -0.5,
+        "ind": "Textiles",
+        "mcap_cr": 10.6,
+        "pe": -3.1,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -419,24 +427,24 @@
       }
     },
     {
-      "ticker": "CSBBANK",
+      "ticker": "FALCONTECH",
       "rank": 16,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 8.99,
-        "price": 328.75,
-        "pct_change_1d": 10.93,
+        "volume_ratio": 6.15,
+        "price": 13.0,
+        "pct_change_1d": 0.78,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "CSB Bank Ltd",
+        "name": "Falcon Technoprojects India Ltd",
         "sector": "Others",
-        "ind": "Private Banks",
-        "mcap_cr": 6473.2,
-        "pe": 10.9,
+        "ind": "Construction & Engineering",
+        "mcap_cr": 37.8,
+        "pe": 32.6,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -445,50 +453,50 @@
       }
     },
     {
-      "ticker": "CSM",
+      "ticker": "GNFC",
       "rank": 17,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 9.27,
-        "price": 96.22,
-        "pct_change_1d": 7.09,
+        "volume_ratio": 8.69,
+        "price": 584.85,
+        "pct_change_1d": 8.36,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "CSM TECHNOLOGIES LIMITED",
+        "name": "Gujarat Narmada Valley Fertilizers & Chemicals Ltd",
         "sector": "Others",
-        "ind": "Information Technology Services",
-        "mcap_cr": 496.5,
-        "pe": 35.2,
-        "eps": 2.73,
-        "52h": 113.0,
-        "52l": 76.26,
-        "bv": 26.53,
-        "dy": 56.0
+        "ind": "Fertilizers & Agro Chemicals",
+        "mcap_cr": 6895.9,
+        "pe": 11.5,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
       }
     },
     {
-      "ticker": "EMUDHRA",
+      "ticker": "INDIACEM",
       "rank": 18,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 17.43,
-        "price": 642.3,
-        "pct_change_1d": 8.34,
+        "volume_ratio": 9.56,
+        "price": 351.7,
+        "pct_change_1d": 5.09,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "eMudhra Ltd",
-        "sector": "Others",
-        "ind": "IT Services & Consulting",
-        "mcap_cr": 4015.2,
-        "pe": 47.4,
+        "name": "India Cements Ltd",
+        "sector": "Infrastructure",
+        "ind": "Cement",
+        "mcap_cr": 12268.8,
+        "pe": -182.4,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -497,24 +505,24 @@
       }
     },
     {
-      "ticker": "FOSECOIND",
+      "ticker": "PNC",
       "rank": 19,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 6.73,
-        "price": 6846.5,
-        "pct_change_1d": 10.01,
+        "volume_ratio": 8.26,
+        "price": 16.63,
+        "pct_change_1d": 2.84,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Foseco India Ltd",
+        "name": "Pritish Nandy Communications Ltd",
         "sector": "Others",
-        "ind": "Specialty Chemicals",
-        "mcap_cr": 3556.9,
-        "pe": 49.2,
+        "ind": "Movies & TV Serials",
+        "mcap_cr": 31.1,
+        "pe": -33.0,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -523,24 +531,24 @@
       }
     },
     {
-      "ticker": "INDTERRAIN",
+      "ticker": "RIR",
       "rank": 20,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 9.29,
-        "price": 30.29,
-        "pct_change_1d": 8.14,
+        "volume_ratio": 13.06,
+        "price": 197.63,
+        "pct_change_1d": 9.93,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Indian Terrain Fashions Ltd",
+        "name": "RIR Power Electronics Ltd",
         "sector": "Others",
-        "ind": "Apparel & Accessories",
-        "mcap_cr": 152.7,
-        "pe": -3.6,
+        "ind": "Electronic Equipments",
+        "mcap_cr": 1357.5,
+        "pe": 178.2,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -549,24 +557,24 @@
       }
     },
     {
-      "ticker": "IPL",
+      "ticker": "SBGLP",
       "rank": 21,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 18.99,
-        "price": 137.77,
-        "pct_change_1d": 3.84,
+        "volume_ratio": 7.96,
+        "price": 25.78,
+        "pct_change_1d": 19.96,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "India Pesticides Ltd",
-        "sector": "Others",
-        "ind": "Fertilizers & Agro Chemicals",
-        "mcap_cr": 1729.8,
-        "pe": 21.0,
+        "name": "Suratwwala Business Group Ltd",
+        "sector": "Real Estate",
+        "ind": "Real Estate",
+        "mcap_cr": 469.3,
+        "pe": 42.7,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -575,24 +583,24 @@
       }
     },
     {
-      "ticker": "JINDALPOLY",
+      "ticker": "SYRMA",
       "rank": 22,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 7.39,
-        "price": 742.4,
-        "pct_change_1d": 0.61,
+        "volume_ratio": 6.86,
+        "price": 1617.7,
+        "pct_change_1d": 7.05,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Jindal Poly Films Ltd",
+        "name": "Syrma SGS Technology Ltd",
         "sector": "Others",
-        "ind": "Packaging",
-        "mcap_cr": 3177.4,
-        "pe": 28.9,
+        "ind": "Electronic Equipments",
+        "mcap_cr": 18471.8,
+        "pe": 108.7,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -601,206 +609,24 @@
       }
     },
     {
-      "ticker": "KARMAENG",
+      "ticker": "TEGA",
       "rank": 23,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 9.11,
-        "price": 38.72,
-        "pct_change_1d": 3.83,
+        "volume_ratio": 7.94,
+        "price": 1920.0,
+        "pct_change_1d": 11.82,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Karma Energy Ltd",
+        "name": "Tega Industries Ltd",
         "sector": "Others",
-        "ind": "Renewable Energy",
-        "mcap_cr": 60.6,
-        "pe": 38.6,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "KOPRAN",
-      "rank": 24,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.58,
-        "price": 260.86,
-        "pct_change_1d": 4.39,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Kopran Ltd",
-        "sector": "Others",
-        "ind": "Pharmaceuticals",
-        "mcap_cr": 794.9,
-        "pe": 20.6,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NAGREEKCAP",
-      "rank": 25,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.15,
-        "price": 27.79,
-        "pct_change_1d": 1.5,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Nagreeka Capital & Infrastructure Ltd",
-        "sector": "Others",
-        "ind": "Asset Management",
-        "mcap_cr": 39.5,
-        "pe": 2.1,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "NPST",
-      "rank": 26,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 15.15,
-        "price": 1834.6,
-        "pct_change_1d": 11.9,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Network People Services Technologies Ltd",
-        "sector": "Others",
-        "ind": "Software Services",
-        "mcap_cr": 2487.2,
-        "pe": 55.0,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "PATANJALI",
-      "rank": 27,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 9.11,
-        "price": 365.0,
-        "pct_change_1d": 7.81,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Patanjali Foods Ltd",
-        "sector": "Others",
-        "ind": "Packaged Foods & Meats",
-        "mcap_cr": 49992.9,
-        "pe": 38.4,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ROSSTECH",
-      "rank": 28,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 8.81,
-        "price": 1349.9,
-        "pct_change_1d": 6.68,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Rossell Techsys Ltd",
-        "sector": "Others",
-        "ind": "Aerospace & Defense Equipments",
-        "mcap_cr": 3730.8,
-        "pe": 471.7,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SAATVIKGL",
-      "rank": 29,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.14,
-        "price": 413.25,
-        "pct_change_1d": 6.08,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Saatvik Green Energy Ltd",
-        "sector": "Others",
-        "ind": "Renewable Energy Equipment & Services",
-        "mcap_cr": 5848.1,
-        "pe": 27.3,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SKIL",
-      "rank": 30,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 11.75,
-        "price": 0.9,
-        "pct_change_1d": 3.45,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Skil Infrastructure Ltd",
-        "sector": "Others",
-        "ind": "Construction & Engineering",
-        "mcap_cr": 19.2,
-        "pe": 2.2,
+        "ind": "Industrial Machinery",
+        "mcap_cr": 12496.7,
+        "pe": 62.4,
         "eps": null,
         "52h": null,
         "52l": null,
