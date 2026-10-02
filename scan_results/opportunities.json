@@ -1,8 +1,8 @@
 {
-  "generated": "01 Oct 2026",
-  "generated_ts": "2026-10-01_1808",
+  "generated": "02 Oct 2026",
+  "generated_ts": "2026-10-02_1731",
   "engine_version": "2.0",
-  "total_opportunities": 40,
+  "total_opportunities": 31,
   "opportunities": [
     {
       "ticker": "GFSTEELS",
@@ -37,18 +37,18 @@
     {
       "ticker": "INFINIUM",
       "rank": 2,
-      "score": 59,
+      "score": 50,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 293.15,
-        "pct_from_52w_high": 0.58,
-        "volume_ratio": 5.85,
-        "price": 291.45,
-        "pct_change_1d": 9.36,
+        "high_52w": 317.4,
+        "pct_from_52w_high": 0.99,
+        "volume_ratio": 4.51,
+        "price": 314.25,
+        "pct_change_1d": 7.82,
         "above_sma10": true
       },
       "fundamental": {
@@ -95,38 +95,8 @@
       }
     },
     {
-      "ticker": "VIAZ",
-      "rank": 4,
-      "score": 45,
-      "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 84.4,
-        "pct_from_52w_high": 1.24,
-        "volume_ratio": 3.7,
-        "price": 83.35,
-        "pct_change_1d": 3.54,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Viaz Tyres Ltd",
-        "sector": "Others",
-        "ind": "Tires & Rubber",
-        "mcap_cr": 90.1,
-        "pe": 27.0,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "RAMRAT",
-      "rank": 5,
+      "rank": 4,
       "score": 43,
       "signals": [
         "52W_BREAKOUT",
@@ -156,7 +126,7 @@
     },
     {
       "ticker": "UYFINCORP",
-      "rank": 6,
+      "rank": 5,
       "score": 41,
       "signals": [
         "52W_BREAKOUT",
@@ -186,7 +156,7 @@
     },
     {
       "ticker": "STLTECH",
-      "rank": 7,
+      "rank": 6,
       "score": 40,
       "signals": [
         "52W_BREAKOUT",
@@ -214,37 +184,8 @@
       }
     },
     {
-      "ticker": "LIQUIDSHRI",
-      "rank": 8,
-      "score": 39,
-      "signals": [
-        "52W_BREAKOUT",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 1124.13,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 2.78,
-        "price": 1124.12,
-        "pct_change_1d": 0.06,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Shriram Nifty 1D Rate Liquid ETF",
-        "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 20.4,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "ROLEXRINGS",
-      "rank": 9,
+      "rank": 7,
       "score": 35,
       "signals": [
         "52W_BREAKOUT",
@@ -272,50 +213,24 @@
       }
     },
     {
-      "ticker": "LIQUID",
-      "rank": 10,
-      "score": 30,
+      "ticker": "GLOBALPET",
+      "rank": 8,
+      "score": 29,
       "signals": [
         "52W_BREAKOUT"
       ],
       "indicators": {
-        "high_52w": 1001.2,
-        "pct_from_52w_high": 0.12,
-        "volume_ratio": 2.35,
-        "price": 999.99
+        "high_52w": 179.0,
+        "pct_from_52w_high": 0.31,
+        "volume_ratio": 2.18,
+        "price": 178.45
       },
       "fundamental": {
-        "name": "Mirae Asset Nifty 1D Rate Liquid ETF - IDCW",
+        "name": "Global Pet Industries Ltd",
         "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 60.0,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "HDFCLIQUID",
-      "rank": 11,
-      "score": 27,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 1083.65,
-        "pct_from_52w_high": 0.28,
-        "volume_ratio": 1.93,
-        "price": 1080.61
-      },
-      "fundamental": {
-        "name": "HDFC Nifty 1D Rate Liquid ETF - Growth",
-        "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 50.3,
-        "pe": null,
+        "ind": "Industrial Machinery",
+        "mcap_cr": 137.9,
+        "pe": 32.3,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -325,7 +240,7 @@
     },
     {
       "ticker": "SIGMAADV",
-      "rank": 12,
+      "rank": 9,
       "score": 27,
       "signals": [
         "52W_BREAKOUT"
@@ -333,7 +248,7 @@
       "indicators": {
         "high_52w": 1076.9,
         "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.91,
+        "volume_ratio": 1.92,
         "price": 1076.9
       },
       "fundamental": {
@@ -350,34 +265,8 @@
       }
     },
     {
-      "ticker": "LIQUIDSBI",
-      "rank": 13,
-      "score": 26,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 1000.01,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.68,
-        "price": 1000.0
-      },
-      "fundamental": {
-        "name": "SBI Nifty 1D Rate Liquid ETF - IDCW",
-        "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 121.6,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "BOSCH-HCIL",
-      "rank": 14,
+      "rank": 10,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -402,60 +291,8 @@
       }
     },
     {
-      "ticker": "GLOBALPET",
-      "rank": 15,
-      "score": 25,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 175.0,
-        "pct_from_52w_high": 0.46,
-        "volume_ratio": 1.55,
-        "price": 174.2
-      },
-      "fundamental": {
-        "name": "Global Pet Industries Ltd",
-        "sector": "Others",
-        "ind": "Industrial Machinery",
-        "mcap_cr": 137.9,
-        "pe": 32.3,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "LIQUIDCASE",
-      "rank": 16,
-      "score": 25,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 116.22,
-        "pct_from_52w_high": 0.02,
-        "volume_ratio": 1.5,
-        "price": 116.2
-      },
-      "fundamental": {
-        "name": "Zerodha Nifty 1D Rate Liquid ETF",
-        "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 43.3,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "ONELIFECAP",
-      "rank": 17,
+      "rank": 11,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -481,7 +318,7 @@
     },
     {
       "ticker": "ONEPOINT",
-      "rank": 18,
+      "rank": 12,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -507,7 +344,7 @@
     },
     {
       "ticker": "SBC",
-      "rank": 19,
+      "rank": 13,
       "score": 25,
       "signals": [
         "52W_BREAKOUT"
@@ -533,7 +370,7 @@
     },
     {
       "ticker": "ALICON",
-      "rank": 20,
+      "rank": 14,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -559,7 +396,7 @@
     },
     {
       "ticker": "ANKITMETAL",
-      "rank": 21,
+      "rank": 15,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -585,7 +422,7 @@
     },
     {
       "ticker": "BNAGROCHEM",
-      "rank": 22,
+      "rank": 16,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -610,34 +447,8 @@
       }
     },
     {
-      "ticker": "DHANLAXMI",
-      "rank": 23,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.98,
-        "price": 26.4,
-        "pct_change_1d": 1.54,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Dhanlaxmi Crop Science Ltd",
-        "sector": "Others",
-        "ind": "Seeds",
-        "mcap_cr": 52.2,
-        "pe": 6.0,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "EUROTEXIND",
-      "rank": 24,
+      "rank": 17,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -663,7 +474,7 @@
     },
     {
       "ticker": "GKSL",
-      "rank": 25,
+      "rank": 18,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -689,7 +500,7 @@
     },
     {
       "ticker": "HILINFRA",
-      "rank": 26,
+      "rank": 19,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -715,7 +526,7 @@
     },
     {
       "ticker": "KREBSBIO",
-      "rank": 27,
+      "rank": 20,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -741,7 +552,7 @@
     },
     {
       "ticker": "LEMONTREE",
-      "rank": 28,
+      "rank": 21,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -767,7 +578,7 @@
     },
     {
       "ticker": "LOKESHMACH",
-      "rank": 29,
+      "rank": 22,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -793,7 +604,7 @@
     },
     {
       "ticker": "MMWL",
-      "rank": 30,
+      "rank": 23,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -818,34 +629,8 @@
       }
     },
     {
-      "ticker": "MOGSEC",
-      "rank": 31,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 17.65,
-        "price": 65.16,
-        "pct_change_1d": 0.77,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Motilal Oswal Nifty 5 year BM G-Sec ETF",
-        "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": null,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "MTNL",
-      "rank": 32,
+      "rank": 24,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -871,7 +656,7 @@
     },
     {
       "ticker": "PACEDIGITK",
-      "rank": 33,
+      "rank": 25,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -897,7 +682,7 @@
     },
     {
       "ticker": "PIXTRANS",
-      "rank": 34,
+      "rank": 26,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -923,7 +708,7 @@
     },
     {
       "ticker": "RVTH",
-      "rank": 35,
+      "rank": 27,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -949,7 +734,7 @@
     },
     {
       "ticker": "SHBAJRG",
-      "rank": 36,
+      "rank": 28,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -975,7 +760,7 @@
     },
     {
       "ticker": "SMLT",
-      "rank": 37,
+      "rank": 29,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1000,34 +785,8 @@
       }
     },
     {
-      "ticker": "SPECTSTM",
-      "rank": 38,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 7.89,
-        "price": 61.5,
-        "pct_change_1d": 2.5,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Spectrum Talent Management Ltd",
-        "sector": "Others",
-        "ind": "Employment Services",
-        "mcap_cr": 141.8,
-        "pe": 19.6,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "TARIL",
-      "rank": 39,
+      "rank": 30,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -1053,7 +812,7 @@
     },
     {
       "ticker": "THOMASCOTT",
-      "rank": 40,
+      "rank": 31,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
