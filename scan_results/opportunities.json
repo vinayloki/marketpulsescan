@@ -1,8 +1,8 @@
 {
-  "generated": "19 Oct 2026",
-  "generated_ts": "2026-10-19_1819",
+  "generated": "20 Oct 2026",
+  "generated_ts": "2026-10-20_1611",
   "engine_version": "2.0",
-  "total_opportunities": 29,
+  "total_opportunities": 26,
   "opportunities": [
     {
       "ticker": "SMARTLINK",
@@ -125,38 +125,8 @@
       }
     },
     {
-      "ticker": "UWCSL",
-      "rank": 5,
-      "score": 43,
-      "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 123.0,
-        "pct_from_52w_high": 0.41,
-        "volume_ratio": 3.33,
-        "price": 122.5,
-        "pct_change_1d": 2.04,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Ultra Wiring Connectivity System Ltd",
-        "sector": "Others",
-        "ind": "Auto Parts",
-        "mcap_cr": 50.5,
-        "pe": 18.0,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "RBZJEWEL",
-      "rank": 6,
+      "rank": 5,
       "score": 38,
       "signals": [
         "52W_BREAKOUT",
@@ -185,7 +155,7 @@
     },
     {
       "ticker": "SOUTHBANK",
-      "rank": 7,
+      "rank": 6,
       "score": 35,
       "signals": [
         "52W_BREAKOUT",
@@ -214,7 +184,7 @@
     },
     {
       "ticker": "BAFNAPH",
-      "rank": 8,
+      "rank": 7,
       "score": 30,
       "signals": [
         "52W_BREAKOUT"
@@ -240,7 +210,7 @@
     },
     {
       "ticker": "VALIANTLAB",
-      "rank": 9,
+      "rank": 8,
       "score": 30,
       "signals": [
         "52W_BREAKOUT"
@@ -266,7 +236,7 @@
     },
     {
       "ticker": "LIQUIDSBI",
-      "rank": 10,
+      "rank": 9,
       "score": 29,
       "signals": [
         "52W_BREAKOUT"
@@ -291,50 +261,24 @@
       }
     },
     {
-      "ticker": "ESCONET",
-      "rank": 11,
-      "score": 27,
+      "ticker": "MEGAFLEX",
+      "rank": 10,
+      "score": 25,
       "signals": [
         "52W_BREAKOUT"
       ],
       "indicators": {
-        "high_52w": 305.15,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.92,
-        "price": 305.15
+        "high_52w": 159.0,
+        "pct_from_52w_high": 1.01,
+        "volume_ratio": 2.35,
+        "price": 157.4
       },
       "fundamental": {
-        "name": "Esconet Technologies Ltd",
+        "name": "Mega Flex Plastics Ltd",
         "sector": "Others",
-        "ind": "IT Services & Consulting",
-        "mcap_cr": 183.6,
-        "pe": 23.0,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "AGUL",
-      "rank": 12,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 8.0,
-        "price": 46.65,
-        "pct_change_1d": 3.55,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "A G Universal Ltd",
-        "sector": "Others",
-        "ind": "Iron & Steel",
-        "mcap_cr": 31.2,
-        "pe": 22.9,
+        "ind": "Packaging",
+        "mcap_cr": 175.9,
+        "pe": 51.4,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -344,13 +288,13 @@
     },
     {
       "ticker": "COMFINTE",
-      "rank": 13,
+      "rank": 11,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 8.08,
+        "volume_ratio": 8.12,
         "price": 9.27,
         "pct_change_1d": 19.77,
         "above_sma10": true
@@ -370,7 +314,7 @@
     },
     {
       "ticker": "DODLA",
-      "rank": 14,
+      "rank": 12,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -396,7 +340,7 @@
     },
     {
       "ticker": "EUROPRATIK",
-      "rank": 15,
+      "rank": 13,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -422,7 +366,7 @@
     },
     {
       "ticker": "GANESHCP",
-      "rank": 16,
+      "rank": 14,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -448,7 +392,7 @@
     },
     {
       "ticker": "IXIGO",
-      "rank": 17,
+      "rank": 15,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -474,7 +418,7 @@
     },
     {
       "ticker": "JAICORPLTD",
-      "rank": 18,
+      "rank": 16,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -500,7 +444,7 @@
     },
     {
       "ticker": "JUSTDIAL",
-      "rank": 19,
+      "rank": 17,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -526,7 +470,7 @@
     },
     {
       "ticker": "KANCHI",
-      "rank": 20,
+      "rank": 18,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -551,8 +495,34 @@
       }
     },
     {
+      "ticker": "KODYTECH",
+      "rank": 19,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 6.42,
+        "price": 1556.15,
+        "pct_change_1d": 0.21,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Kody Technolab Ltd",
+        "sector": "Others",
+        "ind": "Software Services",
+        "mcap_cr": 1012.3,
+        "pe": 57.5,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
       "ticker": "KROSS",
-      "rank": 21,
+      "rank": 20,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -578,7 +548,7 @@
     },
     {
       "ticker": "LAGNAM",
-      "rank": 22,
+      "rank": 21,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -604,7 +574,7 @@
     },
     {
       "ticker": "ONWARDTEC",
-      "rank": 23,
+      "rank": 22,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -630,7 +600,7 @@
     },
     {
       "ticker": "OSWALAGRO",
-      "rank": 24,
+      "rank": 23,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -656,7 +626,7 @@
     },
     {
       "ticker": "PARACABLES",
-      "rank": 25,
+      "rank": 24,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -682,7 +652,7 @@
     },
     {
       "ticker": "PLATIND",
-      "rank": 26,
+      "rank": 25,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -708,7 +678,7 @@
     },
     {
       "ticker": "SWARNSAR",
-      "rank": 27,
+      "rank": 26,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
@@ -725,58 +695,6 @@
         "ind": "Precious Metals, Jewellery & Watches",
         "mcap_cr": 71.6,
         "pe": 13.5,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SYNOPTICS",
-      "rank": 28,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.67,
-        "price": 55.0,
-        "pct_change_1d": 10.0,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Synoptics Technologies Ltd",
-        "sector": "Others",
-        "ind": "IT Services & Consulting",
-        "mcap_cr": 52.2,
-        "pe": 12.9,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "URBAN",
-      "rank": 29,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.36,
-        "price": 146.2,
-        "pct_change_1d": 18.0,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Urban Enviro Waste Management Ltd",
-        "sector": "Others",
-        "ind": "Water Management",
-        "mcap_cr": 123.1,
-        "pe": 12.0,
         "eps": null,
         "52h": null,
         "52l": null,
