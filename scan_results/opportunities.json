@@ -1,73 +1,13 @@
 {
-  "generated": "23 Oct 2026",
-  "generated_ts": "2026-10-23_1645",
+  "generated": "26 Oct 2026",
+  "generated_ts": "2026-10-26_1807",
   "engine_version": "2.0",
-  "total_opportunities": 13,
+  "total_opportunities": 10,
   "opportunities": [
     {
-      "ticker": "IGIL",
-      "rank": 1,
-      "score": 60,
-      "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 388.5,
-        "pct_from_52w_high": 1.89,
-        "volume_ratio": 11.15,
-        "price": 381.15,
-        "pct_change_1d": 7.91,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "International Gemological Institute Ltd",
-        "sector": "Others",
-        "ind": "Education Services",
-        "mcap_cr": 14950.6,
-        "pe": 28.1,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SSWL",
-      "rank": 2,
-      "score": 60,
-      "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "high_52w": 468.75,
-        "pct_from_52w_high": 0.0,
-        "volume_ratio": 8.99,
-        "price": 468.75,
-        "pct_change_1d": 19.99,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Steel Strips Wheels Ltd",
-        "sector": "Others",
-        "ind": "Auto Parts",
-        "mcap_cr": 3343.4,
-        "pe": 17.1,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
       "ticker": "DSKULKARNI",
-      "rank": 3,
-      "score": 43,
+      "rank": 1,
+      "score": 44,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
@@ -76,7 +16,7 @@
       "indicators": {
         "high_52w": 34.34,
         "pct_from_52w_high": 0.0,
-        "volume_ratio": 3.44,
+        "volume_ratio": 3.53,
         "price": 34.34,
         "pct_change_1d": 1.99,
         "above_sma10": true
@@ -95,28 +35,24 @@
       }
     },
     {
-      "ticker": "MAHASTEEL",
-      "rank": 4,
-      "score": 42,
+      "ticker": "ABMINTLLTD",
+      "rank": 2,
+      "score": 25,
       "signals": [
-        "52W_BREAKOUT",
-        "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 1488.0,
-        "pct_from_52w_high": 0.97,
-        "volume_ratio": 3.29,
-        "price": 1473.5,
-        "pct_change_1d": 3.73,
+        "volume_ratio": 12.6,
+        "price": 51.64,
+        "pct_change_1d": 4.98,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Mahamaya Steel Industries Ltd",
+        "name": "Abm International Ltd",
         "sector": "Others",
-        "ind": "Iron & Steel",
-        "mcap_cr": 1394.8,
-        "pe": 184.0,
+        "ind": "Plastic Products",
+        "mcap_cr": 39.1,
+        "pe": -28.6,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -125,24 +61,24 @@
       }
     },
     {
-      "ticker": "KORE",
-      "rank": 5,
-      "score": 27,
+      "ticker": "ASAL",
+      "rank": 3,
+      "score": 25,
       "signals": [
-        "52W_BREAKOUT"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 326.95,
-        "pct_from_52w_high": 0.02,
-        "volume_ratio": 1.86,
-        "price": 326.9
+        "volume_ratio": 11.39,
+        "price": 453.2,
+        "pct_change_1d": 13.58,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "Jay Jalaram Technologies Ltd",
+        "name": "Automotive Stampings and Assemblies Ltd",
         "sector": "Others",
-        "ind": "Electrical Components & Equipments",
-        "mcap_cr": 153.8,
-        "pe": 24.6,
+        "ind": "Auto Parts",
+        "mcap_cr": 812.3,
+        "pe": 29.3,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -151,24 +87,76 @@
       }
     },
     {
-      "ticker": "LIQGRWBEES",
+      "ticker": "ITCHOTELS",
+      "rank": 4,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 7.61,
+        "price": 164.31,
+        "pct_change_1d": 5.16,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "ITC Hotels Ltd",
+        "sector": "Others",
+        "ind": "Hotels, Resorts & Cruise Lines",
+        "mcap_cr": 33446.4,
+        "pe": 52.7,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "MLKFOOD",
+      "rank": 5,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 6.08,
+        "price": 90.86,
+        "pct_change_1d": 8.14,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Milkfood Ltd",
+        "sector": "Others",
+        "ind": "FMCG - Foods",
+        "mcap_cr": 155.6,
+        "pe": 34.5,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "PERMAGN",
       "rank": 6,
       "score": 25,
       "signals": [
-        "52W_BREAKOUT"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 1065.63,
-        "pct_from_52w_high": 0.42,
-        "volume_ratio": 1.51,
-        "price": 1061.12
+        "volume_ratio": 12.98,
+        "price": 1028.25,
+        "pct_change_1d": 20.0,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "Nippon India Nifty 1D Rate Liquid ETF - Growth",
+        "name": "Permanent Magnets Ltd",
         "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 18.1,
-        "pe": null,
+        "ind": "Metals - Diversified",
+        "mcap_cr": 777.5,
+        "pe": 49.4,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -177,24 +165,24 @@
       }
     },
     {
-      "ticker": "LIQUIDCASE",
+      "ticker": "SSWL",
       "rank": 7,
       "score": 25,
       "signals": [
-        "52W_BREAKOUT"
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 116.57,
-        "pct_from_52w_high": 0.02,
-        "volume_ratio": 1.53,
-        "price": 116.55
+        "volume_ratio": 9.21,
+        "price": 532.25,
+        "pct_change_1d": 13.55,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "Zerodha Nifty 1D Rate Liquid ETF",
+        "name": "Steel Strips Wheels Ltd",
         "sector": "Others",
-        "ind": "Debt",
-        "mcap_cr": 43.3,
-        "pe": null,
+        "ind": "Auto Parts",
+        "mcap_cr": 3343.4,
+        "pe": 17.1,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -203,24 +191,24 @@
       }
     },
     {
-      "ticker": "ABGSEC",
+      "ticker": "UNIENTER",
       "rank": 8,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 6.58,
-        "price": 112.67,
-        "pct_change_1d": 0.87,
+        "volume_ratio": 8.13,
+        "price": 86.87,
+        "pct_change_1d": 6.58,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Aditya Birla Sun Life CRISIL Broad Based Gilt ETF",
+        "name": "Uniphos Enterprises Ltd",
         "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 11.8,
-        "pe": null,
+        "ind": "Fertilizers & Agro Chemicals",
+        "mcap_cr": 746.2,
+        "pe": 2665.1,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -229,24 +217,24 @@
       }
     },
     {
-      "ticker": "CYIENT",
+      "ticker": "UPHOT",
       "rank": 9,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 11.27,
-        "price": 1233.0,
-        "pct_change_1d": 7.81,
+        "volume_ratio": 10.3,
+        "price": 1574.0,
+        "pct_change_1d": 4.58,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Cyient Ltd",
+        "name": "U. P. Hotels Ltd",
         "sector": "Others",
-        "ind": "Software Services",
-        "mcap_cr": 9630.6,
-        "pe": 22.5,
+        "ind": "Hotels, Resorts & Cruise Lines",
+        "mcap_cr": 756.0,
+        "pe": 25.4,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -255,102 +243,24 @@
       }
     },
     {
-      "ticker": "JINDALPHOT",
+      "ticker": "VINYLINDIA",
       "rank": 10,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 7.29,
-        "price": 1055.7,
-        "pct_change_1d": 2.0,
+        "volume_ratio": 7.5,
+        "price": 240.07,
+        "pct_change_1d": 20.0,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Jindal Photo Ltd",
+        "name": "Vinyl Chemicals (India) Ltd",
         "sector": "Others",
-        "ind": "Electronic Equipments",
-        "mcap_cr": 1138.9,
-        "pe": 5.0,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "JINDALPOLY",
-      "rank": 11,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 17.93,
-        "price": 739.35,
-        "pct_change_1d": 11.23,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Jindal Poly Films Ltd",
-        "sector": "Others",
-        "ind": "Packaging",
-        "mcap_cr": 3177.4,
-        "pe": 28.9,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "LINC",
-      "rank": 12,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.11,
-        "price": 89.67,
-        "pct_change_1d": 17.35,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Linc Ltd",
-        "sector": "Others",
-        "ind": "Stationery",
-        "mcap_cr": 600.1,
-        "pe": 15.8,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "VENTIVE",
-      "rank": 13,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 6.62,
-        "price": 556.65,
-        "pct_change_1d": 1.77,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "Ventive Hospitality Ltd",
-        "sector": "Others",
-        "ind": "Hotels, Resorts & Cruise Lines",
-        "mcap_cr": 14472.6,
-        "pe": 120.3,
+        "ind": "Specialty Chemicals",
+        "mcap_cr": 469.9,
+        "pe": 28.5,
         "eps": null,
         "52h": null,
         "52l": null,
