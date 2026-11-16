@@ -1,23 +1,23 @@
 {
-  "generated": "13 Nov 2026 19:12",
+  "generated": "16 Nov 2026 22:03",
   "regime": "Bull",
   "size_multiplier": 1.0,
-  "nifty_close": 25299.35,
-  "ema_200": 24014.08,
-  "pct_vs_ema200": 5.35,
-  "last_date": "2026-11-12",
+  "nifty_close": 25144.3,
+  "ema_200": 24050.61,
+  "pct_vs_ema200": 4.55,
+  "last_date": "2026-11-13",
   "regime_breakdown_52w": {
     "Bull": {
-      "days": 10,
-      "pct_of_year": 4.0
+      "days": 5,
+      "pct_of_year": 2.0
     },
     "Sideways": {
-      "days": 144,
-      "pct_of_year": 57.1
+      "days": 143,
+      "pct_of_year": 56.7
     },
     "Bear": {
-      "days": 98,
-      "pct_of_year": 38.9
+      "days": 104,
+      "pct_of_year": 41.3
     }
   },
   "interpretation": "NIFTY above EMA200 — favor breakout/momentum strategies"
