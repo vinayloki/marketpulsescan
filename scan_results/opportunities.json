@@ -1,11 +1,11 @@
 {
-  "generated": "23 Nov 2026",
-  "generated_ts": "2026-11-23_2311",
+  "generated": "24 Nov 2026",
+  "generated_ts": "2026-11-24_2200",
   "engine_version": "2.0",
-  "total_opportunities": 22,
+  "total_opportunities": 28,
   "opportunities": [
     {
-      "ticker": "SGMART",
+      "ticker": "HMAAGRO",
       "rank": 1,
       "score": 60,
       "signals": [
@@ -14,19 +14,19 @@
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 1107.6,
-        "pct_from_52w_high": 0.95,
-        "volume_ratio": 7.35,
-        "price": 1097.05,
-        "pct_change_1d": 8.57,
+        "high_52w": 40.69,
+        "pct_from_52w_high": 1.62,
+        "volume_ratio": 8.54,
+        "price": 40.03,
+        "pct_change_1d": 18.05,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "SG Mart Ltd",
-        "sector": "Infrastructure",
-        "ind": "Building Products - Others",
-        "mcap_cr": 7194.6,
-        "pe": 69.6,
+        "name": "HMA Agro Industries Ltd",
+        "sector": "Others",
+        "ind": "Packaged Foods & Meats",
+        "mcap_cr": 1218.4,
+        "pe": 14.0,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -35,7 +35,7 @@
       }
     },
     {
-      "ticker": "VIAZ",
+      "ticker": "SAMBHV",
       "rank": 2,
       "score": 60,
       "signals": [
@@ -44,19 +44,19 @@
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 117.2,
-        "pct_from_52w_high": 1.28,
-        "volume_ratio": 6.15,
-        "price": 115.7,
-        "pct_change_1d": 3.63,
+        "high_52w": 179.8,
+        "pct_from_52w_high": 1.61,
+        "volume_ratio": 7.37,
+        "price": 176.9,
+        "pct_change_1d": 11.92,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Viaz Tyres Ltd",
-        "sector": "Others",
-        "ind": "Tires & Rubber",
-        "mcap_cr": 90.1,
-        "pe": 27.0,
+        "name": "Sambhv Steel Tubes Ltd",
+        "sector": "Infrastructure",
+        "ind": "Building Products - Pipes",
+        "mcap_cr": 3498.0,
+        "pe": 61.1,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -65,28 +65,28 @@
       }
     },
     {
-      "ticker": "BBNPNBETF",
+      "ticker": "PERMAGN",
       "rank": 3,
-      "score": 58,
+      "score": 47,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 65.35,
-        "pct_from_52w_high": 1.33,
-        "volume_ratio": 5.74,
-        "price": 64.48,
-        "pct_change_1d": 1.26,
+        "high_52w": 1354.5,
+        "pct_from_52w_high": 1.37,
+        "volume_ratio": 4.04,
+        "price": 1335.9,
+        "pct_change_1d": 18.35,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Baroda BNP Paribas Nifty Bank ETF",
+        "name": "Permanent Magnets Ltd",
         "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 20.1,
-        "pe": null,
+        "ind": "Metals - Diversified",
+        "mcap_cr": 777.5,
+        "pe": 49.4,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -95,28 +95,28 @@
       }
     },
     {
-      "ticker": "BANKPSU",
+      "ticker": "SOTAC",
       "rank": 4,
-      "score": 49,
+      "score": 41,
       "signals": [
         "52W_BREAKOUT",
         "HIGH_VOLUME",
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 99.95,
-        "pct_from_52w_high": 0.17,
-        "volume_ratio": 4.3,
-        "price": 99.78,
-        "pct_change_1d": 1.36,
+        "high_52w": 140.0,
+        "pct_from_52w_high": 0.0,
+        "volume_ratio": 3.03,
+        "price": 140.0,
+        "pct_change_1d": 3.7,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Mirae Asset Nifty PSU Bank ETF",
+        "name": "Sotac Pharmaceuticals Ltd",
         "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 34.8,
-        "pe": null,
+        "ind": "Pharmaceuticals",
+        "mcap_cr": 129.3,
+        "pe": 16.1,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -125,24 +125,27 @@
       }
     },
     {
-      "ticker": "FEDERALBNK",
+      "ticker": "RATNAVEER",
       "rank": 5,
-      "score": 29,
+      "score": 39,
       "signals": [
-        "52W_BREAKOUT"
+        "52W_BREAKOUT",
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 374.3,
-        "pct_from_52w_high": 0.21,
-        "volume_ratio": 2.21,
-        "price": 373.5
+        "high_52w": 406.8,
+        "pct_from_52w_high": 0.86,
+        "volume_ratio": 2.94,
+        "price": 403.3,
+        "pct_change_1d": 8.93,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "Federal Bank Ltd",
+        "name": "Ratnaveer Precision Engineering Ltd",
         "sector": "Others",
-        "ind": "Private Banks",
-        "mcap_cr": 70719.8,
-        "pe": 16.3,
+        "ind": "Industrial Machinery",
+        "mcap_cr": 1107.6,
+        "pe": 23.7,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -151,102 +154,53 @@
       }
     },
     {
-      "ticker": "PSUBNKBEES",
+      "ticker": "MILKYMIST",
       "rank": 6,
-      "score": 27,
+      "score": 36,
       "signals": [
-        "52W_BREAKOUT"
+        "52W_BREAKOUT",
+        "VOLUME_SPIKE"
       ],
       "indicators": {
-        "high_52w": 110.47,
-        "pct_from_52w_high": 0.17,
-        "volume_ratio": 1.81,
-        "price": 110.28
+        "high_52w": 342.4,
+        "pct_from_52w_high": 0.86,
+        "volume_ratio": 2.68,
+        "price": 339.45,
+        "pct_change_1d": 4.88,
+        "above_sma10": true
       },
       "fundamental": {
-        "name": "Nippon India ETF Nifty PSU Bank BeES",
+        "name": "MILKY MIST DAIRY FOOD L",
         "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 347.2,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
+        "ind": "Packaged Foods",
+        "mcap_cr": 26132.3,
+        "pe": 104.1,
+        "eps": 3.26,
+        "52h": 342.4,
+        "52l": 165.0,
+        "bv": 33.46,
         "dy": null
       }
     },
     {
-      "ticker": "BANKBEES",
+      "ticker": "ASPIRE",
       "rank": 7,
-      "score": 26,
+      "score": 30,
       "signals": [
         "52W_BREAKOUT"
       ],
       "indicators": {
-        "high_52w": 670.0,
-        "pct_from_52w_high": 0.09,
-        "volume_ratio": 1.74,
-        "price": 669.37
-      },
-      "fundamental": {
-        "name": "Nippon India ETF Nifty Bank BeES",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 13952.7,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "EQUAL50ADD",
-      "rank": 8,
-      "score": 26,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 361.0,
-        "pct_from_52w_high": 1.36,
-        "volume_ratio": 2.48,
-        "price": 356.1
-      },
-      "fundamental": {
-        "name": "DSP Nifty 50 Equal Weight ETF",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 51.3,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ADROITINFO",
-      "rank": 9,
-      "score": 25,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 16.09,
+        "high_52w": 20.25,
         "pct_from_52w_high": 0.0,
-        "volume_ratio": 1.5,
-        "price": 16.09
+        "volume_ratio": 2.38,
+        "price": 20.25
       },
       "fundamental": {
-        "name": "Adroit Infotech Ltd",
+        "name": "Aspire & Innovative Advertising Ltd",
         "sector": "Others",
-        "ind": "IT Services & Consulting",
-        "mcap_cr": 77.6,
-        "pe": 110.9,
+        "ind": "Home Electronics & Appliances",
+        "mcap_cr": 25.0,
+        "pe": 6.5,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -255,50 +209,24 @@
       }
     },
     {
-      "ticker": "BANKETF",
-      "rank": 10,
-      "score": 25,
-      "signals": [
-        "52W_BREAKOUT"
-      ],
-      "indicators": {
-        "high_52w": 660.28,
-        "pct_from_52w_high": 0.12,
-        "volume_ratio": 1.62,
-        "price": 659.46
-      },
-      "fundamental": {
-        "name": "Mirae Asset Nifty Bank ETF",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 22.2,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "ABSLBANETF",
-      "rank": 11,
+      "ticker": "ABINFRA",
+      "rank": 8,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 9.97,
-        "price": 66.34,
-        "pct_change_1d": 2.6,
+        "volume_ratio": 10.14,
+        "price": 13.01,
+        "pct_change_1d": 11.01,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Aditya Birla Sun Life Nifty Bank ETF",
+        "name": "A B Infrabuild Ltd",
         "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 114.0,
-        "pe": null,
+        "ind": "Construction & Engineering",
+        "mcap_cr": 1013.1,
+        "pe": 62.8,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -308,15 +236,15 @@
     },
     {
       "ticker": "AJMERA",
-      "rank": 12,
+      "rank": 9,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
         "volume_ratio": 11.83,
-        "price": 149.29,
-        "pct_change_1d": 11.84,
+        "price": 162.62,
+        "pct_change_1d": 8.93,
         "above_sma10": true
       },
       "fundamental": {
@@ -333,16 +261,42 @@
       }
     },
     {
+      "ticker": "AMIABLE",
+      "rank": 10,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 13.33,
+        "price": 79.0,
+        "pct_change_1d": 19.7,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Amiable Logistics (India) Ltd",
+        "sector": "Infrastructure",
+        "ind": "Logistics",
+        "mcap_cr": 12.8,
+        "pe": 16.4,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
       "ticker": "BAJAJINDEF",
-      "rank": 13,
+      "rank": 11,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
         "volume_ratio": 7.52,
-        "price": 201.88,
-        "pct_change_1d": 6.89,
+        "price": 216.17,
+        "pct_change_1d": 7.08,
         "above_sma10": true
       },
       "fundamental": {
@@ -360,15 +314,15 @@
     },
     {
       "ticker": "CHALET",
-      "rank": 14,
+      "rank": 12,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
         "volume_ratio": 6.1,
-        "price": 824.0,
-        "pct_change_1d": 0.55,
+        "price": 869.25,
+        "pct_change_1d": 5.49,
         "above_sma10": true
       },
       "fundamental": {
@@ -386,15 +340,15 @@
     },
     {
       "ticker": "DOLATALGO",
-      "rank": 15,
+      "rank": 13,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
         "volume_ratio": 6.12,
-        "price": 63.98,
-        "pct_change_1d": 0.13,
+        "price": 67.46,
+        "pct_change_1d": 5.44,
         "above_sma10": true
       },
       "fundamental": {
@@ -411,24 +365,154 @@
       }
     },
     {
-      "ticker": "HMAAGRO",
+      "ticker": "DUGLOBAL",
+      "rank": 14,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 12.09,
+        "price": 24.5,
+        "pct_change_1d": 0.2,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "DU Digital Global Ltd",
+        "sector": "Others",
+        "ind": "IT Services & Consulting",
+        "mcap_cr": 311.1,
+        "pe": 90.5,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "GSEC10YEAR",
+      "rank": 15,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 8.1,
+        "price": 30.28,
+        "pct_change_1d": 0.8,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Mirae Asset Nifty 8-13 yr G-Sec ETF",
+        "sector": "Others",
+        "ind": "Debt",
+        "mcap_cr": 91.3,
+        "pe": null,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "HCL-INSYS",
       "rank": 16,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 8.54,
-        "price": 33.91,
-        "pct_change_1d": 15.58,
+        "volume_ratio": 10.0,
+        "price": 11.38,
+        "pct_change_1d": 19.92,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "HMA Agro Industries Ltd",
+        "name": "HCL Infosystems Ltd",
         "sector": "Others",
-        "ind": "Packaged Foods & Meats",
-        "mcap_cr": 1218.4,
-        "pe": 14.0,
+        "ind": "IT Services & Consulting",
+        "mcap_cr": 400.6,
+        "pe": -19.0,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "HITECH",
+      "rank": 17,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 12.15,
+        "price": 85.63,
+        "pct_change_1d": 13.51,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Hi-Tech Pipes Ltd",
+        "sector": "Infrastructure",
+        "ind": "Building Products - Pipes",
+        "mcap_cr": 1868.4,
+        "pe": 25.6,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "INDIAGLYCO",
+      "rank": 18,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 9.38,
+        "price": 294.85,
+        "pct_change_1d": 11.54,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "India Glycols Ltd",
+        "sector": "Others",
+        "ind": "Commodity Chemicals",
+        "mcap_cr": 6984.5,
+        "pe": 30.2,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "ITI",
+      "rank": 19,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 8.07,
+        "price": 276.21,
+        "pct_change_1d": 12.41,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "ITI Ltd",
+        "sector": "Others",
+        "ind": "Telecom Equipments",
+        "mcap_cr": 28777.7,
+        "pe": -133.9,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -438,15 +522,15 @@
     },
     {
       "ticker": "KSHITIJPOL",
-      "rank": 17,
+      "rank": 20,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
         "volume_ratio": 6.19,
-        "price": 3.52,
-        "pct_change_1d": 4.76,
+        "price": 3.68,
+        "pct_change_1d": 4.55,
         "above_sma10": true
       },
       "fundamental": {
@@ -463,76 +547,128 @@
       }
     },
     {
-      "ticker": "MAHICKRA",
-      "rank": 18,
+      "ticker": "MARC",
+      "rank": 21,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
-        "volume_ratio": 6.98,
-        "price": 307.55,
-        "pct_change_1d": 7.91,
+        "volume_ratio": 12.08,
+        "price": 149.95,
+        "pct_change_1d": 4.13,
         "above_sma10": true
       },
       "fundamental": {
-        "name": "Mahickra Chemicals Ltd",
+        "name": "Marc Technocrats Ltd",
+        "sector": "Others",
+        "ind": "Business Support Services",
+        "mcap_cr": 147.3,
+        "pe": 19.7,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "PREMEXPLN",
+      "rank": 22,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 8.3,
+        "price": 582.4,
+        "pct_change_1d": 6.16,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Premier Explosives Ltd",
+        "sector": "Others",
+        "ind": "Commodity Chemicals",
+        "mcap_cr": 3017.9,
+        "pe": 105.2,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "RUCHINFRA",
+      "rank": 23,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 14.11,
+        "price": 5.1,
+        "pct_change_1d": 3.03,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Ruchi Infrastructure Ltd",
+        "sector": "Others",
+        "ind": "Agro Products",
+        "mcap_cr": 150.8,
+        "pe": 90.3,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "SCPL",
+      "rank": 24,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 9.28,
+        "price": 707.8,
+        "pct_change_1d": 11.38,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Sheetal Cool Products Ltd",
+        "sector": "Others",
+        "ind": "FMCG - Foods",
+        "mcap_cr": 402.1,
+        "pe": 24.3,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
+      "ticker": "SHALPAINTS",
+      "rank": 25,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 11.54,
+        "price": 103.97,
+        "pct_change_1d": 6.72,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Shalimar Paints Ltd",
         "sector": "Others",
         "ind": "Specialty Chemicals",
-        "mcap_cr": 227.3,
-        "pe": 89.9,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "MOIPO",
-      "rank": 19,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 10.12,
-        "price": 48.61,
-        "pct_change_1d": 0.58,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "MOTILAL OSWAL BSE SELECT IPO ETF",
-        "sector": "Others",
-        "ind": "Equity",
-        "mcap_cr": 4.6,
-        "pe": null,
-        "eps": null,
-        "52h": null,
-        "52l": null,
-        "bv": null,
-        "dy": null
-      }
-    },
-    {
-      "ticker": "SAB",
-      "rank": 20,
-      "score": 25,
-      "signals": [
-        "VOLUME_SPIKE"
-      ],
-      "indicators": {
-        "volume_ratio": 11.55,
-        "price": 198.18,
-        "pct_change_1d": 1.63,
-        "above_sma10": true
-      },
-      "fundamental": {
-        "name": "SAB Industries Ltd",
-        "sector": "Others",
-        "ind": "Conglomerates",
-        "mcap_cr": 205.3,
-        "pe": -9.7,
+        "mcap_cr": 427.9,
+        "pe": -5.3,
         "eps": null,
         "52h": null,
         "52l": null,
@@ -542,15 +678,15 @@
     },
     {
       "ticker": "THOMASCOOK",
-      "rank": 21,
+      "rank": 26,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
         "volume_ratio": 12.37,
-        "price": 114.66,
-        "pct_change_1d": 1.1,
+        "price": 129.39,
+        "pct_change_1d": 12.85,
         "above_sma10": true
       },
       "fundamental": {
@@ -567,16 +703,42 @@
       }
     },
     {
+      "ticker": "WELSPLSOL",
+      "rank": 27,
+      "score": 25,
+      "signals": [
+        "VOLUME_SPIKE"
+      ],
+      "indicators": {
+        "volume_ratio": 15.03,
+        "price": 47.66,
+        "pct_change_1d": 15.2,
+        "above_sma10": true
+      },
+      "fundamental": {
+        "name": "Welspun Specialty Solutions Ltd",
+        "sector": "Others",
+        "ind": "Iron & Steel",
+        "mcap_cr": 2468.9,
+        "pe": 108.9,
+        "eps": null,
+        "52h": null,
+        "52l": null,
+        "bv": null,
+        "dy": null
+      }
+    },
+    {
       "ticker": "WINDMACHIN",
-      "rank": 22,
+      "rank": 28,
       "score": 25,
       "signals": [
         "VOLUME_SPIKE"
       ],
       "indicators": {
         "volume_ratio": 14.62,
-        "price": 321.2,
-        "pct_change_1d": 2.47,
+        "price": 354.7,
+        "pct_change_1d": 10.43,
         "above_sma10": true
       },
       "fundamental": {
