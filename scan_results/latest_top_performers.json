@@ -2,6 +2,11 @@
   "1W": {
     "top_gainers": [
       {
+        "ticker": "NV20",
+        "last_close": 12655.2,
+        "1W": 86579.45
+      },
+      {
         "ticker": "BALAXI",
         "last_close": 35.89,
         "1W": 62.69
@@ -95,11 +100,6 @@
         "ticker": "WEL",
         "last_close": 83.05,
         "1W": 16.04
-      },
-      {
-        "ticker": "COOLCAPS",
-        "last_close": 23.8,
-        "1W": 15.82
       }
     ],
     "top_losers": [
@@ -208,6 +208,11 @@
   "2W": {
     "top_gainers": [
       {
+        "ticker": "NV20",
+        "last_close": 12655.2,
+        "2W": 86579.45
+      },
+      {
         "ticker": "FLEXITUFF",
         "last_close": 4.61,
         "2W": 72.01
@@ -301,11 +306,6 @@
         "ticker": "SUNSHINE",
         "last_close": 536.5,
         "2W": 23.62
-      },
-      {
-        "ticker": "RUNWALENTR",
-        "last_close": 260.22,
-        "2W": 23.52
       }
     ],
     "top_losers": [
@@ -400,19 +400,24 @@
         "2W": -21.05
       },
       {
-        "ticker": "FONEBOX",
-        "last_close": 125.0,
+        "ticker": "LANCORHOL",
+        "last_close": 26.07,
         "2W": -20.86
       },
       {
-        "ticker": "LANCORHOL",
-        "last_close": 26.07,
+        "ticker": "FONEBOX",
+        "last_close": 125.0,
         "2W": -20.86
       }
     ]
   },
   "1M": {
     "top_gainers": [
+      {
+        "ticker": "NV20",
+        "last_close": 12655.2,
+        "1M": 95266.99
+      },
       {
         "ticker": "MELSTAR",
         "last_close": 440.42,
@@ -507,11 +512,6 @@
         "ticker": "MILTON",
         "last_close": 58.05,
         "1M": 46.41
-      },
-      {
-        "ticker": "AGIIL",
-        "last_close": 313.0,
-        "1M": 45.85
       }
     ],
     "top_losers": [
@@ -620,6 +620,11 @@
   "3M": {
     "top_gainers": [
       {
+        "ticker": "NV20",
+        "last_close": 12655.2,
+        "3M": 90748.53
+      },
+      {
         "ticker": "SRIRAM",
         "last_close": 1603.17,
         "3M": 15773.01
@@ -713,11 +718,6 @@
         "ticker": "HMAAGRO",
         "last_close": 40.03,
         "3M": 82.2
-      },
-      {
-        "ticker": "MILKYMIST",
-        "last_close": 339.45,
-        "3M": 79.39
       }
     ],
     "top_losers": [
@@ -767,12 +767,12 @@
         "3M": -64.82
       },
       {
-        "ticker": "HEG",
+        "ticker": "HEGAM",
         "last_close": 258.67,
         "3M": -63.61
       },
       {
-        "ticker": "HEGAM",
+        "ticker": "HEG",
         "last_close": 258.67,
         "3M": -63.61
       },
@@ -825,6 +825,11 @@
   },
   "6M": {
     "top_gainers": [
+      {
+        "ticker": "NV20",
+        "last_close": 12655.2,
+        "6M": 88895.78
+      },
       {
         "ticker": "SRIRAM",
         "last_close": 1603.17,
@@ -919,18 +924,13 @@
         "ticker": "ONELIFECAP",
         "last_close": 62.97,
         "6M": 150.95
-      },
-      {
-        "ticker": "HITECHCORP",
-        "last_close": 414.9,
-        "6M": 147.89
       }
     ],
     "top_losers": [
       {
         "ticker": "MIDQ50ADD",
-        "last_close": 24.17,
-        "6M": -90.08
+        "last_close": 24.08,
+        "6M": -90.16
       },
       {
         "ticker": "VERANDA",
@@ -944,8 +944,8 @@
       },
       {
         "ticker": "IVZINNIFTY",
-        "last_close": 292.42,
-        "6M": -89.18
+        "last_close": 296.08,
+        "6M": -89.19
       },
       {
         "ticker": "INDOTHAI",
@@ -954,13 +954,13 @@
       },
       {
         "ticker": "HEALTHADD",
-        "last_close": 17.54,
-        "6M": -88.96
+        "last_close": 17.95,
+        "6M": -88.68
       },
       {
         "ticker": "PSUBANK",
-        "last_close": 95.71,
-        "6M": -88.1
+        "last_close": 95.95,
+        "6M": -88.37
       },
       {
         "ticker": "BANSALWIRE",
@@ -1040,6 +1040,11 @@
         "ticker": "MELSTAR",
         "last_close": 440.42,
         "12M": 10262.82
+      },
+      {
+        "ticker": "NV20",
+        "last_close": 12655.2,
+        "12M": 8246.66
       },
       {
         "ticker": "ARIHANT",
@@ -1125,11 +1130,6 @@
         "ticker": "SILKFLEX",
         "last_close": 282.25,
         "12M": 240.47
-      },
-      {
-        "ticker": "SCPL",
-        "last_close": 707.8,
-        "12M": 221.1
       }
     ],
     "top_losers": [
@@ -1140,13 +1140,13 @@
       },
       {
         "ticker": "IVZINGOLD",
-        "last_close": 108.05,
-        "12M": -98.98
+        "last_close": 104.05,
+        "12M": -99.04
       },
       {
         "ticker": "LICMFGOLD",
-        "last_close": 112.0,
-        "12M": -98.98
+        "last_close": 109.0,
+        "12M": -99.03
       },
       {
         "ticker": "INDOTHAI",
@@ -1164,44 +1164,39 @@
         "12M": -91.02
       },
       {
-        "ticker": "NV20",
-        "last_close": 14.6,
-        "12M": -90.44
-      },
-      {
-        "ticker": "MIDQ50ADD",
-        "last_close": 24.17,
-        "12M": -90.29
-      },
-      {
-        "ticker": "IVZINNIFTY",
-        "last_close": 292.42,
-        "12M": -90.17
-      },
-      {
-        "ticker": "QNIFTY",
-        "last_close": 280.04,
-        "12M": -90.17
-      },
-      {
-        "ticker": "CONS",
-        "last_close": 12.62,
-        "12M": -90.13
+        "ticker": "SILVER1",
+        "last_close": 13.9,
+        "12M": -90.8
       },
       {
         "ticker": "GROWWSLVR",
-        "last_close": 15.0,
-        "12M": -89.91
+        "last_close": 14.28,
+        "12M": -90.7
       },
       {
         "ticker": "GROWWGOLD",
-        "last_close": 12.23,
-        "12M": -89.83
+        "last_close": 11.77,
+        "12M": -90.38
       },
       {
-        "ticker": "BANKNIFTY1",
-        "last_close": 65.04,
-        "12M": -89.34
+        "ticker": "MIDQ50ADD",
+        "last_close": 24.08,
+        "12M": -90.26
+      },
+      {
+        "ticker": "CONS",
+        "last_close": 12.72,
+        "12M": -90.01
+      },
+      {
+        "ticker": "IVZINNIFTY",
+        "last_close": 296.08,
+        "12M": -89.97
+      },
+      {
+        "ticker": "QNIFTY",
+        "last_close": 284.77,
+        "12M": -89.93
       },
       {
         "ticker": "POLYSIL",
@@ -1209,24 +1204,29 @@
         "12M": -89.24
       },
       {
-        "ticker": "MIDCAP",
-        "last_close": 18.09,
-        "12M": -88.66
+        "ticker": "BANKNIFTY1",
+        "last_close": 66.05,
+        "12M": -89.15
       },
       {
         "ticker": "PSUBANK",
-        "last_close": 95.71,
-        "12M": -88.52
+        "last_close": 95.95,
+        "12M": -88.65
       },
       {
-        "ticker": "HEALTHADD",
-        "last_close": 17.54,
-        "12M": -88.26
+        "ticker": "MIDCAP",
+        "last_close": 18.14,
+        "12M": -88.63
       },
       {
         "ticker": "VERANDA",
         "last_close": 24.77,
         "12M": -88.22
+      },
+      {
+        "ticker": "HEALTHADD",
+        "last_close": 17.95,
+        "12M": -87.99
       },
       {
         "ticker": "KDL",
